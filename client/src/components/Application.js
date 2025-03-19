@@ -74,11 +74,11 @@ export default class Application extends Component {
                 <Card.Body>
                     <Card.Text>
                     <Form onSubmit={this.onSubmit}>
-                        <Form.Group controlId="formDepartmentName">
+                        {/*<Form.Group controlId="formDepartmentName">
                         <Form.Label>
                             Type
                         </Form.Label>
-                            <Form.Control
+                             <Form.Control
                                 as="select"
                                 name="type"
                                 style={{width: "50%"}}
@@ -91,8 +91,8 @@ export default class Application extends Component {
                                 <option value="illness">Illness</option>
                                 <option value="student">Student</option>
                                 <option value="marriage">Marriage</option>
-                            </Form.Control>
-                        </Form.Group>
+                            </Form.Control> 
+                        </Form.Group>*/}
                         <Form.Group>
                             <Form.Label>Start Date</Form.Label>
                             <Form.Row>
