@@ -25,19 +25,23 @@ export default class ApplicationList extends Component {
   }
 
   componentDidMount() {
+      let deptId = JSON.parse(localStorage.getItem('user')).departmentId
     axios({
       method: "get",
-      url: "/api/applications",
+      url: "/api/applications/department/" + deptId,
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     }).then((res) => {
         res.data.map(app => {
             app.startDate=moment(app.startDate).format('YYYY-MM-DD')
             app.endDate=moment(app.endDate).format('YYYY-MM-DD')
         })
-      this.setState({ applications: res.data }, () => {
-          console.log('applications', this.state.aplications)
-      });
-    });
+        this.setState({ applications: res.data }, () => {
+            console.log('applications', this.state.aplications)
+        });
+    })
+    .catch(err => {
+        console.log(err)
+    })
   }
 
   handleChange = (event) => {
@@ -121,7 +125,11 @@ export default class ApplicationList extends Component {
               <ThemeProvider theme={theme}>
                 <MaterialTable
                     columns={[
-                        {title: 'APP ID', field: 'id'},
+                        { 
+                            title: '#', 
+                            render: rowData => rowData.tableData.id + 1,
+                            width: 50
+                        },
                         {title: 'Full Name', field: 'user.fullName'},
                         {title: 'Start Date', field: 'startDate'},
                         {title: 'End Date', field: 'endDate'},

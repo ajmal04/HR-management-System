@@ -74,7 +74,11 @@ export default class Announcement extends Component {
                     <ThemeProvider theme={theme}>
                     <MaterialTable
                             columns={[
-                                {title: 'ID', field: 'id'},
+                                { 
+                                    title: '#', 
+                                    render: rowData => rowData.tableData.id + 1,  // Show raw row number
+                                    width: 50
+                                 },
                                 {title: 'Title', field: 'announcementTitle'},
                                 {title: 'Description', field: 'announcementDescription'},
                                 {title: 'Created By', field: 'user.fullName'},

@@ -57,40 +57,16 @@ export default class SidebarAdmin extends Component {
                   <i className="nav-icon fas fa-tachometer-alt" />
                   <p>
                     Dashboard
-                    <span className="right badge badge-success">Home</span>
                   </p>
                 </NavLink>
               </li>
               <li className="nav-item">
-                <NavLink exact to="/departments" className="nav-link">
-                  <i className="nav-icon fa fa-building" />
+                <NavLink to="/employee-list" className="nav-link" >
+                  <i className="nav-icon fas fa-users" />
                   <p>
-                    Departments
+                    Employees
                   </p>
                 </NavLink>
-              </li>
-              <li className="nav-item has-treeview">
-                <NavLink to="/fake-url" className="nav-link" activeClassName="nav-link">
-                  <i className="nav-icon fa fa-user" />
-                  <p>
-                    Employee
-                    <i className="right fas fa-angle-left" />
-                  </p>
-                </NavLink>
-                <ul className="nav nav-treeview">
-                  <li className="nav-item">
-                    <NavLink to="/employee-add" className="nav-link">
-                      <i className="fa fa-user-plus nav-icon" />
-                      <p>Add Employee</p>
-                    </NavLink>
-                  </li>
-                  <li className="nav-item">
-                    <NavLink to="/employee-list" className="nav-link">
-                      <i className="fas fa-users nav-icon" />
-                      <p>Employee List</p>
-                    </NavLink>
-                  </li>
-                </ul>
               </li>
               <li className="nav-item">
                 <NavLink to="/job-list" className="nav-link">
@@ -122,50 +98,23 @@ export default class SidebarAdmin extends Component {
                     <i className="right fas fa-angle-left" />
                   </p>
                 </NavLink>
-                <ul className="nav nav-treeview">
+                <ul className="nav nav-treeview" style={{ paddingLeft: "20px" }}>
+                <li className="nav-item">
+                    <NavLink to="/application-list" className="nav-link">
+                      <i className="fas fa-list-ul nav-icon" />
+                      <p>Application List</p>
+                    </NavLink>
+                  </li>
                   <li className="nav-item">
                     <NavLink to="/application" className="nav-link">
                       <i className="fa fa-plus nav-icon" />
                       <p>Add Application</p>
                     </NavLink>
                   </li>
-                  <li className="nav-item">
-                    <NavLink to="/application-list" className="nav-link">
-                      <i className="fas fa-list-ul nav-icon" />
-                      <p>Application List</p>
-                    </NavLink>
-                  </li>
+                  
                 </ul>
               </li>
-              <li className="nav-item has-treeview">
-                <NavLink to="/fake-url" className="nav-link" activeClassName="nav-link">
-                  <i className="nav-icon fas fa-euro-sign" />
-                  <p>
-                    Payroll Management
-                    <i className="right fas fa-angle-left" />
-                  </p>
-                </NavLink>
-                <ul className="nav nav-treeview">
-                  <li className="nav-item">
-                    <NavLink to="/salary-details" className="nav-link">
-                      <i className="fas fa-euro-sign nav-icon" />
-                      <p>Manage Salary Details</p>
-                    </NavLink>
-                  </li>
-                  <li className="nav-item">
-                    <NavLink to="/salary-list" className="nav-link">
-                      <i className="fas fa-users nav-icon" />
-                      <p>Employee Salary List</p>
-                    </NavLink>
-                  </li>
-                  <li className="nav-item">
-                    <NavLink to="/payment" className="nav-link">
-                      <i className="fas fa-money-check nav-icon" />
-                      <p>Make Payment</p>
-                    </NavLink>
-                  </li>
-                </ul>
-              </li>
+              
               <li className="nav-item has-treeview">
                 <NavLink to="/fake-url" className="nav-link" activeClassName="nav-link">
                   <i className="nav-icon fas fa-money-bill" />
@@ -174,19 +123,20 @@ export default class SidebarAdmin extends Component {
                     <i className="right fas fa-angle-left" />
                   </p>
                 </NavLink>
-                <ul className="nav nav-treeview">
-                  <li className="nav-item">
-                    <NavLink to="/expense" className="nav-link">
-                      <i className="fas fa-shopping-cart nav-icon" />
-                      <p>Make Expense</p>
-                    </NavLink>
-                  </li>
+                <ul className="nav nav-treeview" style={{ paddingLeft: "20px" }}>
                   <li className="nav-item">
                     <NavLink to="/expense-report" className="nav-link">
                       <i className="fas fa-file-invoice nav-icon" />
                       <p>Expense Report</p>
                     </NavLink>
                   </li>
+                  <li className="nav-item">
+                    <NavLink to="/expense" className="nav-link">
+                      <i className="fas fa-shopping-cart nav-icon" />
+                      <p>Make Expense</p>
+                    </NavLink>
+                  </li>
+                  
                 </ul>
               </li>
               <li className="nav-item">

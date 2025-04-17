@@ -57,7 +57,6 @@ export default class SidebarEmployee extends Component {
                   <i className="nav-icon fas fa-tachometer-alt" />
                   <p>
                     Dashboard
-                    <span className="right badge badge-success">Home</span>
                   </p>
                 </NavLink>
               </li>
@@ -77,19 +76,20 @@ export default class SidebarEmployee extends Component {
                     <i className="right fas fa-angle-left" />
                   </p>
                 </NavLink>
-                <ul className="nav nav-treeview">
+                <ul className="nav nav-treeview" style={{ paddingLeft: "20px" }}>
+                 <li className="nav-item">
+                    <NavLink to="/application-list" className="nav-link">
+                      <i className="fas fa-list-ul nav-icon" />
+                      <p>My Applications</p>
+                    </NavLink>
+                  </li>
                   <li className="nav-item">
                     <NavLink to="/application" className="nav-link">
                       <i className="fa fa-plus nav-icon" />
                       <p>Application</p>
                     </NavLink>
                   </li>
-                  <li className="nav-item">
-                    <NavLink to="/application-list" className="nav-link">
-                      <i className="fas fa-list-ul nav-icon" />
-                      <p>My Applications</p>
-                    </NavLink>
-                  </li>
+                  
                 </ul>
               </li>
               <li className="nav-item">

@@ -23,6 +23,7 @@ export default class JobDeleteModal extends Component {
             headers: {Authorization: `Bearer ${localStorage.getItem('token')}`}
         })
         .then(res => {
+            this.props.onSuccess();
             this.setState({redirect: true})
         })
         .catch(err => {

@@ -12,6 +12,18 @@ module.exports = (sequelize, Sequelize) => {
             validate: {
                 notEmpty: true
             }
+        },
+        college: {
+            type: Sequelize.ENUM,
+            values: [
+              'Engineering',
+              'Pharmacy',
+              'Nursing',
+              'Allied_Health_Science',
+              'Medical_Science_Research',
+              'Na'
+            ],
+            allowNull: true
         }
     }, {
         timestamps: false,

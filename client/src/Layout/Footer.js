@@ -1,17 +1,18 @@
-import React, { Component } from "react";
+import React from "react";
 
-export default class Footer extends Component {
-  render() {
-    return (
-      <footer className="main-footer">
-        {/* <strong className="mr-1">
-          Copyright © 2020-2021 <a href="http://mantzarisvasilis.com">Vasilis Mantzaris</a>.
-        </strong>
-        All rights reserved.
-        <div className="float-right d-none d-sm-inline-block">
-          <b>Version</b> 1.0.0
-        </div> */}
-      </footer>
-    );
-  }
-}
+const Footer = () => {
+  const currentYear = new Date().getFullYear();
+
+  return (
+    <footer className="main-footer" style={{ textAlign: "center", padding: "1rem", background: "#f5f5f5" }}>
+      <strong className="mr-1">
+        © {currentYear} <a href="https://shanmugha.edu.in/" target="_blank" rel="noopener noreferrer">Sri Shanmugha Educational Institution</a>.
+      </strong> All rights reserved.
+      <div style={{ marginTop: "0.5rem" }}>
+        <b>Version</b> 1.0.0
+      </div>
+    </footer>
+  );
+};
+
+export default Footer;

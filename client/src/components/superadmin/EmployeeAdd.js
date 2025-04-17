@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { Redirect } from 'react-router-dom';
 import { Card, Form, Button, Alert } from "react-bootstrap";
 import DatePicker from "react-datepicker";
 import axios from "axios";
@@ -9,6 +10,7 @@ export default class EmployeeAdd extends Component {
     super(props);
 
     this.state = {
+      redirectToList: false,
       fistname: "",
       lastname: "",
       dateOfBirth: "",
@@ -34,12 +36,15 @@ export default class EmployeeAdd extends Component {
       startDate: "",
       endDate: "",
       departments: [],
+      college: "",
+      colleges: [],
       jobTitle: null,
       joiningDate: "",
       file: null,
       hasError: false,
       errMsg: "",
       completed: false,
+      newEmployeeId: null // Only new state added
     };
   }
 
@@ -51,6 +56,18 @@ export default class EmployeeAdd extends Component {
     })
       .then((res) => {
         this.setState({ departments: res.data });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    axios({
+      method: "get",
+      url: "/api/colleges",
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+    })
+      .then((res) => {
+        this.setState({ colleges: res.data });
       })
       .catch((err) => {
         console.log(err);
@@ -70,128 +87,114 @@ export default class EmployeeAdd extends Component {
     });
   };
 
-  onSubmit = (e) => {
-    this.setState({ hasError: false, errorMsg: "", completed: false });
+  pushColleges = () => {
+    return this.state.colleges.map((college, index) => (
+      <option key={index} value={college}>
+        {college}
+      </option>
+    ));
+  };
 
-    let user = {
-      username: this.state.username,
-      password: 1234,
-      fullname: this.state.fistname + " " + this.state.lastname,
-      role: this.state.role,
-      departmentId: this.state.departmentId,
-      active: 1,
-    };
-
+  onSubmit = async (e) => {
     e.preventDefault();
-    axios({
-      method: "post",
-      url: "/api/users",
-      data: user,
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-    })
-      .then((res) => {
-        let userId = res.data.id;
+    this.setState({ hasError: false, errMsg: "" });
 
-        let userPersonalInfo = {
-          dateOfBirth: this.state.dateOfBirth,
-          gender: this.state.gender,
-          maritalStatus: this.state.maritalStatus,
-          fatherName: this.state.fathername,
-          idNumber: this.state.idNumber,
-          address: this.state.address,
-          city: this.state.city,
-          country: this.state.country,
-          mobile: this.state.mobile,
-          phone: this.state.phone,
-          emailAddress: this.state.email,
-          userId: userId,
-        };
-
-        axios({
-          method: "post",
-          url: "/api/personalInformations",
-          data: userPersonalInfo,
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        })
-          .then((res) => {
-            let userFinancialInfo = {
-              bankName: this.state.bankName,
-              accountName: this.state.accountName,
-              accountNumber: this.state.accountNumber,
-              iban: this.state.iBan,
-              userId: userId,
-            };
-
-            axios({
-              method: "post",
-              url: "api/financialInformations",
-              data: userFinancialInfo,
-              headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-              },
-            })
-              .then((res) => {
-                let job = {
-                  jobTitle: this.state.jobTitle,
-                  startDate: this.state.startDate,
-                  endDate: this.state.endDate,
-                  userId: userId,
-                };
-                axios({
-                  method: "post",
-                  url: "api/jobs/",
-                  data: job,
-                  headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
-                  },
-                })
-                  .then((res) => {
-                    this.setState({ completed: true });
-                    window.scrollTo(0, 0);
-                  })
-                  .catch((err) => {
-                    this.setState({
-                      hasError: true,
-                      errMsg: err.response.data.message,
-                    });
-                    window.scrollTo(0, 0);
-                  });
-              })
-              .catch((err) => {
-                this.setState({
-                  hasError: true,
-                  errMsg: err.response.data.message,
-                });
-                window.scrollTo(0, 0);
-              });
-          })
-          .catch((err) => {
-            this.setState({
-              hasError: true,
-              errMsg: err.response.data.message,
-            });
-            window.scrollTo(0, 0);
-          });
-      })
-      .catch((err) => {
-        this.setState({ hasError: true, errMsg: err.response.data.message });
-        window.scrollTo(0, 0);
+    try {
+      // 1. Create User
+      const userRes = await axios.post("/api/users", {
+        username: this.state.username,
+        password: this.state.password || "1234",
+        fullname: `${this.state.fistname} ${this.state.lastname}`,
+        role: this.state.role,
+        departmentId: this.state.departmentId,
+        college: this.state.college,
+        active: 1,
+      }, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
       });
+
+      const userId = userRes.data.id;
+      this.setState({ newEmployeeId: userId });
+
+      // 2. Create Onboarding Request (using your existing model)
+      await axios.post("/api/onboarding", {
+        employeeId: userId,
+        requestedBy: localStorage.getItem("userId")
+      }, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+      });
+
+      // 3. Create Related Records
+      await this.createRelatedRecords(userId);
+
+      this.setState({ 
+        completed: true,
+        redirectToList: true 
+      });
+
+    } catch (err) {
+      this.setState({
+        hasError: true,
+        errMsg: err.response?.data?.message || "Employee creation failed",
+      });
+      window.scrollTo(0, 0);
+    }
+  };
+
+  createRelatedRecords = async (userId) => {
+    // Personal Info
+    await axios.post("/api/personalInformations", {
+      dateOfBirth: this.state.dateOfBirth,
+      gender: this.state.gender,
+      maritalStatus: this.state.maritalStatus,
+      fatherName: this.state.fathername,
+      idNumber: this.state.idNumber,
+      address: this.state.address,
+      city: this.state.city,
+      country: this.state.country,
+      mobile: this.state.mobile,
+      phone: this.state.phone,
+      emailAddress: this.state.email,
+      userId
+    }, {
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+    });
+
+    // Financial Info
+    await axios.post("/api/financialInformations", {
+      bankName: this.state.bankName,
+      accountName: this.state.accountName,
+      accountNumber: this.state.accountNumber,
+      iban: this.state.iBan,
+      userId
+    }, {
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+    });
+
+    // Job Info
+    await axios.post("/api/jobs", {
+      jobTitle: this.state.jobTitle,
+      startDate: this.state.startDate,
+      endDate: this.state.endDate,
+      userId
+    }, {
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+    });
   };
 
   pushDepartments = () => {
-    let items = [];
-    this.state.departments.map((dept, index) => {
-      items.push(
-        <option key={index} value={dept.id}>
-          {dept.departmentName}
-        </option>
-      );
-    });
-    return items;
+    return this.state.departments.map((dept, index) => (
+      <option key={index} value={dept.id}>
+        {dept.departmentName}
+      </option>
+    ));
   };
 
   render() {
+    if (this.state.redirectToList) {
+      return <Redirect to="/employee-list" />;
+    }
+
     return (
       <Form onSubmit={this.onSubmit}>
         <div className="row">
@@ -201,20 +204,18 @@ export default class EmployeeAdd extends Component {
             </Alert>
           ) : this.state.completed ? (
             <Alert variant="success" className="m-3" block>
-              Employee has been inserted.
+              Employee Details Added Successfully.
             </Alert>
           ) : (
             <></>
           )}
 
-          {/* Main Card */}
           <Card className="col-sm-12 main-card">
             <Card.Header>
               <b>Add Employee</b>
             </Card.Header>
             <Card.Body>
               <div className="row">
-                {/* Personal Details Card */}
                 <div className="col-sm-6">
                   <Card className="secondary-card">
                     <Card.Header>Personal Details</Card.Header>
@@ -528,6 +529,21 @@ export default class EmployeeAdd extends Component {
                             {this.pushDepartments()}
                           </Form.Control>
                         </Form.Group>
+                        <Form.Group controlId="formCollege" className="mt-3">
+                          <Form.Label className="text-muted required">
+                            College
+                          </Form.Label>
+                          <Form.Control
+                            as="select"
+                            value={this.state.college}
+                            onChange={this.handleChange}
+                            name="college"
+                            required
+                          >
+                            <option value="">Choose...</option>
+                            {this.pushColleges()}
+                          </Form.Control>
+                        </Form.Group>
                         <Form.Group controlId="formRole">
                           <Form.Label className="text-muted required">
                             Role
@@ -540,9 +556,11 @@ export default class EmployeeAdd extends Component {
                             required
                           >
                             <option value="">Choose...</option>
-                            <option value="ROLE_ADMIN">Admin</option>
-                            <option value="ROLE_MANAGER">Manager</option>
-                            <option value="ROLE_EMPLOYEE">Employee</option>
+                            <option value="ROLE_SUPER_ADMIN">Super Admin</option>
+                            <option value="ROLE_SYSTEM_ADMIN">System Admin</option>
+                            <option value="ROLE_ADMIN">Principal</option>
+                            <option value="ROLE_HOD">HOD</option>
+                            <option value="ROLE_FACULTY">Faculty</option>
                           </Form.Control>
                         </Form.Group>
                       </Card.Text>

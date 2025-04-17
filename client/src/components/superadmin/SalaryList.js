@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Card, Badge, Button, Form, Modal } from "react-bootstrap";
 import {Redirect} from 'react-router-dom'
 import MaterialTable from 'material-table'
-import DeleteModal from './DeleteModal'
+import DeleteModal from '../DeleteModal'
 import axios from 'axios'
 import { ThemeProvider } from '@material-ui/core'
 import { createMuiTheme } from '@material-ui/core/styles'
@@ -77,7 +77,11 @@ export default class SalaryList extends Component {
               <ThemeProvider theme={theme}>
                 <MaterialTable 
                   columns={[
-                    {title: 'EMP ID', field: 'user.id'},
+                    { 
+                      title: '#', 
+                      render: rowData => rowData.tableData.id + 1,  // Show raw row number
+                      width: 50
+                    },
                     {title: 'Full Name', field: 'user.fullName'},
                     {title: 'Gross Salary', field: 'salaryGross'},
                     {title: 'Deductions', field: 'deductionTotal'},

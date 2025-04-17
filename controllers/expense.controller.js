@@ -1,8 +1,10 @@
 const db = require("../models");
 const Expense = db.expense;
+const User = db.user
 const Department = db.department
 const Op = db.Sequelize.Op;
 const sequelize = db.sequelize
+const moment = require('moment');
 
 // Create and Save a new Expense
 exports.create = (req, res) => {
@@ -219,4 +221,56 @@ exports.deleteAllByDeptId = (req, res) => {
             err.message || "Some error occurred while removing all Expenses."
         });
       });
+  };
+
+  exports.getCollegeExpenses = async (req, res) => {
+    try {
+      const adminCollege = req.user.college;
+      if (!adminCollege) {
+        return res.status(400).json({ message: 'Admin college not specified' });
+      }
+  
+      // 1. Fetch expenses with department filtering by college
+      const expenses = await Expense.findAll({
+        attributes: [
+          'id',
+          ['expense_item_name', 'expenseItemName'],
+          ['expense_item_store', 'expenseItemStore'],
+          'date',
+          'amount'
+        ],
+        include: [{
+          model: Department,
+          attributes: [['department_name', 'departmentName']],
+          where: { college: adminCollege }, // Direct college filter
+          required: true
+        }],
+        order: [['date', 'DESC']]
+      });
+  
+      // 2. Format data for frontend (no user-related processing)
+      const formattedExpenses = expenses.map(expense => ({
+        id: expense.id,
+        expenseItemName: expense.expenseItemName,
+        expenseItemStore: expense.expenseItemStore,
+        date: expense.date,
+        amount: expense.amount,
+        department: {
+          departmentName: expense.department.departmentName
+        }
+      }));
+  
+      // 3. Send response
+      res.status(200).json({
+        expenses: formattedExpenses,
+        totalAmount: expenses.reduce((sum, e) => sum + parseFloat(e.amount), 0).toFixed(2)
+      });
+      
+    } catch (err) {
+      console.error('Error fetching college expenses:', err);
+      res.status(500).json({ 
+        message: 'Failed to fetch expenses',
+        error: process.env.NODE_ENV === 'development' ? err.message : undefined
+      });
+    }
   };

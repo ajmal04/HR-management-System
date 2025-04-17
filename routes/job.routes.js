@@ -1,32 +1,38 @@
 var express = require('express');
 var router = express.Router();
 
-const withAuth = require("../withAuth")
+const withAuth = require("../withAuth");
 
 const job = require("../controllers/job.controller.js");
 
-// Create a new Job
-router.post('/', withAuth.verifyToken, withAuth.withRoleAdmin, job.create);
 
-//Retrieve all Jobs
-router.get('/', withAuth.verifyToken, withAuth.withRoleAdminOrManager, job.findAll);
 
-//Retrieve all Jobs by User Id
-router.get('/user/:id', withAuth.verifyToken, withAuth.withRoleAdminOrManager, job.findAllByUserId);
+//  Create a new Job (Only Admin & System Admin)
+router.post('/', withAuth.verifyToken, withAuth.withHigherRoles, job.create);
 
-//Retrieve a single Job with an id
+//  Retrieve all Jobs (Admin, System Admin, HOD)
+router.get('/', withAuth.verifyToken, withAuth.withHigherRoles, job.findAll);
+
+//  Retrieve all Jobs by college
+router.get('/college/list', withAuth.verifyToken, withAuth.withAdmin, job.getJobsByCollege);
+
+//  Retrieve all Jobs by User ID (Admin, System Admin, HOD)
+router.get('/user/:id', withAuth.verifyToken, withAuth.withHigherRoles, job.findAllByUserId);
+
+//  Retrieve a single Job by ID (Accessible to all authenticated users)
 router.get('/:id', withAuth.verifyToken, job.findOne);
 
-// Update a Job with an id
-router.put('/:id', withAuth.verifyToken, withAuth.withRoleAdmin, job.update);
+//  Update a Job (Only Admin & System Admin)
+router.put('/:id', withAuth.verifyToken, withAuth.withHigherRoles, job.update);
 
-// Delete a Job with an id
-router.delete('/:id', withAuth.verifyToken, withAuth.withRoleAdmin, job.delete);
+//  Delete a Job by ID (Only Super Admin & Admin)
+router.delete('/:id', withAuth.verifyToken, withAuth.withHigherRoles, job.delete);
 
-// Delete all Jobs
-router.delete('/', withAuth.verifyToken, withAuth.withRoleAdmin, job.deleteAll);
+//  Delete all Jobs (Only Super Admin)
+router.delete('/', withAuth.verifyToken, withAuth.withSuperAdmin, job.deleteAll);
 
-// Delete all Jobs by User Id
-router.delete('/user/:id', withAuth.verifyToken, withAuth.withRoleAdmin, job.deleteAllByUserId);
+//  Delete all Jobs by User ID (Only Super Admin & Admin)
+router.delete('/user/:id', withAuth.verifyToken, withAuth.withHigherRoles, job.deleteAllByUserId);
+
 
 module.exports = router;

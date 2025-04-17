@@ -1,43 +1,46 @@
 var express = require('express');
 var router = express.Router();
 
-const withAuth = require('../withAuth')
+const withAuth = require('../withAuth');
 
 const application = require("../controllers/application.controller.js");
 
-// Retrieve all applications
-router.get('/', withAuth.verifyToken, withAuth.withRoleAdminOrManager, application.findAll)
+// 📌 Retrieve all applications (Admin & Manager only)
+router.get('/', withAuth.verifyToken, withAuth.withHigherRoles, application.findAll);
 
-// Create a new Application
+router.get('/college', withAuth.verifyToken, withAuth.withAdmin, application.getApplicationsByCollege);
+
+// 📌 Create a new Application (Any authenticated user can apply)
 router.post('/', withAuth.verifyToken, application.create);
 
-//Retrieve all Application by User Id
+// 📌 Retrieve all Applications by User Id (Admin, Manager & User itself)
 router.get('/user/:id', withAuth.verifyToken, application.findAllByUserId);
 
-//Retrieve all Application by User Id
-router.get('/department/:id', withAuth.verifyToken, withAuth.withRoleManager, application.findAllByDeptId);
+// 📌 Retrieve all Applications by Department Id (Manager only)
+router.get('/department/:id', withAuth.verifyToken, withAuth.withHOD, application.findAllByDeptId);
 
-//Retrieve Recent Applications (2 weeks old)
-router.get('/recent', withAuth.verifyToken, application.findAllRecent)
+// 📌 Retrieve Recent Applications (2 weeks old) (Admin & Manager only)
+router.get('/recent', withAuth.verifyToken, withAuth.withHigherRoles, application.findAllRecent);
 
-//Retrieve Recent Applications (2 weeks old) And Dept
-router.get('/recent/department/:id', withAuth.verifyToken, withAuth.withRoleManager, application.findAllRecentAndDept)
+// 📌 Retrieve Recent Applications by Department (Manager only)
+router.get('/recent/department/:id', withAuth.verifyToken, withAuth.withHigherRoles, application.findAllRecentAndDept);
 
-//Retrieve Recent Applications (2 weeks old) And User
-router.get('/recent/user/:id', withAuth.verifyToken, application.findAllRecentAndUser)
+// 📌 Retrieve Recent Applications by User (Admin & User itself)
+router.get('/recent/user/:id', withAuth.verifyToken, application.findAllRecentAndUser);
 
-//Retrieve a single Application with an id
+// 📌 Retrieve a single Application (Admin & User itself)
 router.get('/:id', withAuth.verifyToken, application.findOne);
 
-// Update a Application with an id
-router.put('/:id', withAuth.verifyToken, withAuth.withRoleAdminOrManager, application.update);
+// 📌 Update an Application (Admin & Manager only)
+router.put('/:id', withAuth.verifyToken, withAuth.withHigherRoles, application.update);
 
-// Delete all Applications
-router.delete('/', withAuth.verifyToken, withAuth.withRoleAdmin, application.deleteAll);
+// 📌 Delete all Applications (Only Admin)
+router.delete('/', withAuth.verifyToken, withAuth.withHigherRoles, application.deleteAll);
 
-router.delete('/:id', withAuth.verifyToken, withAuth.withRoleAdminOrManager, application.delete)
+// 📌 Delete a single Application (Admin & Manager only)
+router.delete('/:id', withAuth.verifyToken, withAuth.withHigherRoles, application.delete);
 
-// Delete all Application by User Id
-router.delete('/user/:id', withAuth.verifyToken, withAuth.withRoleAdmin, application.deleteAllByUserId);
+// 📌 Delete all Applications by User Id (Only Admin)
+router.delete('/user/:id', withAuth.verifyToken, withAuth.withHigherRoles, application.deleteAllByUserId);
 
 module.exports = router;

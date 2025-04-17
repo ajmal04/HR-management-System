@@ -56,6 +56,7 @@ export default class JobEditModal extends Component {
         headers: {Authorization: `Bearer ${localStorage.getItem('token')}`}
     })
     .then(res => {
+        this.props.onSuccess();
         this.setState({done: true})
     })
     .catch(err => {

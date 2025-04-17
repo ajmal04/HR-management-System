@@ -17,7 +17,7 @@ export default class EmployeeList extends Component {
       viewRedirect: false,
       viewSalaryRedirect: false,
       editRedirect: false,
-      deleteModal: false
+      deleteModal: false                              
     }
   }
 

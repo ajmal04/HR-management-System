@@ -1,5 +1,7 @@
 const db = require("../models");
 const Job = db.job;
+const User = db.user;
+const Department = db.department;
 const Op = db.Sequelize.Op;
 const moment= require('moment')
 
@@ -195,4 +197,49 @@ exports.deleteAllByUserId = (req, res) => {
         message: err.message || "Some error occurred while removing all Jobs.",
       });
     });
+};
+
+exports.getJobsByCollege = async (req, res) => {
+  
+  try {
+    
+    if (!req.user) {
+      console.error('No user in request');
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+      const adminCollege = req.user.college;
+      
+      if (!adminCollege) {
+          return res.status(400).json({ message: 'College not found for admin.' });
+      }
+
+      const jobs = await Job.findAll({
+          include: [
+              {
+                  model: User,
+                  where: { college: adminCollege },
+                  attributes: ['id', 'fullName'],
+                  include: [{
+                      model: Department,
+                      attributes: ['id', ['department_name', 'departmentName']]
+                  }]
+              }
+          ],
+          order: [['startDate', 'DESC']]
+      });
+
+      // Format dates for consistency
+      const formattedJobs = jobs.map(job => ({
+          ...job.get({ plain: true }),
+          startDate: job.startDate.toISOString().split('T')[0],
+          endDate: job.endDate.toISOString().split('T')[0]
+      }));
+
+      res.status(200).json(formattedJobs);
+  } catch (err) {
+      console.error('Error fetching jobs:', err);
+      res.status(500).json({ message: 'Failed to fetch college jobs',
+        error: err.message // Include the actual error message
+       });
+  }
 };

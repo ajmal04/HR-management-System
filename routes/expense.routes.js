@@ -5,34 +5,36 @@ const withAuth = require("../withAuth")
 
 const expense = require("../controllers/expense.controller.js");
 
-// Create a new Expense
-router.post('/', withAuth.verifyToken, withAuth.withRoleAdminOrManager, expense.create);
+// 📌 Create a new Expense (Only Admin & System Admin)
+router.post('/', withAuth.verifyToken, withAuth.withHigherRoles, expense.create);
 
-//Retrieve all Expenses
-router.get('/', withAuth.verifyToken, withAuth.withRoleAdminOrManager, expense.findAll)
+// 📌 Retrieve all Expenses (Only Admin & System Admin)
+router.get('/', withAuth.verifyToken, withAuth.withHigherRoles, expense.findAll);
 
-// Retrieve Expenses By Year
-router.get('/year/:id', withAuth.verifyToken, expense.findAllByYear)
+router.get('/college', withAuth.verifyToken, withAuth.withAdmin, expense.getCollegeExpenses);
 
-// Retrieve Expenses By Year and Department
-router.get('/year/:id/department/:id2', withAuth.verifyToken, withAuth.withRoleManager, expense.findAllByYearAndDept)
+// 📌 Retrieve Expenses By Year (Only Admin & System Admin)
+router.get('/year/:id', withAuth.verifyToken, withAuth.withHigherRoles, expense.findAllByYear);
 
-//Retrieve all Expenses by Department Id
-router.get('/department/:id', withAuth.verifyToken, withAuth.withRoleAdminOrManager, expense.findAllByDeptId);
+// 📌 Retrieve Expenses By Year and Department (Admin, System Admin, HOD)
+router.get('/year/:id/department/:id2', withAuth.verifyToken, withAuth.withHigherRoles, expense.findAllByYearAndDept);
 
-//Retrieve a single Expense with an id
-router.get('/:id', withAuth.verifyToken, withAuth.withRoleAdminOrManager, expense.findOne);
+// 📌 Retrieve all Expenses by Department Id (Admin, System Admin, HOD)
+router.get('/department/:id', withAuth.verifyToken, withAuth.   withHigherRoles, expense.findAllByDeptId);
 
-// Update an Expense with an id
-router.put('/:id', withAuth.verifyToken, withAuth.withRoleAdminOrManager, expense.update);
+// 📌 Retrieve a single Expense by ID (Admin, System Admin, HOD)
+router.get('/:id', withAuth.verifyToken, withAuth.withHigherRoles, expense.findOne);
 
-// Delete all Expenses
-router.delete('/', withAuth.verifyToken, withAuth.withRoleAdmin, expense.deleteAll)
+// 📌 Update an Expense (Only Admin & System Admin)
+router.put('/:id', withAuth.verifyToken, withAuth.withHigherRoles, expense.update);
 
-// Delete an Expense with an id
-router.delete('/:id', withAuth.verifyToken, withAuth.withRoleAdmin, expense.delete);
+// 📌 Delete all Expenses (Only Super Admin)
+router.delete('/', withAuth.verifyToken, withAuth.withSuperAdmin, expense.deleteAll);
 
-// Delete all Expenses by Department Id
-router.delete('/department/:id', withAuth.verifyToken, withAuth.withRoleAdmin, expense.deleteAllByDeptId);
+// 📌 Delete an Expense by ID (Only Super Admin & Admin)
+router.delete('/:id', withAuth.verifyToken, withAuth.withHigherRoles, expense.delete);
+
+// 📌 Delete all Expenses by Department ID (Only Super Admin & Admin)
+router.delete('/department/:id', withAuth.verifyToken, withAuth.withHigherRoles, expense.deleteAllByDeptId);
 
 module.exports = router;

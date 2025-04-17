@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Card, Badge, Button, Form, Modal } from "react-bootstrap";
 import {Redirect} from 'react-router-dom'
 import MaterialTable from 'material-table'
-import DeleteModal from './DeleteModal'
+import DeleteModal from '../DeleteModal'
 import axios from 'axios'
 import { ThemeProvider } from '@material-ui/core'
 import { createMuiTheme } from '@material-ui/core/styles'
@@ -17,11 +17,12 @@ export default class EmployeeList extends Component {
       selectedUser: null,
       viewRedirect: false,
       editRedirect: false,
-      deleteModal: false
+      deleteModal: false,
+      
     }
   }
 
-  componentDidMount() {
+  refreshEmployeeList = () => {
     axios({
       method: 'get',
       url: '/api/users',
@@ -34,6 +35,23 @@ export default class EmployeeList extends Component {
       console.log(err)
     })
   }
+
+  componentDidMount() {
+    this.refreshEmployeeList();
+
+    axios({
+      method: 'get',
+      url: '/api/users',
+      headers: {Authorization: `Bearer ${localStorage.getItem('token')}`}
+    })
+    .then(res => {
+      this.setState({users: res.data})
+    })
+    .catch(err => {
+      console.log(err)
+    })
+  }
+
 
   onView = (user) => {
     return (event) => {
@@ -78,7 +96,7 @@ export default class EmployeeList extends Component {
         {this.state.viewRedirect ? (<Redirect to={{pathname: '/employee-view', state: {selectedUser: this.state.selectedUser}}}></Redirect>) : (<></>)}
         {this.state.editRedirect ? (<Redirect to={{pathname: '/employee-edit', state: {selectedUser: this.state.selectedUser}}}></Redirect>) : (<></>)}
         {this.state.deleteModal ? (
-          <DeleteModal show={true} onHide={closeDeleteModel} data={this.state.selectedUser} />
+          <DeleteModal show={true} onHide={closeDeleteModel} data={this.state.selectedUser} onDeleteSuccess={this.refreshEmployeeList} />
         ) :(<></>)}
         <h4>
           <a className="fa fa-plus mb-2 ml-2" href="/employee-add">
@@ -96,19 +114,38 @@ export default class EmployeeList extends Component {
               <ThemeProvider theme={theme}>
                 <MaterialTable 
                   columns={[
-                    {title: 'EMP ID', field: 'id'},
+                    { 
+                      title: '#', 
+                      render: rowData => rowData.tableData.id + 1,  // Show raw row number
+                      width: 50
+                  },
                     {title: 'Full Name', field: 'fullName'},
                     {title: 'Department', field: 'department.departmentName'},
                     {
                       title: 'Job Title', 
                       field: 'jobs',
-                      render: rowData => (
-                        rowData.jobs.map((job, index) => {
-                          if(new Date(job.startDate).setHours(0) <= Date.now() && new Date(job.endDate).setHours(24) >= Date.now()) {
-                            return job.jobTitle
+                      render: rowData => {
+                        // If no jobs or empty array, return N/A
+                        if (!rowData.jobs || rowData.jobs.length === 0) return 'N/A';
+                        
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0); // Normalize to start of day
+                        
+                        // Find first job where today is between start and end dates
+                        const currentJob = rowData.jobs.find(job => {
+                          try {
+                            const startDate = new Date(job.startDate);
+                            const endDate = new Date(job.endDate);
+                            return today >= startDate && today <= endDate;
+                          } catch (e) {
+                            console.error("Invalid job dates:", job);
+                            return false;
                           }
-                        })
-                      )
+                        });
+                        
+                        // Return current job title or first job title if none current
+                        return currentJob ? currentJob.jobTitle : rowData.jobs[0].jobTitle;
+                      }
                     },
                     {title: 'Mobile', field: 'user_personal_info.mobile'},
                     {

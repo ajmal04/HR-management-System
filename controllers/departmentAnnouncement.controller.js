@@ -20,7 +20,7 @@ exports.create = (req, res) => {
     announcementDescription: req.body.announcementDescription,
     createdByUserId: req.body.createdByUserId,
     departmentId: req.body.departmentId,
-    createdAt: new Date()
+    created_at: new Date()
   };
 
   // Save Department Announcement in the database
@@ -225,3 +225,52 @@ exports.deleteAllByDeptId = (req, res) => {
         });
       });
   };
+
+exports.getCollegeAnnouncements = async (req, res) => {
+    try {
+        const adminCollege = req.user.college;
+        
+        if (!adminCollege) {
+            return res.status(400).json({ 
+                success: false,
+                message: 'College information not found in user profile' 
+            });
+        }
+
+        const announcements = await DepartmentAnnouncement.findAll({
+            attributes: [
+                'id',
+                'announcementTitle',
+                'announcementDescription',
+                'created_at'
+            ],
+            include: [
+                {
+                    model: Department,
+                    attributes: [['department_name', 'departmentName']],
+                    where: { college: adminCollege },
+                    required: true
+                },
+                {
+                    model: User,
+                    attributes: [['full_name', 'fullName']],
+                    required: true
+                }
+            ],
+            order: [['created_at', 'DESC']]
+        });
+
+        res.status(200).json({
+            success: true,
+            data: announcements
+        });
+
+    } catch (error) {
+        console.error('Error fetching college announcements:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch announcements',
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
+    }
+};

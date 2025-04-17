@@ -73,7 +73,11 @@ export default class ApplicationList extends Component {
               <ThemeProvider theme={theme}>
                 <MaterialTable
                     columns={[
-                        {title: 'APP ID', field: 'id'},
+                      { 
+                        title: '#', 
+                        render: rowData => rowData.tableData.id + 1,  // Show raw row number
+                        width: 50
+                     },
                         {title: 'Full Name', field: 'user.fullName'},
                         {title: 'Start Date', field: 'startDate'},
                         {title: 'End Date', field: 'endDate'},

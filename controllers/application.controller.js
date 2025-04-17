@@ -321,3 +321,48 @@ exports.deleteAllByUserId = (req, res) => {
       });
     });
 };
+
+
+exports.getApplicationsByCollege = async (req, res) => {
+  try {
+    // 1. Get admin's college from the authenticated user
+    const adminCollege = req.user.college;
+    
+    if (!adminCollege) {
+      return res.status(400).json({ message: 'Admin college not specified' });
+    }
+
+    // 2. Find all applications from users in the same college
+    const applications = await Application.findAll({
+      include: [
+        {
+          model: User,
+          where: { college: adminCollege },
+          attributes: ['id', 'fullName'],
+          include: [{
+            model: Department,
+            attributes: ['id', ['department_name', 'departmentName']]
+        }],
+          required: true
+        }
+      ],
+      order: [['start_date', 'DESC']]
+    });
+
+    // 3. Format the response
+    const formattedApplications = applications.map(app => ({
+      ...app.get({ plain: true }),
+      startDate: app.startDate ? moment(app.startDate).format('YYYY-MM-DD') : null,
+      endDate: app.endDate ? moment(app.endDate).format('YYYY-MM-DD') : null
+    }));
+
+    res.status(200).json(formattedApplications);
+    
+  } catch (err) {
+    console.error('Error fetching college applications:', err);
+    res.status(500).json({ 
+      message: 'Failed to fetch applications',
+      error: process.env.NODE_ENV === 'development' ? err.message : undefined
+    });
+  }
+};

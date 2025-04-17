@@ -17,6 +17,7 @@ exports.create = (req, res) => {
   // Create a Department
   const department = {
     departmentName: req.body.departmentName,
+    college: req.body.college,
     organizationId: req.body.organizationId
   };
 
@@ -159,4 +160,24 @@ exports.deleteAll = (req, res) => {
           err.message || "Some error occurred while removing all Departments."
       });
     });
+};
+
+exports.getDepartmentsByCollege = (req, res) => {
+  const adminCollege = req.user.college; // ✅ college info from JWT token
+  console.log("Inside Controller");  // ✅ First check
+    console.log("User in request:", req.user);  // ✅ Is user info available? 
+
+  const department = Department.findAll({
+      where: { college: adminCollege },
+      attributes: ['id', 'department_name'] // You can choose what fields to return
+  })
+  .then(departments => {
+      res.status(200).send(departments);
+  })
+  .catch(error => {
+      console.error(error);
+      res.status(500).send({ message: "Failed to fetch departments" });
+  });
+  console.log("Admin College:", department);
+
 };

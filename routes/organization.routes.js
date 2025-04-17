@@ -2,22 +2,21 @@ var express = require('express');
 var router = express.Router();
 
 const withAuth = require('../withAuth');
-
 const organization = require("../controllers/organization.controller.js");
 
-// Create a new Organization
-router.post('/', organization.create, withAuth.verifyToken);
+// 📌 Create a new Organization (Only Super Admin & System Admin)
+router.post('/', withAuth.verifyToken, withAuth.withSuperAdmin, organization.create);
 
-//Retrieve a single Organization with an id
+// 📌 Retrieve a single Organization by ID (Accessible to all authenticated users)
 router.get('/:id', withAuth.verifyToken, organization.findOne);
 
-// Update an Organization with id
-router.put('/:id', withAuth.verifyToken, withAuth.withRoleAdmin, withAuth.verifyToken, organization.update);
+// 📌 Update an Organization (Only Super Admin, System Admin, and Admin)
+router.put('/:id', withAuth.verifyToken, withAuth.withHigherRoles, organization.update);
 
-// Delete an Organization with id
-router.delete('/:id', withAuth.verifyToken, withAuth.withRoleAdmin, organization.delete);
+// 📌 Delete an Organization by ID (Only Super Admin & System Admin)
+router.delete('/:id', withAuth.verifyToken, withAuth.withAdminOrSystemAdmin, organization.delete);
 
-// Delete all Organizations
-router.delete('/', withAuth.verifyToken, withAuth.withRoleAdmin, organization.deleteAll);
+// 📌 Delete all Organizations (Only Super Admin)
+router.delete('/', withAuth.verifyToken, withAuth.withSuperAdmin, organization.deleteAll);
 
 module.exports = router;

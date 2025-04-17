@@ -1,15 +1,15 @@
 import React, { Component } from "react";
 import { Card, Button, Form, Alert, Badge } from "react-bootstrap";
 import { Redirect } from 'react-router-dom'
-import JobAddModal from './JobAddModal'
-import JobEditModal from './JobEditModal'
-import JobDeleteModal from './JobDeleteModal'
+import JobAddModal from '../JobAddModal'
+import JobEditModal from '../JobEditModal'
+import JobDeleteModal from '../JobDeleteModal'
 import axios from 'axios'
 import moment from 'moment'
 import MaterialTable from 'material-table'
 import { ThemeProvider } from '@material-ui/core'
 import { createMuiTheme } from '@material-ui/core/styles'
-import AlertModal from './AlertModal'
+import AlertModal from '../AlertModal'
 
 export default class JobList extends Component {
 
@@ -47,6 +47,14 @@ export default class JobList extends Component {
             console.log(err)
         })
     }
+
+    refreshJobList = () => {
+        if(this.state.selectedDepartment === "all") {
+          this.fetchDataAll();
+        } else {
+          this.fetchData();
+        }
+      }
 
     fetchData = () => {
         axios({
@@ -214,7 +222,11 @@ export default class JobList extends Component {
                     <ThemeProvider theme={theme}>
                     <MaterialTable
                             columns={[
-                                {title: 'JOB ID', field: 'id'},
+                                { 
+                                    title: '#', 
+                                    render: rowData => rowData.tableData.id + 1,  // Show raw row number
+                                    width: 50
+                                },
                                 {title: 'Job Title', field: 'jobTitle'},
                                 {title: 'Employee', field: 'user.fullName'},
                                 {title: 'Start Date', field: 'startDate'},
@@ -270,11 +282,23 @@ export default class JobList extends Component {
                 </Card.Body>
             </Card>
             {this.state.showEditModel ? (
-                <JobEditModal show={true} onHide={closeEditModel} data={this.state.selectedJob} />
+                <JobEditModal show={true} onHide={closeEditModel} data={this.state.selectedJob} 
+                onSuccess={() => {
+                    closeEditModel();
+                    this.refreshJobList();
+                  }} />
             ) : this.state.showAddModel ? (
-                <JobAddModal show={true} onHide={closeAddModel} />
+                <JobAddModal show={true} onHide={closeAddModel}
+                onSuccess={() => {
+                    closeAddModel();
+                    this.refreshJobList();
+                  }} />
             ) : this.state.showDeleteModel ? (
-                <JobDeleteModal show={true} onHide={closeDeleteModel} data={this.state.selectedJob} />
+                <JobDeleteModal show={true} onHide={closeDeleteModel} data={this.state.selectedJob}
+                onSuccess={() => {
+                    closeDeleteModel();
+                    this.refreshJobList();
+                  }} />
             ) : (<></>)}
             </div>
         </div>

@@ -1,12 +1,12 @@
 import React, { Component } from "react";
 
-import "../App.css";
-import Infobox from "./infobox";
-import Calendar from "./Calendar";
-import ExpenseChartsPage from "./ExpenseChartsPage";
-import PaymentChartsPage from "./PaymentChartsPage";
-import RecentApplciations from "./RecentApplications";
-import RecentAnnouncements from "./RecentAnnouncements";
+import "../../App.css";
+import Infobox from "../infobox";
+import Calendar from "../Calendar";
+import ExpenseChartsPage from "../ExpenseChartsPage";
+import PaymentChartsPage from "../PaymentChartsPage";
+import RecentApplciations from "../RecentApplications";
+import RecentAnnouncements from "../RecentAnnouncements";
 import axios from "axios";
 
 export default class Dashboard extends Component {
@@ -36,7 +36,7 @@ export default class Dashboard extends Component {
     //Fetch Expenses Total
     axios({
       method: "get",
-      url: "/api/expenses/year/2021",
+      url: "/api/expenses/year/2025",
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     }).then((res) => {
       let array = res.data;
@@ -83,7 +83,7 @@ export default class Dashboard extends Component {
           <div className="col-md-4 col-sm-6 col-xs-12">
             <Infobox
               title="Total Expenses"
-              description={this.state.totalExpenses + "€"}
+              description={"₹" + this.state.totalExpenses}
               color="bg-warning"
               icon="fa fa-shopping-cart"
             />
@@ -92,7 +92,7 @@ export default class Dashboard extends Component {
           <div className="col-md-4 col-sm-6 col-xs-12">
             <Infobox
               title="Total Payments"
-              description={this.state.totalPayments + "€"}
+              description={"₹" + this.state.totalPayments}
               color="bg-danger"
               icon="fa fa-money-check"
             />

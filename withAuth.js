@@ -1,7 +1,10 @@
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
 const db = require("./models");
 const User = db.user;
 
+/**
+ * Middleware to verify JWT token
+ */
 exports.checkToken = (req, res) => {
     //Get auth header value
     const bearerHeader = req.headers['authorization']; 
@@ -30,109 +33,66 @@ exports.checkToken = (req, res) => {
 }
 
 exports.verifyToken = (req, res, next) => {
-    //Get auth header value
     const bearerHeader = req.headers['authorization']; 
 
-    //Check if undefined
-    if(typeof bearerHeader !== 'undefined') {
-        //Split at the space
-        const bearer = bearerHeader.split(' ');
-        
-        //Get token from array
-        const bearerToken = bearer[1];
+    if (typeof bearerHeader !== 'undefined') {
+        const bearerToken = bearerHeader.split(' ')[1];
 
-        //Set the token
-        req.token = bearerToken;
-
-        jwt.verify(req.token, process.env.SECRET_KEY, (err, authData) => {
-            if(err) {
-                res.status(403).send({message: 'Access denied: Wrong access token'});
-            } else {
-                req.authData = authData;
-                next();
-            }
-        })
+        jwt.verify(bearerToken, process.env.SECRET_KEY, (err, authData) => {
+            if (err) {
+                return res.status(403).send({ message: 'Access denied: Invalid token' });
+            } 
+            
+            req.user = authData.user;  // ✅ Attach user info to request
+            next();
+        });
     } else {
-        res.status(401).send({message: 'Access denied: No token provided'});
+        return res.status(401).send({ message: 'Access denied: No token provided' });
     }
-}
+};
 
-exports.withRoleAdmin = (req, res, next) => {
-    var authData = req.authData;
+/**
+ * General function to check if user has the required role
+ */
+const checkRole = (requiredRoles) => {
+    return (req, res, next) => {
+        const currentUser = req.user;  // Better naming
 
-    User.findOne({
-        where: {id: authData.user.id}
-    })
-    .then(user => {
-        if(user) {
-            if(user.role === "ROLE_ADMIN") {
-                req.authData = authData;
-                next()
-            } else {
-                res.status(401).send({message: "Access denied: Role can't access this api"})
-            }
-        } else {
-            res.status(401).send({message: "Forbidden"})
-        }
-    })
-}
+        User.findOne({ where: { id: currentUser.id } })
+            .then(dbUser => {
+                if (!dbUser) {
+                    return res.status(401).send({ message: "Forbidden" });
+                }
+                if (requiredRoles.includes(dbUser.role)) {
+                    next();
+                } else {
+                    res.status(403).send({ message: "You are Not Authorized to Perform This Action" });
+                }
+            })
+            .catch(err => {
+                res.status(500).send({ message: "Internal Server Error" });
+            });
+    };
+};
 
-exports.withRoleAdminOrManager = (req, res, next) => {
-    var authData = req.authData;
 
-    User.findOne({
-        where: {id: authData.user.id}
-    })
-    .then(user => {
-        if(user) {
-            if(user.role === "ROLE_ADMIN" || user.role === "ROLE_MANAGER") {
-                req.authData = authData;
-                next()
-            } else {
-                res.status(401).send({message: "Access denied: Role can't access this api"})
-            }
-        } else {
-            res.status(401).send({message: "Forbidden"})
-        }
-    })
-}
+// ✅ Middleware functions for different role-based access
+exports.withSuperAdmin = checkRole(["ROLE_SUPER_ADMIN"]);
+exports.withSystemAdmin = checkRole(["ROLE_SYSTEM_ADMIN"]);
+exports.withAdmin = checkRole(["ROLE_ADMIN"]);
+exports.withHOD = checkRole(["ROLE_HOD"]);
+exports.withFaculty = checkRole(["ROLE_FACULTY"]);
 
-exports.withRoleManager = (req, res, next) => {
-    var authData = req.authData;
+// ✅ Middleware for combined roles
+exports.withAdminOrHOD = checkRole(["ROLE_ADMIN", "ROLE_HOD"]);
+exports.withAdminOrSystemAdmin = checkRole(["ROLE_ADMIN", "ROLE_SYSTEM_ADMIN"]);
+exports.withHigherRoles = checkRole(["ROLE_SUPER_ADMIN", "ROLE_SYSTEM_ADMIN", "ROLE_ADMIN","ROLE_HOD"]);  // High-level access
+exports.withSuperAdminOrAdmin = checkRole(["ROLE_SUPER_ADMIN", "ROLE_ADMIN"]); 
 
-    User.findOne({
-        where: {id: authData.user.id}
-    })
-    .then(user => {
-        if(user) {
-            if(user.role === "ROLE_MANAGER") {
-                req.authData = authData;
-                next()
-            } else {
-                res.status(401).send({message: "Access denied: Role can't access this api"})
-            }
-        } else {
-            res.status(401).send({message: "Forbidden"})
-        }
-    })
-}
 
-exports.withRoleEmployee = (req, res, next) => {
-    var authData = req.authData;
-
-    User.findOne({
-        where: {id: authData.user.id}
-    })
-    .then(user => {
-        if(user) {
-            if(user.role === "ROLE_EMPLOYEE") {
-                req.authData = authData;
-                next()
-            } else {
-                res.status(401).send({message: "Access denied: Role can't access this api"})
-            }
-        } else {
-            res.status(401).send({message: "Forbidden"})
-        }
-    })
-}
+exports.withAdminOrSelf = (req, res, next) => {
+    if (req.user.role === "ROLE_ADMIN" || req.user.id === req.params.id) {
+        return next();  // Allow access
+    }
+    return res.status(403).json({ message: "Access denied" });
+};

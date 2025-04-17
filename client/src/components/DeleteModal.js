@@ -22,8 +22,9 @@ export default class DeleteModal extends Component {
             url: 'api/users/' + this.props.data.id,
             headers: {Authorization: `Bearer ${localStorage.getItem('token')}`}
         })
-        .then(res => {
-            this.setState({redirect: true})
+        .then(() => {
+          this.props.onDeleteSuccess();  // Refresh the list
+          this.props.onHide();           // Close the modal
         })
         .catch(err => {
             console.log(err)

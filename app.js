@@ -56,27 +56,40 @@ if (process.env.NODE_ENV === "production") {
   });
 }
 
-// app.get('/', (req, res) => {
-//   res.send('Server is running...');
-// });
+app.get("/", (req, res) => {
+  res.json({ success: true, message: "Server is running 🚀" });
+});
 
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
-  next(createError(404));
+  // For API routes, return JSON instead of forwarding to error handler
+  res.status(404).json({
+    success: false,
+    message: 'Resource not found',
+    error: {
+      status: 404,
+      message: 'The requested resource was not found on this server'
+    }
+  });
 });
 
 // error handler
 app.use(function (err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get("env") === "development" ? err : {};
-
-  // render the error page
-  res.status(err.status || 500);
-  res.render("error");
+  // Set error status code
+  const status = err.status || 500;
+  
+  // Return JSON error response
+  res.status(status).json({
+    success: false,
+    message: err.message || 'Internal Server Error',
+    error: {
+      status: status,
+      // Only show stack trace in development
+      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    }
+  });
 });
-
 module.exports = app;
 
 

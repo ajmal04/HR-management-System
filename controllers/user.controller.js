@@ -32,7 +32,8 @@ exports.create = (req, res) => {
         fullName: req.body.fullname,
         role: req.body.role,
         active: true,
-        departmentId: req.body.departmentId
+        departmentId: req.body.departmentId,
+        college: req.body.college
     };
 
     // Save User in the database
@@ -179,7 +180,7 @@ exports.update = (req, res) => {
     const id = req.params.id;
 
     if(req.body.password) {
-        req.body.password = bcrypt(req.body.password, 10);
+        req.body.password = bcrypt.hashSync(req.body.password, 10);
     }
 
     User.update(req.body, {

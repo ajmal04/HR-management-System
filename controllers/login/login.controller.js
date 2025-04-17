@@ -39,10 +39,11 @@ exports.authenticate = (req, res) => {
                         username: user.username,
                         fullname: user.fullName,
                         role: user.role,
-                        departmentId: deptId
+                        departmentId: deptId,
+                        college: user.college
                     }
                     jwt.sign({user: userData}, process.env.SECRET_KEY, { expiresIn: '30m' }, (err, token) => {
-                        // console.log("Generated Token:", token);
+                         console.log("Generated Token:", token);
                         res.cookie('token', token)
                         res.status(200).send({
                             token: token

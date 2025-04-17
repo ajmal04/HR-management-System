@@ -16,6 +16,10 @@ var userPersonalEventRouter = require('./userPersonalEvent.routes')
 var userPersonalInformationRouter = require('./userPersonalInformation.routes')
 var userFinancialInformationRouter = require('./userFinacnialInformation.routes')
 
+var collegeRouter = require('./college.routes');
+var onboardingRouter = require('./onboarding.routes');
+
+
 /* GET home page. */
 router.get('/', function(req, res, next) {
     res.send('this is the index for api')
@@ -35,5 +39,8 @@ router.use('/messages', userMessageRouter)
 router.use('/personalEvents', userPersonalEventRouter)
 router.use('/personalInformations', userPersonalInformationRouter)
 router.use('/financialInformations', userFinancialInformationRouter)
+
+router.use('/colleges', collegeRouter);
+router.use('/onboarding', onboardingRouter);
 
 module.exports = router;
