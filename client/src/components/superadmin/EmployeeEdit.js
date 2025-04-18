@@ -763,6 +763,29 @@ export default class EmployeeEdit extends Component {
                             ))}
                           </Form.Control>
                         </Form.Group>
+                        <Form.Group controlId="formJobPosition">
+                          <Form.Label className="text-muted required">
+                            Job Position
+                          </Form.Label>
+                          <Form.Control
+                            as="select"
+                            value={this.state.jobPosition}
+                            onChange={this.handleChange}
+                            name="jobPosition"
+                            required
+                          >
+                            <option value="">Choose...</option>
+                            <option value="HOD">HOD</option>
+                            <option value="PRINCIPAL">principal</option>
+                            <option value="HOD">Hod</option>
+                            <option value="ASSOCIATE_PROFESSOR">
+                              Associate Professor
+                            </option>
+                            <option value="ASSISTANT_PROFESSOR">
+                              Assistant Professor
+                            </option>
+                          </Form.Control>
+                        </Form.Group>
                         <Form.Group controlId="formRole">
                           <Form.Label className="text-muted required">
                             Role
