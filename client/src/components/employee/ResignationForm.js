@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, Form, Button, Alert, Spinner } from "react-bootstrap";
 import { Redirect } from "react-router-dom";
 import DatePicker from "react-datepicker";
@@ -10,6 +10,7 @@ export default function ResignationForm() {
     fullName: "",
     employeeId: "",
     department: "",
+    departmentId: null,
     role: "",
     collegeEmail: "",
     dateOfJoining: null,
@@ -22,46 +23,78 @@ export default function ResignationForm() {
     college: "",
   });
 
-  const departments = [
-    "Computer Science",
-    "Electrical Engineering",
-    "Mechanical Engineering",
-    "Agricultural Engineering",
-    "Pharmaceutics",
-    "Pharmacology",
-    "Nursing",
-    "Physiotherapy",
-    "OInformation Technology",
-  ];
-
-  const colleges = [
-    "Engineering",
-    "Pharmacy",
-    "Nursing",
-    "Allied Health Science",
-    "Medical Science and Research",
-    "N/A",
-  ];
-
-  const roles = [
-    "Super Admin",
-    "System Admin",
-    "Admin",
-    "HOD",
-    "Faculty",
-    "Employee",
-  ];
+  const [departments, setDepartments] = useState([]);
+  const [colleges, setColleges] = useState([]);
+  const [roles, setRoles] = useState([
+    "ROLE_SUPER_ADMIN",
+    "ROLE_SYSTEM_ADMIN",
+    "ROLE_ADMIN",
+    "ROLE_HOD",
+    "ROLE_FACULTY",
+  ]);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [errMsg, setErrMsg] = useState("");
   const [completed, setCompleted] = useState(false);
 
+  useEffect(() => {
+    // Fetch departments
+    axios({
+      method: "get",
+      url: "/api/departments",
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+    })
+      .then((res) => {
+        console.log("Departments API response:", res.data);
+        // Ensure we have an array of departments with id and departmentName
+        const depts = Array.isArray(res.data)
+          ? res.data.map((item) => ({
+              id: item.departmentId, // Adjust these property names if needed
+              departmentName: item.name,
+            }))
+          : [];
+        console.log("Processed departments:", depts);
+        setDepartments(depts);
+      })
+      .catch((err) => {
+        console.error("Error fetching departments:", err);
+        setDepartments([]);
+      });
+
+    // Fetch colleges
+    axios({
+      method: "get",
+      url: "/api/colleges",
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+    })
+      .then((res) => {
+        // Ensure we have an array of colleges
+        const cols = Array.isArray(res.data) ? res.data : [];
+        setColleges(cols);
+      })
+      .catch((err) => {
+        console.error("Error fetching colleges:", err);
+        setColleges([]);
+      });
+  }, []);
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  const handleDepartmentChange = (e) => {
+    const selectedDeptId = e.target.value;
+    const selectedDept = departments.find((dept) => dept.id == selectedDeptId);
+
+    setFormData((prev) => ({
+      ...prev,
+      department: selectedDept ? selectedDept.departmentName : "",
+      departmentId: selectedDept ? selectedDept.id : null,
     }));
   };
 
@@ -81,38 +114,40 @@ export default function ResignationForm() {
       return;
     }
 
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setHasError(true);
+      setErrMsg("No token found. Please login again.");
+      return;
+    }
+
     setIsSubmitting(true);
     setHasError(false);
 
     try {
       const submissionData = {
-        fullName: formData.fullName,
-        employeeId: formData.employeeId,
         department: formData.department,
-        role: formData.role,
-        collegeEmail: formData.collegeEmail,
-        dateOfJoining: formData.dateOfJoining
-          ? moment(formData.dateOfJoining).format("YYYY-MM-DD")
-          : null,
+        departmentId: formData.departmentId,
         personalEmail: formData.personalEmail,
         phone: formData.phone,
         reasonForResignation: formData.reasonForResignation,
+        dateOfJoining: formData.dateOfJoining
+          ? moment(formData.dateOfJoining).format("YYYY-MM-DD")
+          : null,
         dateOfSubmission: moment(formData.dateOfSubmission).format(
           "YYYY-MM-DD"
         ),
         noticePeriod: formData.noticePeriod,
         college: formData.college,
-        status: "pending",
       };
 
-      await axios({
-        method: "post",
-        url: "/api/resignations",
-        data: submissionData,
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        timeout: 10000,
+      const response = await axios.post("/api/resignations", submissionData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
 
+      console.log("Resignation submitted successfully", response.data);
       setCompleted(true);
     } catch (err) {
       setHasError(true);
@@ -209,18 +244,24 @@ export default function ResignationForm() {
               </Form.Label>
               <Form.Control
                 as="select"
-                name="department"
-                value={formData.department}
-                onChange={handleChange}
+                name="departmentId"
+                value={formData.departmentId || ""}
+                onChange={handleDepartmentChange}
                 required
               >
                 <option value="">Select Department</option>
-                {departments.map((dept, index) => (
-                  <option key={index} value={dept}>
-                    {dept}
+                {departments.map((dept) => (
+                  <option key={dept.id} value={dept.id}>
+                    {dept.departmentName || `Department ${dept.id}`}
                   </option>
                 ))}
               </Form.Control>
+              {/* Display the selected department name if needed */}
+              {formData.department && (
+                <small className="text-muted">
+                  Selected: {formData.department}
+                </small>
+              )}
             </div>
             <div className="col">
               <Form.Label style={{ color: "#515e73", fontWeight: "bold" }}>
@@ -236,7 +277,7 @@ export default function ResignationForm() {
                 <option value="">Select Role</option>
                 {roles.map((role, index) => (
                   <option key={index} value={role}>
-                    {role}
+                    {role.replace("ROLE_", "").replace(/_/g, " ")}
                   </option>
                 ))}
               </Form.Control>
