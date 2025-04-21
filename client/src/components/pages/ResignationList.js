@@ -11,19 +11,38 @@ export default class ResignationList extends Component {
     super(props);
     this.state = {
       resignedEmployees: [],
+      role: "",
     };
   }
 
   componentDidMount() {
-    this.fetchResignations();
+    const token = localStorage.getItem("token");
+    if (token) {
+      const decoded = JSON.parse(atob(token.split(".")[1]));
+      this.setState({ role: decoded.user.role }, this.fetchResignations);
+    }
   }
 
   fetchResignations = () => {
-    axios({
-      method: "get",
-      url: "/api/resignations/hod", // Updated endpoint for HOD
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-    })
+    const { role } = this.state;
+    const token = localStorage.getItem("token");
+
+    let url = "";
+
+    if (role === "ROLE_HOD") {
+      url = "/api/resignations/hod";
+    } else if (role === "ROLE_ADMIN") {
+      url = "/api/resignations/admin";
+    } else if (role === "ROLE_SUPER_ADMIN") {
+      url = "/api/resignations/superadmin";
+    } else {
+      return;
+    }
+
+    axios
+      .get(url, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
       .then((res) => {
         this.setState({ resignedEmployees: res.data });
       })
@@ -32,19 +51,44 @@ export default class ResignationList extends Component {
       });
   };
 
-  handleStatusChange = (resignationId, status) => {
-    axios({
-      method: "put",
-      url: `/api/resignations/hod/${resignationId}`,
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      data: { status },
-    })
-      .then(() => {
+  handleStatusChange = async (resignationId, action) => {
+    const token = localStorage.getItem("token");
+    const { role } = this.state;
+
+    let endpoint = "";
+
+    if (role === "ROLE_HOD") {
+      endpoint =
+        action === "approved"
+          ? `/api/resignations/hod/approve/${resignationId}`
+          : `/api/resignations/hod/reject/${resignationId}`;
+    } else if (role === "ROLE_ADMIN") {
+      endpoint =
+        action === "approved"
+          ? `/api/resignations/admin/approve/${resignationId}`
+          : `/api/resignations/admin/reject/${resignationId}`;
+    } else if (role === "ROLE_SUPER_ADMIN") {
+      endpoint =
+        action === "approved"
+          ? `/api/resignations/superadmin/approve/${resignationId}`
+          : `/api/resignations/superadmin/reject/${resignationId}`;
+    }
+
+    try {
+      await axios.put(
+        endpoint,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setTimeout(() => {
         this.fetchResignations();
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+      }, 300);
+      this.fetchResignations();
+    } catch (err) {
+      console.error("Status update failed:", err);
+    }
   };
 
   render() {
@@ -103,15 +147,7 @@ export default class ResignationList extends Component {
                         moment(rowData.dateOfSubmission).format("DD/MM/YYYY"),
                     },
                     { title: "Notice Period", field: "noticePeriod" },
-                    {
-                      title: "HOD Status",
-                      field: "hodStatus",
-                      lookup: {
-                        pending: "Pending",
-                        approved: "Approved",
-                        rejected: "Rejected",
-                      },
-                    },
+                    { title: "Message", field: "resignationStatus" },
                     {
                       title: "Actions",
                       field: "actions",
@@ -122,7 +158,14 @@ export default class ResignationList extends Component {
                             onClick={() =>
                               this.handleStatusChange(rowData.id, "approved")
                             }
-                            disabled={rowData.hodStatus !== "pending"}
+                            disabled={
+                              (this.state.role === "ROLE_HOD" &&
+                                rowData.hodStatus !== "pending") ||
+                              (this.state.role === "ROLE_ADMIN" &&
+                                rowData.principalStatus !== "pending") ||
+                              (this.state.role === "ROLE_SUPER_ADMIN" &&
+                                rowData.hrStatus !== "pending")
+                            }
                           >
                             Approve
                           </button>
@@ -131,7 +174,14 @@ export default class ResignationList extends Component {
                             onClick={() =>
                               this.handleStatusChange(rowData.id, "rejected")
                             }
-                            disabled={rowData.hodStatus !== "pending"}
+                            disabled={
+                              (this.state.role === "ROLE_HOD" &&
+                                rowData.hodStatus !== "pending") ||
+                              (this.state.role === "ROLE_ADMIN" &&
+                                rowData.principalStatus !== "pending") ||
+                              (this.state.role === "ROLE_SUPER_ADMIN" &&
+                                rowData.hrStatus !== "pending")
+                            }
                           >
                             Reject
                           </button>

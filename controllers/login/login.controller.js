@@ -41,6 +41,7 @@ exports.authenticate = (req, res) => {
             fullname: user.fullName,
             role: user.role,
             departmentId: deptId,
+            department: user.department?.name || "",
             college: user.college,
           };
           jwt.sign(

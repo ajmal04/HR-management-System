@@ -31,6 +31,7 @@ export default function ResignationForm() {
     "ROLE_ADMIN",
     "ROLE_HOD",
     "ROLE_FACULTY",
+    "ROLE_EMPLOYEE",
   ]);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -40,27 +41,42 @@ export default function ResignationForm() {
 
   useEffect(() => {
     // Fetch departments
-    axios({
-      method: "get",
-      url: "/api/departments",
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-    })
+    axios
+      .get("/api/departments", {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      })
       .then((res) => {
-        console.log("Departments API response:", res.data);
-        // Ensure we have an array of departments with id and departmentName
-        const depts = Array.isArray(res.data)
-          ? res.data.map((item) => ({
-              id: item.departmentId, // Adjust these property names if needed
-              departmentName: item.name,
-            }))
-          : [];
-        console.log("Processed departments:", depts);
-        setDepartments(depts);
+        const mappedDepartments = res.data.map((dept) => ({
+          id: dept.id,
+          departmentName: dept.departmentName,
+        }));
+        setDepartments(mappedDepartments);
       })
       .catch((err) => {
         console.error("Error fetching departments:", err);
-        setDepartments([]);
       });
+
+    // axios({
+    //   method: "get",
+    //   url: "/api/departments",
+    //   headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+    // })
+    //   .then((res) => {
+    //     console.log("Departments API response:", res.data);
+    //     // Ensure we have an array of departments with id and departmentName
+    //     const depts = Array.isArray(res.data)
+    //       ? res.data.map((item) => ({
+    //           id: item.departmentId, // Adjust these property names if needed
+    //           departmentName: item.name,
+    //         }))
+    //       : [];
+    //     console.log("Processed departments:", depts);
+    //     setDepartments(depts);
+    //   })
+    //   .catch((err) => {
+    //     console.error("Error fetching departments:", err);
+    //     setDepartments([]);
+    //   });
 
     // Fetch colleges
     axios({
@@ -88,13 +104,13 @@ export default function ResignationForm() {
   };
 
   const handleDepartmentChange = (e) => {
-    const selectedDeptId = e.target.value;
-    const selectedDept = departments.find((dept) => dept.id == selectedDeptId);
+    const selectedId = parseInt(e.target.value);
+    const selectedDept = departments.find((d) => d.id == selectedId);
 
     setFormData((prev) => ({
       ...prev,
-      department: selectedDept ? selectedDept.departmentName : "",
-      departmentId: selectedDept ? selectedDept.id : null,
+      department: selectedDept?.departmentName || "",
+      departmentId: selectedDept?.id || null,
     }));
   };
 
@@ -126,8 +142,12 @@ export default function ResignationForm() {
 
     try {
       const submissionData = {
+        fullName: formData.fullName,
+        employeeId: formData.employeeId,
         department: formData.department,
         departmentId: formData.departmentId,
+        role: formData.role,
+        collegeEmail: formData.collegeEmail,
         personalEmail: formData.personalEmail,
         phone: formData.phone,
         reasonForResignation: formData.reasonForResignation,
@@ -139,6 +159,10 @@ export default function ResignationForm() {
         ),
         noticePeriod: formData.noticePeriod,
         college: formData.college,
+        hodStatus: "pending",
+        principalStatus: "pending",
+        hrStatus: "pending",
+        resignationStatus: "Resignation submitted and pending HOD approval",
       };
 
       const response = await axios.post("/api/resignations", submissionData, {
@@ -252,16 +276,10 @@ export default function ResignationForm() {
                 <option value="">Select Department</option>
                 {departments.map((dept) => (
                   <option key={dept.id} value={dept.id}>
-                    {dept.departmentName || `Department ${dept.id}`}
+                    {dept.departmentName}
                   </option>
                 ))}
               </Form.Control>
-              {/* Display the selected department name if needed */}
-              {formData.department && (
-                <small className="text-muted">
-                  Selected: {formData.department}
-                </small>
-              )}
             </div>
             <div className="col">
               <Form.Label style={{ color: "#515e73", fontWeight: "bold" }}>

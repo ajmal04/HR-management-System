@@ -54,15 +54,13 @@ import Login from "./components/Login";
 // import JobListSuperAdmin from "./components/superadmin/JobList";
 // import JobListAdmin from "./components/admin/JobList";
 // import JobListHOD from "./components/hod/JobList";
-import ResignationFormAdmin from "./components/admin/ResignationForm.js";
 import TerminationList from "./components/pages/TerminationList";
 import ResignationList from "./components/pages/ResignationList";
-import ResignationFormEmployee from "./components/employee/ResignationForm.js";
-import ResignationFormSuperadmin from "./components/superadmin/ResignationForm.js";
+import ResignationForm from "./components/pages/ResignationForm.js";
+import ResignationStatus from "./components/pages/ResignationStatus.js";
 import OnboardingList from "./components/systemadmin/OnboardingList.js";
 import OnboardingDetail from "./components/systemadmin/OnboardingDetail.js";
 import AssetAllocation from "./components/systemadmin/AssetAllocation.js";
-import ResignationFormHOD from "./components/hod/ResignationForm.js";
 
 export default class App extends Component {
   render() {
@@ -150,11 +148,7 @@ const SuperAdminContainer = () => (
         {/* <Route exact path="/job-list" component={JobListSuperAdmin} /> */}
         <Route exact path="/termination-list" component={TerminationList} />
         <Route exact path="/resignation-list" component={ResignationList} />
-        <Route
-          exact
-          path="/resignation-form"
-          component={ResignationFormSuperadmin}
-        />
+        <Route exact path="/resignation-form" component={ResignationForm} />
         <Route
           exact
           path="/application-list"
@@ -204,11 +198,7 @@ const AdminContainer = () => (
         {/* <Route exact path="/job-list" component={JobListAdmin} /> */}
         <Route exact path="/termination-list" component={TerminationList} />
         <Route exact path="/resignation-list" component={ResignationList} />
-        <Route
-          exact
-          path="/resignation-form"
-          component={ResignationFormAdmin}
-        />
+        <Route exact path="/resignation-form" component={ResignationForm} />
         <Route
           exact
           path="/application-list"
@@ -237,7 +227,7 @@ const HODContainer = () => (
         <Route exact path="/salary-view" component={SalaryViewHOD} />
         <Route exact path="/termination-list" component={TerminationList} />
         <Route exact path="/resignation-list" component={ResignationList} />
-        <Route exact path="/resignation-form" component={ResignationFormHOD} />
+        <Route exact path="/resignation-form" component={ResignationForm} />
         {/* <Route exact path="/job-list" component={JobListHOD} /> */}
         <Route exact path="/application-list" component={ApplicationListHOD} />
         <Route exact path="/application" component={Application} />
@@ -266,12 +256,9 @@ const FacultyContainer = () => (
         <Route exact path="/application" component={Application} />
         <Route exact path="/salary-view" component={SalaryViewEmployee} />
         <Route exact path="/announcement" component={AnnouncementEmployee} />
+        <Route exact path="/resignation-form" component={ResignationForm} />
+        <Route exact path="/resignation-status" component={ResignationStatus} />
         <Route exact path="/" component={DashboardEmployee} />
-        <Route
-          exact
-          path="/resignation-form"
-          component={ResignationFormEmployee}
-        />
       </Switch>
     </Layout>
     <Footer />
