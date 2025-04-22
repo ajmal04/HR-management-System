@@ -1,9 +1,9 @@
 import React, { Component } from "react";
 import { Card, Form, Button, Alert, Spinner } from "react-bootstrap";
-import { Redirect } from 'react-router-dom';
+import { Redirect } from "react-router-dom";
 import DatePicker from "react-datepicker";
-import axios from 'axios';
-import moment from 'moment';
+import axios from "axios";
+import moment from "moment";
 
 export default class EmployeeEdit extends Component {
   constructor(props) {
@@ -12,55 +12,54 @@ export default class EmployeeEdit extends Component {
     this.state = {
       user: {
         id: null,
-        fullName: '',
+        fullName: "",
         role: null,
         active: null,
         departmentId: null,
         college: null,
-        username: ''
+        username: "",
       },
       userPersonalInfo: {
         id: null,
         dateOfBirth: null,
-        gender: '',
-        maritalStatus: '',
-        fatherName: '',
-        idNumber: '',
-        address: '',
-        city: '',
-        country: '',
-        mobile: '',
-        phone: '',
-        emailAddress: ''
+        gender: "",
+        maritalStatus: "",
+        fatherName: "",
+        idNumber: "",
+        address: "",
+        city: "",
+        country: "",
+        mobile: "",
+        phone: "",
+        emailAddress: "",
       },
       userFinancialInfo: {
         id: null,
-        bankName: '',
-        accountName: '',
-        accountNumber: '',
-        iban: ''
+        bankName: "",
+        accountName: "",
+        accountNumber: "",
+        iban: "",
       },
       department: {
         departmentId: null,
-        departmentName: null
+        departmentName: null,
       },
       departments: [],
       colleges: [],
       job: {
         id: null,
-        jobTitle: '',
+        jobTitle: "",
         startDate: null,
-        endDate: null
+        endDate: null,
       },
       hasError: false,
       errMsg: "",
       completed: false,
       falseRedirect: false,
-      isLoading: true,
       isSubmitting: false,
+      isLoadingEmployee: true,
       isLoadingDepartments: true,
       isLoadingColleges: true,
-      isLoadingEmployee: true
     };
 
     this._isMounted = false;
@@ -69,9 +68,9 @@ export default class EmployeeEdit extends Component {
 
   componentDidMount() {
     this._isMounted = true;
-    
+
     if (!this.props.location.state?.selectedUser) {
-      this.setState({ falseRedirect: true, isLoading: false });
+      this.setState({ falseRedirect: true });
       return;
     }
 
@@ -79,13 +78,15 @@ export default class EmployeeEdit extends Component {
     Promise.all([
       this.fetchEmployeeData(),
       this.fetchDepartments(),
-      this.fetchColleges()
-    ]).catch(err => {
+      this.fetchColleges(),
+    ]).catch((err) => {
       if (this._isMounted && !axios.isCancel(err)) {
-        this.setState({ 
-          hasError: true, 
+        this.setState({
+          hasError: true,
           errMsg: "Failed to load initial data",
-          isLoading: false 
+          isLoadingEmployee: false,
+          isLoadingDepartments: false,
+          isLoadingColleges: false,
         });
       }
     });
@@ -93,60 +94,64 @@ export default class EmployeeEdit extends Component {
 
   componentWillUnmount() {
     this._isMounted = false;
-    this.cancelTokenSource.cancel('Component unmounted');
+    this.cancelTokenSource.cancel("Component unmounted");
   }
 
   fetchEmployeeData = async () => {
     try {
       const response = await axios({
-        method: 'get',
-        url: 'api/users/' + this.props.location.state.selectedUser.id,
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+        method: "get",
+        url: "api/users/" + this.props.location.state.selectedUser.id,
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         cancelToken: this.cancelTokenSource.token,
-        timeout: 10000
+        timeout: 10000,
       });
 
       if (!this._isMounted) return;
 
       const user = response.data;
-      
+
       const stateUpdates = {
         isLoadingEmployee: false,
-        isLoading: !(this.state.isLoadingDepartments || this.state.isLoadingColleges),
         user: {
           ...this.state.user,
           ...user,
-          college: user.college || null
+          college: user.college || null,
         },
         userPersonalInfo: {
           ...this.state.userPersonalInfo,
           ...(user.user_personal_info || {}),
-          dateOfBirth: user.user_personal_info?.dateOfBirth 
-            ? moment(new Date(user.user_personal_info.dateOfBirth)).toDate() 
-            : null
+          dateOfBirth: user.user_personal_info?.dateOfBirth
+            ? moment(new Date(user.user_personal_info.dateOfBirth)).toDate()
+            : null,
         },
-        department: user.department || this.state.department
+        department: user.department || this.state.department,
       };
 
       if (user.user_financial_info) {
         stateUpdates.userFinancialInfo = {
           ...this.state.userFinancialInfo,
-          ...user.user_financial_info
+          ...user.user_financial_info,
         };
       }
 
       if (user.jobs?.length > 0) {
-        const currentJob = user.jobs.find(job => 
-          new Date(job.startDate) <= Date.now() && 
-          new Date(job.endDate) >= Date.now()
+        const currentJob = user.jobs.find(
+          (job) =>
+            new Date(job.startDate) <= Date.now() &&
+            new Date(job.endDate) >= Date.now()
         );
-        
+
         if (currentJob) {
           stateUpdates.job = {
             id: currentJob.id,
-            jobTitle: currentJob.jobTitle || '',
-            startDate: currentJob.startDate ? moment(new Date(currentJob.startDate)).toDate() : null,
-            endDate: currentJob.endDate ? moment(new Date(currentJob.endDate)).toDate() : null
+            jobTitle: currentJob.jobTitle || "",
+            startDate: currentJob.startDate
+              ? moment(new Date(currentJob.startDate)).toDate()
+              : null,
+            endDate: currentJob.endDate
+              ? moment(new Date(currentJob.endDate)).toDate()
+              : null,
           };
         }
       }
@@ -154,11 +159,10 @@ export default class EmployeeEdit extends Component {
       this.setState(stateUpdates);
     } catch (err) {
       if (this._isMounted && !axios.isCancel(err)) {
-        this.setState({ 
-          hasError: true, 
+        this.setState({
+          hasError: true,
           errMsg: err.response?.data?.message || "Failed to load employee data",
-          isLoading: false,
-          isLoadingEmployee: false
+          isLoadingEmployee: false,
         });
       }
     }
@@ -167,27 +171,25 @@ export default class EmployeeEdit extends Component {
   fetchDepartments = async () => {
     try {
       const response = await axios({
-        method: 'get',
-        url: '/api/departments',
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+        method: "get",
+        url: "/api/departments",
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         cancelToken: this.cancelTokenSource.token,
-        timeout: 10000
+        timeout: 10000,
       });
 
       if (this._isMounted) {
-        this.setState({ 
+        this.setState({
           departments: response.data,
           isLoadingDepartments: false,
-          isLoading: !(this.state.isLoadingEmployee || this.state.isLoadingColleges)
         });
       }
     } catch (err) {
       if (this._isMounted && !axios.isCancel(err)) {
-        this.setState({ 
+        this.setState({
           hasError: true,
           errMsg: "Failed to load departments",
-          isLoading: false,
-          isLoadingDepartments: false
+          isLoadingDepartments: false,
         });
       }
     }
@@ -196,27 +198,25 @@ export default class EmployeeEdit extends Component {
   fetchColleges = async () => {
     try {
       const response = await axios({
-        method: 'get',
-        url: '/api/colleges',
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+        method: "get",
+        url: "/api/colleges",
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         cancelToken: this.cancelTokenSource.token,
-        timeout: 10000
+        timeout: 10000,
       });
-  
+
       if (this._isMounted) {
-        this.setState({ 
+        this.setState({
           colleges: response.data,
           isLoadingColleges: false,
-          isLoading: !(this.state.isLoadingEmployee || this.state.isLoadingDepartments)
         });
       }
     } catch (err) {
       if (this._isMounted && !axios.isCancel(err)) {
-        this.setState({ 
+        this.setState({
           hasError: true,
           errMsg: "Failed to load colleges",
-          isLoading: false,
-          isLoadingColleges: false
+          isLoadingColleges: false,
         });
       }
     }
@@ -224,63 +224,67 @@ export default class EmployeeEdit extends Component {
 
   handleChangeUser = (event) => {
     const { value, name } = event.target;
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       user: {
         ...prevState.user,
-        [name]: value
-      }
+        [name]: value,
+      },
     }));
   };
 
   handleChangeJob = (event) => {
     const { value, name } = event.target;
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       job: {
         ...prevState.job,
-        [name]: value
-      }
+        [name]: value,
+      },
     }));
   };
 
   handleChangeDepartment = (event) => {
     const { value, name } = event.target;
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       department: {
         ...prevState.department,
-        [name]: value
-      }
+        [name]: value,
+      },
     }));
   };
 
   handleChangeUserPersonal = (event) => {
     const { value, name } = event.target;
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       userPersonalInfo: {
         ...prevState.userPersonalInfo,
-        [name]: value
-      }
+        [name]: value,
+      },
     }));
   };
 
   handleChangeUserFinancial = (event) => {
     const { value, name } = event.target;
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       userFinancialInfo: {
         ...prevState.userFinancialInfo,
-        [name]: value
-      }
+        [name]: value,
+      },
     }));
   };
 
   pushDepartments = () => {
     return this.state.departments.map((dept, index) => (
-      <option key={index} value={dept.id}>{dept.departmentName}</option>
+      <option key={index} value={dept.id}>
+        {dept.departmentName}
+      </option>
     ));
   };
 
   pushColleges = () => {
     return this.state.colleges.map((college, index) => (
-      <option key={index} value={college}>{college}</option>
+      <option key={index} value={college}>
+        {college}
+      </option>
     ));
   };
 
@@ -293,33 +297,33 @@ export default class EmployeeEdit extends Component {
 
       // Update user data
       const userResponse = await axios({
-        method: 'put',
-        url: '/api/users/' + this.props.location.state.selectedUser.id,
+        method: "put",
+        url: "/api/users/" + this.props.location.state.selectedUser.id,
         data: {
           fullName: user.fullName,
           role: user.role,
           departmentId: user.departmentId,
           college: user.college,
-          active: user.active
+          active: user.active,
         },
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-        timeout: 10000
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        timeout: 10000,
       });
 
       const userId = userResponse.data.id;
 
       // Update or create personal information
-      const personalInfoMethod = userPersonalInfo.id ? 'put' : 'post';
-      const personalInfoUrl = userPersonalInfo.id 
-        ? '/api/personalInformations/' + userPersonalInfo.id 
-        : '/api/personalInformations';
-      
+      const personalInfoMethod = userPersonalInfo.id ? "put" : "post";
+      const personalInfoUrl = userPersonalInfo.id
+        ? "/api/personalInformations/" + userPersonalInfo.id
+        : "/api/personalInformations";
+
       await axios({
         method: personalInfoMethod,
         url: personalInfoUrl,
         data: {
-          dateOfBirth: userPersonalInfo.dateOfBirth 
-            ? moment(userPersonalInfo.dateOfBirth).format('YYYY-MM-DD') 
+          dateOfBirth: userPersonalInfo.dateOfBirth
+            ? moment(userPersonalInfo.dateOfBirth).format("YYYY-MM-DD")
             : null,
           gender: userPersonalInfo.gender,
           maritalStatus: userPersonalInfo.maritalStatus,
@@ -331,20 +335,24 @@ export default class EmployeeEdit extends Component {
           mobile: userPersonalInfo.mobile,
           phone: userPersonalInfo.phone,
           emailAddress: userPersonalInfo.emailAddress,
-          userId: userId
+          userId: userId,
         },
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-        timeout: 10000
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        timeout: 10000,
       });
 
       // Update or create financial information if any fields are filled
-      if (userFinancialInfo.bankName || userFinancialInfo.accountName || 
-          userFinancialInfo.accountNumber || userFinancialInfo.iban) {
-        const financialInfoMethod = userFinancialInfo.id ? 'put' : 'post';
-        const financialInfoUrl = userFinancialInfo.id 
-          ? 'api/financialInformations/' + userFinancialInfo.id 
-          : 'api/financialInformations';
-        
+      if (
+        userFinancialInfo.bankName ||
+        userFinancialInfo.accountName ||
+        userFinancialInfo.accountNumber ||
+        userFinancialInfo.iban
+      ) {
+        const financialInfoMethod = userFinancialInfo.id ? "put" : "post";
+        const financialInfoUrl = userFinancialInfo.id
+          ? "api/financialInformations/" + userFinancialInfo.id
+          : "api/financialInformations";
+
         await axios({
           method: financialInfoMethod,
           url: financialInfoUrl,
@@ -353,29 +361,33 @@ export default class EmployeeEdit extends Component {
             accountName: userFinancialInfo.accountName,
             accountNumber: userFinancialInfo.accountNumber,
             iban: userFinancialInfo.iban,
-            userId: userId
+            userId: userId,
           },
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-          timeout: 10000
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+          timeout: 10000,
         });
       }
 
       // Update or create job if any fields are filled
       if (job.jobTitle || job.startDate || job.endDate) {
-        const jobMethod = job.id ? 'put' : 'post';
-        const jobUrl = job.id ? 'api/jobs/' + job.id : 'api/jobs';
-        
+        const jobMethod = job.id ? "put" : "post";
+        const jobUrl = job.id ? "api/jobs/" + job.id : "api/jobs";
+
         await axios({
           method: jobMethod,
           url: jobUrl,
           data: {
             jobTitle: job.jobTitle,
-            startDate: job.startDate ? moment(job.startDate).format('YYYY-MM-DD') : null,
-            endDate: job.endDate ? moment(job.endDate).format('YYYY-MM-DD') : null,
-            userId: userId
+            startDate: job.startDate
+              ? moment(job.startDate).format("YYYY-MM-DD")
+              : null,
+            endDate: job.endDate
+              ? moment(job.endDate).format("YYYY-MM-DD")
+              : null,
+            userId: userId,
           },
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-          timeout: 10000
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+          timeout: 10000,
         });
       }
 
@@ -384,10 +396,10 @@ export default class EmployeeEdit extends Component {
       }
     } catch (err) {
       if (this._isMounted && !axios.isCancel(err)) {
-        this.setState({ 
-          hasError: true, 
+        this.setState({
+          hasError: true,
           errMsg: err.response?.data?.message || "Failed to update employee",
-          isSubmitting: false 
+          isSubmitting: false,
         });
         window.scrollTo(0, 0);
       }
@@ -395,27 +407,19 @@ export default class EmployeeEdit extends Component {
   };
 
   render() {
-    const { 
-      hasError, 
-      errMsg, 
-      completed, 
-      falseRedirect, 
-      isLoading,
-      isSubmitting
+    const {
+      hasError,
+      errMsg,
+      completed,
+      falseRedirect,
+      isLoadingEmployee,
+      isLoadingDepartments,
+      isLoadingColleges,
+      isSubmitting,
     } = this.state;
 
     if (falseRedirect) {
       return <Redirect to="/" />;
-    }
-
-    if (isLoading) {
-      return (
-        <div className="d-flex justify-content-center mt-5">
-          <Spinner animation="border" role="status">
-            <span className="sr-only">Loading...</span>
-          </Spinner>
-        </div>
-      );
     }
 
     if (hasError) {
@@ -423,8 +427,8 @@ export default class EmployeeEdit extends Component {
         <Alert variant="danger" className="m-3">
           {errMsg || "Failed to load employee data"}
           <div className="mt-2">
-            <Button 
-              variant="primary" 
+            <Button
+              variant="primary"
               size="sm"
               onClick={() => window.location.reload()}
             >
@@ -439,12 +443,24 @@ export default class EmployeeEdit extends Component {
       return <Redirect to="/employee-list" />;
     }
 
-    const { 
-      user, 
-      userPersonalInfo, 
-      userFinancialInfo, 
+    // Show initial spinner only if NO data has loaded at all
+    if (isLoadingEmployee && isLoadingDepartments && isLoadingColleges) {
+      return (
+        <div className="d-flex justify-content-center mt-5">
+          <Spinner animation="border" role="status">
+            <span className="sr-only">Loading...</span>
+          </Spinner>
+        </div>
+      );
+    }
+
+    const {
+      user,
+      userPersonalInfo,
+      userFinancialInfo,
       departments,
-      colleges
+      colleges,
+      job,
     } = this.state;
 
     return (
@@ -456,208 +472,247 @@ export default class EmployeeEdit extends Component {
             </Alert>
           )}
 
-          {/* Main Card */}
           <Card className="col-sm-12 main-card">
             <Card.Header>
               <b>Edit Employee</b>
+              {(isLoadingEmployee ||
+                isLoadingDepartments ||
+                isLoadingColleges) && (
+                <span className="float-right">
+                  <Spinner animation="border" size="sm" />
+                  <span className="ml-2">Loading data...</span>
+                </span>
+              )}
             </Card.Header>
             <Card.Body>
               <div className="row">
                 {/* Personal Details Card */}
                 <div className="col-sm-6">
                   <Card className="secondary-card">
-                    <Card.Header>Personal Details</Card.Header>
+                    <Card.Header>
+                      Personal Details
+                      {isLoadingEmployee && (
+                        <Spinner
+                          animation="border"
+                          size="sm"
+                          className="ml-2"
+                        />
+                      )}
+                    </Card.Header>
                     <Card.Body>
-                      <Card.Text>
-                        <Form.Group controlId="formFullName">
-                          <Form.Label className="text-muted required">
-                            Full Name
-                          </Form.Label>
-                          <Form.Control
-                            type="text"
-                            placeholder="Enter full name"
-                            name="fullName"
-                            value={user.fullName || ''}
-                            onChange={this.handleChangeUser}
-                            required
-                          />
-                        </Form.Group>
+                      {isLoadingEmployee ? (
+                        <div className="text-center py-3">
+                          <Spinner animation="border" />
+                          <p>Loading personal details...</p>
+                        </div>
+                      ) : (
+                        <Card.Text>
+                          <Form.Group controlId="formFullName">
+                            <Form.Label className="text-muted required">
+                              Full Name
+                            </Form.Label>
+                            <Form.Control
+                              type="text"
+                              placeholder="Enter full name"
+                              name="fullName"
+                              value={user.fullName || ""}
+                              onChange={this.handleChangeUser}
+                              required
+                            />
+                          </Form.Group>
 
-                        <Form.Group controlId="formDateofBirth">
-                          <Form.Label className="text-muted required">
-                            Date of Birth
-                          </Form.Label>
-                          <Form.Row>
+                          <Form.Group controlId="formDateofBirth">
+                            <Form.Label className="text-muted required">
+                              Date of Birth
+                            </Form.Label>
                             <DatePicker
                               selected={userPersonalInfo.dateOfBirth}
-                              onChange={dateOfBirth => this.setState(prevState => ({
-                                userPersonalInfo: {
-                                  ...prevState.userPersonalInfo,
-                                  dateOfBirth: dateOfBirth
-                                }
-                              }))}
+                              onChange={(dateOfBirth) =>
+                                this.setState((prevState) => ({
+                                  userPersonalInfo: {
+                                    ...prevState.userPersonalInfo,
+                                    dateOfBirth: dateOfBirth,
+                                  },
+                                }))
+                              }
                               showMonthDropdown
                               showYearDropdown
                               dropdownMode="select"
                               name="dateOfBirth"
                               dateFormat="yyyy-MM-dd"
-                              className="form-control ml-1"
+                              className="form-control"
                               placeholderText="Select Date Of Birth"
                               autoComplete="off"
                               required
                             />
-                          </Form.Row>
-                        </Form.Group>
+                          </Form.Group>
 
-                        <Form.Group controlId="formGender">
-                          <Form.Label className="text-muted required">
-                            Gender
-                          </Form.Label>
-                          <Form.Control
-                            as="select"
-                            value={userPersonalInfo.gender || ''}
-                            onChange={this.handleChangeUserPersonal}
-                            name="gender"
-                            required
-                          >
-                            <option value="">Choose...</option>
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
-                          </Form.Control>
-                        </Form.Group>
+                          <Form.Group controlId="formGender">
+                            <Form.Label className="text-muted required">
+                              Gender
+                            </Form.Label>
+                            <Form.Control
+                              as="select"
+                              value={userPersonalInfo.gender || ""}
+                              onChange={this.handleChangeUserPersonal}
+                              name="gender"
+                              required
+                            >
+                              <option value="">Choose...</option>
+                              <option value="Male">Male</option>
+                              <option value="Female">Female</option>
+                            </Form.Control>
+                          </Form.Group>
 
-                        <Form.Group controlId="formMaritalStatus">
-                          <Form.Label className="text-muted required">
-                            Marital Status
-                          </Form.Label>
-                          <Form.Control
-                            as="select"
-                            value={userPersonalInfo.maritalStatus || ''}
-                            onChange={this.handleChangeUserPersonal}
-                            name="maritalStatus"
-                            required
-                          >
-                            <option value="">Choose...</option>
-                            <option value="Married">Married</option>
-                            <option value="Single">Single</option>
-                          </Form.Control>
-                        </Form.Group>
+                          <Form.Group controlId="formMaritalStatus">
+                            <Form.Label className="text-muted required">
+                              Marital Status
+                            </Form.Label>
+                            <Form.Control
+                              as="select"
+                              value={userPersonalInfo.maritalStatus || ""}
+                              onChange={this.handleChangeUserPersonal}
+                              name="maritalStatus"
+                              required
+                            >
+                              <option value="">Choose...</option>
+                              <option value="Married">Married</option>
+                              <option value="Single">Single</option>
+                            </Form.Control>
+                          </Form.Group>
 
-                        <Form.Group controlId="formFatherName">
-                          <Form.Label className="text-muted required">
-                            Father's name
-                          </Form.Label>
-                          <Form.Control
-                            type="text"
-                            placeholder="Enter Father's Name"
-                            name="fatherName"
-                            value={userPersonalInfo.fatherName || ''}
-                            onChange={this.handleChangeUserPersonal}
-                            required
-                          />
-                        </Form.Group>
+                          <Form.Group controlId="formFatherName">
+                            <Form.Label className="text-muted required">
+                              Father's name
+                            </Form.Label>
+                            <Form.Control
+                              type="text"
+                              placeholder="Enter Father's Name"
+                              name="fatherName"
+                              value={userPersonalInfo.fatherName || ""}
+                              onChange={this.handleChangeUserPersonal}
+                              required
+                            />
+                          </Form.Group>
 
-                        <Form.Group controlId="formId">
-                          <Form.Label className="text-muted required">
-                            ID Number
-                          </Form.Label>
-                          <Form.Control
-                            type="text"
-                            placeholder="Enter ID Number"
-                            name="idNumber"
-                            value={userPersonalInfo.idNumber || ''}
-                            onChange={this.handleChangeUserPersonal}
-                            required
-                          />
-                        </Form.Group>
-                      </Card.Text>
+                          <Form.Group controlId="formId">
+                            <Form.Label className="text-muted required">
+                              ID Number
+                            </Form.Label>
+                            <Form.Control
+                              type="text"
+                              placeholder="Enter ID Number"
+                              name="idNumber"
+                              value={userPersonalInfo.idNumber || ""}
+                              onChange={this.handleChangeUserPersonal}
+                              required
+                            />
+                          </Form.Group>
+                        </Card.Text>
+                      )}
                     </Card.Body>
                   </Card>
                 </div>
 
                 <div className="col-sm-6">
                   <Card className="secondary-card">
-                    <Card.Header>Contact Details</Card.Header>
+                    <Card.Header>
+                      Contact Details
+                      {isLoadingEmployee && (
+                        <Spinner
+                          animation="border"
+                          size="sm"
+                          className="ml-2"
+                        />
+                      )}
+                    </Card.Header>
                     <Card.Body>
-                      <Card.Text>
-                        <Form.Group controlId="formPhysicalAddress">
-                          <Form.Label className="text-muted required">
-                            Physical Address
-                          </Form.Label>
-                          <Form.Control
-                            type="text"
-                            value={userPersonalInfo.address || ''}
-                            onChange={this.handleChangeUserPersonal} 
-                            name="address"
-                            placeholder="Enter Address"
-                            required
-                          />
-                        </Form.Group>
-                        <Form.Group controlId="formCountry">
-                          <Form.Label className="text-muted required">
-                            Country
-                          </Form.Label>
-                          <Form.Control
-                            type="text"
-                            value={userPersonalInfo.country || ''}
-                            onChange={this.handleChangeUserPersonal}
-                            name="country"
-                            placeholder="Enter Country"
-                            required
-                          />
-                        </Form.Group>
-                        <Form.Group controlId="formCity">
-                          <Form.Label className="text-muted required">
-                            City
-                          </Form.Label>
-                          <Form.Control 
-                            type="text" 
-                            value={userPersonalInfo.city || ''}
-                            onChange={this.handleChangeUserPersonal}
-                            name="city"
-                            placeholder="Enter City" 
-                            required
-                          />
-                        </Form.Group>
-                        <Form.Group controlId="formMobile">
-                          <Form.Label className="text-muted required">
-                            Mobile
-                          </Form.Label>
-                          <Form.Control
-                            type="text"
-                            value={userPersonalInfo.mobile || ''}
-                            onChange={this.handleChangeUserPersonal}
-                            name="mobile"
-                            placeholder="Enter Mobile"
-                            required
-                          />
-                        </Form.Group>
-                        <Form.Group controlId="formPhone">
-                          <Form.Label className="text-muted">
-                            Phone
-                          </Form.Label>
-                          <Form.Control 
-                            type="text" 
-                            value={userPersonalInfo.phone || ''}
-                            onChange={this.handleChangeUserPersonal}
-                            name="phone"
-                            placeholder="Enter Phone" 
-                          />
-                        </Form.Group>
-                        <Form.Group controlId="formEmail">
-                          <Form.Label className="text-muted required">
-                            Email
-                          </Form.Label>
-                          <Form.Control 
-                            type="email" 
-                            value={userPersonalInfo.emailAddress || ''}
-                            onChange={this.handleChangeUserPersonal}
-                            name="emailAddress"
-                            placeholder="Enter Email" 
-                            required
-                          />
-                        </Form.Group>
-                      </Card.Text>
+                      {isLoadingEmployee ? (
+                        <div className="text-center py-3">
+                          <Spinner animation="border" />
+                          <p>Loading contact details...</p>
+                        </div>
+                      ) : (
+                        <Card.Text>
+                          <Form.Group controlId="formPhysicalAddress">
+                            <Form.Label className="text-muted required">
+                              Physical Address
+                            </Form.Label>
+                            <Form.Control
+                              type="text"
+                              value={userPersonalInfo.address || ""}
+                              onChange={this.handleChangeUserPersonal}
+                              name="address"
+                              placeholder="Enter Address"
+                              required
+                            />
+                          </Form.Group>
+                          <Form.Group controlId="formCountry">
+                            <Form.Label className="text-muted required">
+                              Country
+                            </Form.Label>
+                            <Form.Control
+                              type="text"
+                              value={userPersonalInfo.country || ""}
+                              onChange={this.handleChangeUserPersonal}
+                              name="country"
+                              placeholder="Enter Country"
+                              required
+                            />
+                          </Form.Group>
+                          <Form.Group controlId="formCity">
+                            <Form.Label className="text-muted required">
+                              City
+                            </Form.Label>
+                            <Form.Control
+                              type="text"
+                              value={userPersonalInfo.city || ""}
+                              onChange={this.handleChangeUserPersonal}
+                              name="city"
+                              placeholder="Enter City"
+                              required
+                            />
+                          </Form.Group>
+                          <Form.Group controlId="formMobile">
+                            <Form.Label className="text-muted required">
+                              Mobile
+                            </Form.Label>
+                            <Form.Control
+                              type="text"
+                              value={userPersonalInfo.mobile || ""}
+                              onChange={this.handleChangeUserPersonal}
+                              name="mobile"
+                              placeholder="Enter Mobile"
+                              required
+                            />
+                          </Form.Group>
+                          <Form.Group controlId="formPhone">
+                            <Form.Label className="text-muted">
+                              Phone
+                            </Form.Label>
+                            <Form.Control
+                              type="text"
+                              value={userPersonalInfo.phone || ""}
+                              onChange={this.handleChangeUserPersonal}
+                              name="phone"
+                              placeholder="Enter Phone"
+                            />
+                          </Form.Group>
+                          <Form.Group controlId="formEmail">
+                            <Form.Label className="text-muted required">
+                              Email
+                            </Form.Label>
+                            <Form.Control
+                              type="email"
+                              value={userPersonalInfo.emailAddress || ""}
+                              onChange={this.handleChangeUserPersonal}
+                              name="emailAddress"
+                              placeholder="Enter Email"
+                              required
+                            />
+                          </Form.Group>
+                        </Card.Text>
+                      )}
                     </Card.Body>
                   </Card>
                 </div>
@@ -666,174 +721,208 @@ export default class EmployeeEdit extends Component {
               <div className="row mt-3">
                 <div className="col-sm-6">
                   <Card className="secondary-card">
-                    <Card.Header>Bank Information</Card.Header>
+                    <Card.Header>
+                      Bank Information
+                      {isLoadingEmployee && (
+                        <Spinner
+                          animation="border"
+                          size="sm"
+                          className="ml-2"
+                        />
+                      )}
+                    </Card.Header>
                     <Card.Body>
-                      <Card.Text>
-                        <Form.Group controlId="formBankName">
-                          <Form.Label className="text-muted">
-                            Bank Name
-                          </Form.Label>
-                          <Form.Control
-                            type="text"
-                            value={userFinancialInfo.bankName || ''}
-                            onChange={this.handleChangeUserFinancial}
-                            name="bankName"
-                            placeholder="Enter Bank name"
-                          />
-                        </Form.Group>
-                        <Form.Group controlId="formAccountName">
-                          <Form.Label className="text-muted">
-                            Account Name
-                          </Form.Label>
-                          <Form.Control
-                            type="text"
-                            value={userFinancialInfo.accountName || ''}
-                            onChange={this.handleChangeUserFinancial}
-                            name="accountName"
-                            placeholder="Enter Account name"
-                          />
-                        </Form.Group>
-                        <Form.Group controlId="formAccountNumber">
-                          <Form.Label className="text-muted">
-                            Account Number
-                          </Form.Label>
-                          <Form.Control
-                            type="text"
-                            value={userFinancialInfo.accountNumber || ''}
-                            onChange={this.handleChangeUserFinancial}
-                            name="accountNumber"
-                            placeholder="Enter Account number"
-                          />
-                        </Form.Group>
-                        <Form.Group controlId="formIban">
-                          <Form.Label className="text-muted">IBAN</Form.Label>
-                          <Form.Control 
-                            type="text" 
-                            value={userFinancialInfo.iban || ''}
-                            onChange={this.handleChangeUserFinancial}
-                            name="iban"
-                            placeholder="Enter IBAN" 
-                          />
-                        </Form.Group>
-                      </Card.Text>
+                      {isLoadingEmployee ? (
+                        <div className="text-center py-3">
+                          <Spinner animation="border" />
+                          <p>Loading bank information...</p>
+                        </div>
+                      ) : (
+                        <Card.Text>
+                          <Form.Group controlId="formBankName">
+                            <Form.Label className="text-muted">
+                              Bank Name
+                            </Form.Label>
+                            <Form.Control
+                              type="text"
+                              value={userFinancialInfo.bankName || ""}
+                              onChange={this.handleChangeUserFinancial}
+                              name="bankName"
+                              placeholder="Enter Bank name"
+                            />
+                          </Form.Group>
+                          <Form.Group controlId="formAccountName">
+                            <Form.Label className="text-muted">
+                              Account Name
+                            </Form.Label>
+                            <Form.Control
+                              type="text"
+                              value={userFinancialInfo.accountName || ""}
+                              onChange={this.handleChangeUserFinancial}
+                              name="accountName"
+                              placeholder="Enter Account name"
+                            />
+                          </Form.Group>
+                          <Form.Group controlId="formAccountNumber">
+                            <Form.Label className="text-muted">
+                              Account Number
+                            </Form.Label>
+                            <Form.Control
+                              type="text"
+                              value={userFinancialInfo.accountNumber || ""}
+                              onChange={this.handleChangeUserFinancial}
+                              name="accountNumber"
+                              placeholder="Enter Account number"
+                            />
+                          </Form.Group>
+                          <Form.Group controlId="formIban">
+                            <Form.Label className="text-muted">IBAN</Form.Label>
+                            <Form.Control
+                              type="text"
+                              value={userFinancialInfo.iban || ""}
+                              onChange={this.handleChangeUserFinancial}
+                              name="iban"
+                              placeholder="Enter IBAN"
+                            />
+                          </Form.Group>
+                        </Card.Text>
+                      )}
                     </Card.Body>
                   </Card>
                 </div>
 
                 <div className="col-sm-6">
                   <Card className="secondary-card">
-                    <Card.Header>Official Status</Card.Header>
+                    <Card.Header>
+                      Official Status
+                      {(isLoadingEmployee ||
+                        isLoadingDepartments ||
+                        isLoadingColleges) && (
+                        <Spinner
+                          animation="border"
+                          size="sm"
+                          className="ml-2"
+                        />
+                      )}
+                    </Card.Header>
                     <Card.Body>
-                      <Card.Text>
-                        <Form.Group controlId="formEmployeeId">
-                          <Form.Label className="text-muted">
-                            Employee ID
-                          </Form.Label>
-                          <div>{user.username || ''}</div>
-                        </Form.Group>
-                        <Form.Group controlId="formDepartment">
-                          <Form.Label className="text-muted required">
-                            Department
-                          </Form.Label>
-                          <Form.Control
-                            as="select"
-                            value={user.departmentId || ''}
-                            onChange={this.handleChangeUser}
-                            name="departmentId"
-                            required
-                          >
-                            <option value="">Choose...</option>
-                            {departments.map((dept, index) => (
-                              <option key={index} value={dept.id}>{dept.departmentName}</option>
-                            ))}
-                          </Form.Control>
-                        </Form.Group>
-                        <Form.Group controlId="formCollege">
-                          <Form.Label className="text-muted required">College</Form.Label>
-                          <Form.Control
-                            as="select"
-                            value={user.college || ''}
-                            onChange={this.handleChangeUser}
-                            name="college"
-                            required
-                          >
-                            <option value="">Choose...</option>
-                            {colleges.map((college, index) => (
-                              <option key={index} value={college}>{college}</option>
-                            ))}
-                          </Form.Control>
-                        </Form.Group>
-                        <Form.Group controlId="formJobPosition">
-                          <Form.Label className="text-muted required">
-                            Job Position
-                          </Form.Label>
-                          <Form.Control
-                            as="select"
-                            value={this.state.jobPosition}
-                            onChange={this.handleChange}
-                            name="jobPosition"
-                            required
-                          >
-                            <option value="">Choose...</option>
-                            <option value="HOD">HOD</option>
-                            <option value="PRINCIPAL">principal</option>
-                            <option value="HOD">Hod</option>
-                            <option value="ASSOCIATE_PROFESSOR">
-                              Associate Professor
-                            </option>
-                            <option value="ASSISTANT_PROFESSOR">
-                              Assistant Professor
-                            </option>
-                          </Form.Control>
-                        </Form.Group>
-                        <Form.Group controlId="formRole">
-                          <Form.Label className="text-muted required">
-                            Role
-                          </Form.Label>
-                          <Form.Control
-                            as="select"
-                            value={user.role || ''}
-                            onChange={this.handleChangeUser}
-                            name="role"
-                            required
-                          >
-                            <option value="">Choose...</option>
-                            <option value="ROLE_SUPER_ADMIN">Super Admin</option>
-                            <option value="ROLE_SYSTEM_ADMIN">System Admin</option>
-                            <option value="ROLE_ADMIN">Principal</option>
-                            <option value="ROLE_HOD">HOD</option>
-                            <option value="ROLE_FACULTY">Faculty</option>
-                          </Form.Control>
-                        </Form.Group>
-                        <Form.Group controlId="formActive">
-                          <Form.Label className="text-muted required">
-                            Status
-                          </Form.Label>
-                          <Form.Control
-                            as="select"
-                            value={user.active === null ? '' : user.active.toString()}
-                            onChange={(e) => this.handleChangeUser({
-                              target: {
-                                name: 'active',
-                                value: e.target.value === 'true'
+                      {isLoadingEmployee ||
+                      isLoadingDepartments ||
+                      isLoadingColleges ? (
+                        <div className="text-center py-3">
+                          <Spinner animation="border" />
+                          <p>Loading official information...</p>
+                        </div>
+                      ) : (
+                        <Card.Text>
+                          <Form.Group controlId="formEmployeeId">
+                            <Form.Label className="text-muted">
+                              Employee ID
+                            </Form.Label>
+                            <div>{user.username || ""}</div>
+                          </Form.Group>
+                          <Form.Group controlId="formDepartment">
+                            <Form.Label className="text-muted required">
+                              Department
+                            </Form.Label>
+                            <Form.Control
+                              as="select"
+                              value={user.departmentId || ""}
+                              onChange={this.handleChangeUser}
+                              name="departmentId"
+                              required
+                            >
+                              <option value="">Choose...</option>
+                              {departments.map((dept, index) => (
+                                <option key={index} value={dept.id}>
+                                  {dept.departmentName}
+                                </option>
+                              ))}
+                            </Form.Control>
+                          </Form.Group>
+                          <Form.Group controlId="formCollege">
+                            <Form.Label className="text-muted required">
+                              College
+                            </Form.Label>
+                            <Form.Control
+                              as="select"
+                              value={user.college || ""}
+                              onChange={this.handleChangeUser}
+                              name="college"
+                              required
+                            >
+                              <option value="">Choose...</option>
+                              {colleges.map((college, index) => (
+                                <option key={index} value={college}>
+                                  {college}
+                                </option>
+                              ))}
+                            </Form.Control>
+                          </Form.Group>
+                          <Form.Group controlId="formRole">
+                            <Form.Label className="text-muted required">
+                              Role
+                            </Form.Label>
+                            <Form.Control
+                              as="select"
+                              value={user.role || ""}
+                              onChange={this.handleChangeUser}
+                              name="role"
+                              required
+                            >
+                              <option value="">Choose...</option>
+                              <option value="ROLE_SUPER_ADMIN">
+                                Super Admin
+                              </option>
+                              <option value="ROLE_SYSTEM_ADMIN">
+                                System Admin
+                              </option>
+                              <option value="ROLE_ADMIN">Principal</option>
+                              <option value="ROLE_HOD">HOD</option>
+                              <option value="ROLE_FACULTY">Faculty</option>
+                            </Form.Control>
+                          </Form.Group>
+                          <Form.Group controlId="formActive">
+                            <Form.Label className="text-muted required">
+                              Status
+                            </Form.Label>
+                            <Form.Control
+                              as="select"
+                              value={
+                                user.active === null
+                                  ? ""
+                                  : user.active.toString()
                               }
-                            })}
-                            name="active"
-                            required
-                          >
-                            <option value="">Choose...</option>
-                            <option value="false">Inactive</option>
-                            <option value="true">Active</option>
-                          </Form.Control>
-                        </Form.Group>
-                      </Card.Text>
+                              onChange={(e) =>
+                                this.handleChangeUser({
+                                  target: {
+                                    name: "active",
+                                    value: e.target.value === "true",
+                                  },
+                                })
+                              }
+                              name="active"
+                              required
+                            >
+                              <option value="">Choose...</option>
+                              <option value="false">Inactive</option>
+                              <option value="true">Active</option>
+                            </Form.Control>
+                          </Form.Group>
+                        </Card.Text>
+                      )}
                     </Card.Body>
                   </Card>
-                  <Button 
-                    variant="primary" 
-                    type="submit" 
+                  <Button
+                    variant="primary"
+                    type="submit"
                     block
-                    disabled={isSubmitting}
+                    disabled={
+                      isLoadingEmployee ||
+                      isLoadingDepartments ||
+                      isLoadingColleges ||
+                      isSubmitting
+                    }
                   >
                     {isSubmitting ? (
                       <>
@@ -846,7 +935,9 @@ export default class EmployeeEdit extends Component {
                         />
                         <span className="ml-2">Updating...</span>
                       </>
-                    ) : 'Update Employee'}
+                    ) : (
+                      "Update Employee"
+                    )}
                   </Button>
                 </div>
               </div>
