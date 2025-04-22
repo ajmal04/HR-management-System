@@ -55,6 +55,8 @@ import ResignationList from './components/pages/ResignationList';
 import OnboardingList from './components/systemadmin/OnboardingList.js';
 import OnboardingDetail from './components/systemadmin/OnboardingDetail.js';
 import AssetAllocation from './components/systemadmin/AssetAllocation.js';
+import OnboardingDashboard from "./components/onboarding/OnboardingDashboard";
+import AssetManagement from './components/systemadmin/AssetManagement';
 
 export default class App extends Component {
   render() {
@@ -123,7 +125,7 @@ const SuperAdminContainer = () => (
     <SidebarSuperAdmin />
     <Layout>
       <Switch>  
-        
+        <Route exact path="/onboarding-dashboard" component={OnboardingDashboard} />
         <Route exact path="/employee-list" component={EmployeeListSuperAdmin} />
         <Route exact path="/employee-add" component={EmployeeAddSuperAdmin} />
         <Route exact path="/employee-edit" component={EmployeeEditSuperAdmin} />
@@ -152,13 +154,10 @@ const SystemAdminContainer = () => (
     <SidebarSystemAdmin />
     <Layout>
       <Switch>  
-        
         <Route exact path="/onboarding/list" component={OnboardingList} />
-        <Route exact path="/onboarding-detail" component={OnboardingDetail} />
-        <Route exact path="/asset-allocation" component={AssetAllocation} />
-
-
-        
+        <Route exact path="/onboarding-detail/:id" component={OnboardingDetail} />
+        <Route exact path="/asset-allocation/:userId" component={AssetAllocation} />
+        <Route exact path="/assets/manage" component={AssetManagement} />
       </Switch>
     </Layout>
     <Footer />

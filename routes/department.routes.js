@@ -9,7 +9,7 @@ const department = require("../controllers/department.controller.js");
 router.post('/', withAuth.verifyToken, withAuth.withHigherRoles, department.create);
 
 //  Retrieve all Departments (All authenticated users)
-router.get('/', withAuth.verifyToken, withAuth.withHigherRoles, department.findAll);
+router.get('/', withAuth.verifyToken, department.findAll);
 
 //  Retrieve a single Department with an ID (All authenticated users)
 router.get('/:id', withAuth.verifyToken, department.findOne);

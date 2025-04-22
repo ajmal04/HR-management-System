@@ -5,49 +5,58 @@ const User = db.user;
 /**
  * Middleware to verify JWT token
  */
-exports.checkToken = (req, res) => {
-    //Get auth header value
-    const bearerHeader = req.headers['authorization']; 
-    
-    //Check if undefined
-    if(typeof bearerHeader !== 'undefined') {
-        //Split at the space
-        const bearer = bearerHeader.split(' ');
+exports.checkToken = async (req, res) => {
+    try {
+        const bearerHeader = req.headers['authorization']; 
         
-        //Get token from array
-        const bearerToken = bearer[1];
+        if(typeof bearerHeader === 'undefined') {
+            return res.status(401).json({message: 'Access denied: No token provided'});
+        }
+        
+        const bearerToken = bearerHeader.split(' ')[1];
+        
+        if (!bearerToken) {
+            return res.status(401).json({message: 'Access denied: Invalid token format'});
+        }
 
-        //Set the token
-        req.token = bearerToken;
+        const authData = await new Promise((resolve, reject) => {
+            jwt.verify(bearerToken, process.env.SECRET_KEY, (err, decoded) => {
+                if (err) reject(err);
+                else resolve(decoded);
+            });
+        });
 
-        jwt.verify(req.token, process.env.SECRET_KEY, (err, authData) => {
-            if(err) {
-                res.status(403).send({message: 'Access denied: Wrong access token'});
-            } else {
-                res.status(201).send({message: 'Access granted!', authData});
-            }
-        })
-    } else {
-        res.status(401).send({message: 'Access denied: No token provided'});
+        return res.status(200).json({message: 'Access granted!', authData});
+    } catch (error) {
+        return res.status(403).json({message: 'Access denied: Invalid token'});
     }
 }
 
-exports.verifyToken = (req, res, next) => {
-    const bearerHeader = req.headers['authorization']; 
+exports.verifyToken = async (req, res, next) => {
+    try {
+        const bearerHeader = req.headers['authorization']; 
 
-    if (typeof bearerHeader !== 'undefined') {
+        if (typeof bearerHeader === 'undefined') {
+            return res.status(401).json({ message: 'Access denied: No token provided' });
+        }
+        
         const bearerToken = bearerHeader.split(' ')[1];
+        
+        if (!bearerToken) {
+            return res.status(401).json({ message: 'Access denied: Invalid token format' });
+        }
 
-        jwt.verify(bearerToken, process.env.SECRET_KEY, (err, authData) => {
-            if (err) {
-                return res.status(403).send({ message: 'Access denied: Invalid token' });
-            } 
-            
-            req.user = authData.user;  // ✅ Attach user info to request
-            next();
+        const authData = await new Promise((resolve, reject) => {
+            jwt.verify(bearerToken, process.env.SECRET_KEY, (err, decoded) => {
+                if (err) reject(err);
+                else resolve(decoded);
+            });
         });
-    } else {
-        return res.status(401).send({ message: 'Access denied: No token provided' });
+        
+        req.user = authData.user;
+        next();
+    } catch (error) {
+        return res.status(403).json({ message: 'Access denied: Invalid token' });
     }
 };
 

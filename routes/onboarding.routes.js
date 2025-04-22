@@ -1,20 +1,105 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
+const onboardingController = require('../controllers/onboarding.controller');
+const { verifyToken, withHigherRoles, withAdmin } = require('../withAuth');
+const { checkStagePermission, canManageDocuments } = require('../middleware/onboardingAuth');
+const upload = require('../middleware/upload');
 
-const withAuth = require("../withAuth");
-const onboarding = require('../controllers/onboarding.controller.js');
+// Apply authentication middleware to all routes
+router.use(verifyToken);
 
-// Create new onboarding request
-router.post('/', withAuth.verifyToken, withAuth.withSuperAdmin, onboarding.createRequest);
+// Test route to create a sample request
+router.post('/test/create', withAdmin, onboardingController.createTestRequest);
 
-router.get('/', withAuth.verifyToken, withAuth.withSuperAdmin,)
+// Legacy routes for backward compatibility
+router.get('/requests', 
+  withHigherRoles, 
+  onboardingController.getAllRequests
+);
 
-// Get pending requests
-router.get('/pending', withAuth.verifyToken, withAuth.withSystemAdmin, onboarding.getPendingRequests);
+router.get('/requests/:id', 
+  withHigherRoles, 
+  onboardingController.getRequestById
+);
 
-// Complete onboarding
-router.patch('/:id/complete', withAuth.verifyToken, withAuth.withSystemAdmin, onboarding.completeOnboarding);
+router.post('/requests', 
+  withHigherRoles, 
+  
+  onboardingController.createRequest
+);
 
-router.patch ('/bulk-complete',withAuth.verifyToken, withAuth.withSystemAdmin, onboarding.bulkCompleteOnboarding);
+router.put('/requests/:id', 
+  withHigherRoles, 
+  checkStagePermission, 
+  onboardingController.updateRequest
+);
+
+// Add complete endpoint
+router.patch('/requests/:id/complete', 
+  withHigherRoles, 
+  checkStagePermission, 
+  onboardingController.completeRequest
+);
+
+// Add transition endpoint
+router.post('/requests/:id/transition', 
+  withHigherRoles, 
+  checkStagePermission, 
+  onboardingController.transitionRequest
+);
+
+router.delete('/requests/:id', 
+  withAdmin, 
+  checkStagePermission, 
+  onboardingController.deleteRequest
+);
+
+// Document management routes (legacy)
+router.post('/requests/:id/documents', 
+  withHigherRoles, 
+  canManageDocuments,
+  upload.single('file'), 
+  onboardingController.uploadDocument
+);
+
+router.get('/requests/:id/documents', 
+  withHigherRoles, 
+  canManageDocuments, 
+  onboardingController.getDocuments
+);
+
+router.delete('/requests/:id/documents/:documentId', 
+  withHigherRoles, 
+  canManageDocuments, 
+  onboardingController.deleteDocument
+);
+
+// Stage management routes
+router.post('/requests/:id/stages', 
+  withHigherRoles, 
+  checkStagePermission, 
+  onboardingController.createStage
+);
+
+router.get('/requests/:id/stages', 
+  withHigherRoles, 
+  onboardingController.getStagesByRequest
+);
+
+router.put('/requests/:id/stages/:stageId', 
+  withHigherRoles, 
+  checkStagePermission, 
+  onboardingController.updateStage
+);
+
+router.delete('/requests/:id/stages/:stageId', 
+  withAdmin, 
+  checkStagePermission, 
+  onboardingController.deleteStage
+);
+
+// Update document upload routes to use the centralized upload middleware
+router.post('/requests/:requestId/documents', verifyToken, withHigherRoles, upload.single('document'), onboardingController.uploadDocument);
+router.post('/requests/:requestId/documents/bulk', verifyToken, withHigherRoles, upload.array('documents', 5), onboardingController.uploadBulkDocuments);
 
 module.exports = router;

@@ -87,7 +87,7 @@ exports.create = async (req, res) => {
         username: req.body.username,
         password: hash,
         fullName: req.body.fullname,
-        role: "ROLE_EMPLOYEE",
+        role: "ROLE_FACULTY",
         active: false
     };
 

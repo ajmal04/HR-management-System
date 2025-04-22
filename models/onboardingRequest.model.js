@@ -1,5 +1,5 @@
 module.exports = (sequelize, Sequelize) => {
-    const OnboardingRequest = sequelize.define("onboarding_request", {
+    const OnboardingRequest = sequelize.define("onboardingRequest", {
         id: {
             type: Sequelize.INTEGER,
             autoIncrement: true,
@@ -15,8 +15,19 @@ module.exports = (sequelize, Sequelize) => {
             allowNull: false,
             defaultValue: Sequelize.NOW
         },
+        currentStage: {
+            type: Sequelize.ENUM(
+                'HR_VERIFIED',
+                'IT_SETUP',
+                'HOD_REVIEW',
+                'PRINCIPAL_APPROVAL',
+                'COMPLETED'
+            ),
+            allowNull: false,
+            defaultValue: 'HR_VERIFIED'
+        },
         status: {
-            type: Sequelize.ENUM('pending', 'completed'),
+            type: Sequelize.ENUM('pending', 'in_progress', 'completed', 'rejected'),
             allowNull: false,
             defaultValue: 'pending'
         },
@@ -30,6 +41,33 @@ module.exports = (sequelize, Sequelize) => {
         },
         completionDate: {
             type: Sequelize.DATE,
+            allowNull: true
+        },
+        stageHistory: {
+            type: Sequelize.JSON,
+            allowNull: true,
+            defaultValue: []
+        },
+        comments: {
+            type: Sequelize.TEXT,
+            allowNull: true
+        },
+        dueDate: {
+            type: Sequelize.DATE,
+            allowNull: true
+        },
+        college: {
+            type: Sequelize.ENUM(
+                'Engineering',
+                'Pharmacy', 
+                'Nursing',
+                'Allied_Health_Science',
+                'Medical_Science_Research'
+            ),
+            allowNull: false
+        },
+        departmentId: {
+            type: Sequelize.INTEGER,
             allowNull: true
         }
     });

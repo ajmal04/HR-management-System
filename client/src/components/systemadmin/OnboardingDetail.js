@@ -4,12 +4,18 @@ import {
   Badge, ListGroup, Button, Modal 
 } from 'react-bootstrap';
 import axios from 'axios';
-import { useParams , Redirect} from 'react-router-dom';
+import { useParams, Redirect } from 'react-router-dom';
 import moment from 'moment';
 
 const OnboardingDetail = ({ onBack }) => {
   const { id } = useParams();
-  const [request, setRequest] = useState(null);
+  const [request, setRequest] = useState({
+    status: 'pending',
+    requestDate: new Date(),
+    employee: {},
+    requestedByUser: {},
+    userId: ''
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showCompleteModal, setShowCompleteModal] = useState(false);
@@ -18,12 +24,42 @@ const OnboardingDetail = ({ onBack }) => {
 
   const fetchRequest = async () => {
     try {
-      const res = await axios.get(`/api/onboarding/${id}`, {
+      const res = await axios.get(`/api/onboarding/requests/${id}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
       });
-      setRequest(res.data);
+      
+      // Get the first request from the requests array
+      const requestData = Array.isArray(res.data.requests) ? res.data.requests[0] : res.data;
+      
+      // Ensure critical fields exist and normalize the data structure
+      const responseData = {
+        status: requestData.status || 'pending',
+        requestDate: requestData.requestDate || new Date(),
+        employee: {
+          ...requestData.employee,
+          fullName: requestData.employee?.fullName || 'N/A',
+          department: requestData.employee?.department || {}
+        },
+        requester: {
+          ...requestData.requester,
+          fullName: requestData.requester?.fullName || 'System'
+        },
+        userId: requestData.userId || '',
+        ...requestData
+      };
+      
+      setRequest(responseData);
+      setError(null);
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to load request');
+      console.error('Error fetching request details:', err);
+      setError(err.response?.data?.message || 'Failed to load request details');
+      setRequest({
+        status: 'error',
+        requestDate: new Date(),
+        employee: { fullName: 'Error loading data' },
+        requester: { fullName: 'System' },
+        userId: ''
+      });
     } finally {
       setLoading(false);
     }
@@ -31,19 +67,24 @@ const OnboardingDetail = ({ onBack }) => {
 
   const handleComplete = async () => {
     try {
-      await axios.patch(`/api/onboarding/${id}/complete`, {}, {
+      await axios.patch(`/api/onboarding/requests/${id}/complete`, {}, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
       });
       fetchRequest(); // Refresh data
       setShowCompleteModal(false);
     } catch (err) {
-      setError(err.response?.data?.message || 'Completion failed');
+      console.error('Error completing request:', err);
+      setError(err.response?.data?.message || 'Failed to complete request');
     }
   };
 
-  const onAssignAssets = (request) => (e) => {
+  const onAssignAssets = (e) => {
     e.preventDefault();
-    setRedirectToAssetAllocation(true);
+    if (request.userId) {
+      setRedirectToAssetAllocation(true);
+    } else {
+      setError('Cannot assign assets - missing user ID');
+    }
   };
 
   const onBackToList = (e) => {
@@ -51,10 +92,12 @@ const OnboardingDetail = ({ onBack }) => {
     setRedirectToList(true);
   };
 
-  useEffect(() => { fetchRequest(); }, [id]);
+  useEffect(() => { 
+    fetchRequest(); 
+  }, [id]);
 
   if (redirectToAssetAllocation) {
-    return <Redirect to={`/assets/assign/${request.userId}`} />;
+    return <Redirect to={`/asset-allocation/${request.userId}`} />;
   }
 
   if (redirectToList) {
@@ -65,6 +108,7 @@ const OnboardingDetail = ({ onBack }) => {
     return (
       <div className="d-flex justify-content-center mt-5">
         <Spinner animation="border" />
+        <span className="ms-2">Loading request details...</span>
       </div>
     );
   }
@@ -73,6 +117,11 @@ const OnboardingDetail = ({ onBack }) => {
     return (
       <Alert variant="danger" className="m-3" onClose={() => setError(null)} dismissible>
         {error}
+        <div className="mt-2">
+          <Button variant="outline-primary" size="sm" onClick={fetchRequest}>
+            Retry
+          </Button>
+        </div>
       </Alert>
     );
   }
@@ -94,9 +143,9 @@ const OnboardingDetail = ({ onBack }) => {
         <Card.Body>
           <div className="mb-3">
             <Badge pill bg={request.status === 'completed' ? 'success' : 'warning'}>
-              {request.status.toUpperCase()}
+              {(request.status || 'pending').toUpperCase()}
             </Badge>
-            <span className="text-muted ml-2">
+            <span className="text-muted ms-2">
               Requested {moment(request.requestDate).fromNow()}
             </span>
           </div>
@@ -107,10 +156,10 @@ const OnboardingDetail = ({ onBack }) => {
                 <div className="col-md-6">
                   <ListGroup variant="flush">
                     <ListGroup.Item>
-                      <strong>Employee:</strong> {request.employee?.full_name || 'N/A'}
+                      <strong>Employee:</strong> {request.employee?.fullName || 'N/A'}
                     </ListGroup.Item>
                     <ListGroup.Item>
-                      <strong>Requested By:</strong> {request.requestedByUser?.full_name || 'System'}
+                      <strong>Requested By:</strong> {request.requester?.fullName || 'System'}
                     </ListGroup.Item>
                     <ListGroup.Item>
                       <strong>Request Date:</strong> {moment(request.requestDate).format('LLL')}
@@ -120,7 +169,7 @@ const OnboardingDetail = ({ onBack }) => {
                 <div className="col-md-6">
                   <ListGroup variant="flush">
                     <ListGroup.Item>
-                      <strong>Department:</strong> {request.employee?.department || 'N/A'}
+                      <strong>Department:</strong> {request.employee?.department?.departmentName || 'N/A'}
                     </ListGroup.Item>
                     {request.completedByUser && (
                       <ListGroup.Item>
@@ -138,7 +187,11 @@ const OnboardingDetail = ({ onBack }) => {
             </Tab>
 
             <Tab eventKey="assets" title="Assigned Assets">
-              <AssetList userId={request.userId} />
+              {request.userId ? (
+                <AssetList userId={request.userId} />
+              ) : (
+                <Alert variant="warning">No user ID available to load assets</Alert>
+              )}
             </Tab>
           </Tabs>
 
@@ -146,9 +199,10 @@ const OnboardingDetail = ({ onBack }) => {
             <div className="d-flex justify-content-end">
               <Button 
                 variant="info" 
-                className="mr-2" 
+                className="me-2" 
                 size="sm"
-                onClick={onAssignAssets(request)}
+                onClick={onAssignAssets}
+                disabled={!request.userId}
               >
                 Assign Assets
               </Button>
@@ -171,7 +225,7 @@ const OnboardingDetail = ({ onBack }) => {
         <Modal.Body>
           Are you sure you want to mark this onboarding as complete?
           <div className="mt-3">
-            <strong>Employee:</strong> {request.employee?.full_name}
+            <strong>Employee:</strong> {request.employee?.full_name || 'Unknown employee'}
           </div>
         </Modal.Body>
         <Modal.Footer>
@@ -198,6 +252,7 @@ const OnboardingDetail = ({ onBack }) => {
 const AssetList = ({ userId }) => {
   const [assets, setAssets] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchAssets = async () => {
@@ -205,18 +260,23 @@ const AssetList = ({ userId }) => {
         const res = await axios.get(`/api/assets/user/${userId}`, {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
         });
-        setAssets(res.data);
+        setAssets(res.data || []);
       } catch (err) {
-        console.error(err);
+        setError(err.response?.data?.message || 'Failed to load assets');
+        setAssets([]);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchAssets();
+    if (userId) {
+      fetchAssets();
+    }
   }, [userId]);
 
+  if (!userId) return <Alert variant="danger">Invalid user ID</Alert>;
   if (loading) return <Spinner animation="border" size="sm" />;
+  if (error) return <Alert variant="danger">{error}</Alert>;
 
   return (
     <ListGroup variant="flush">

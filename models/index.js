@@ -31,7 +31,10 @@ db.application = require("./application.model")(sequelize, Sequelize);
 db.payment = require("./payment.model")(sequelize, Sequelize);
 db.expense = require("./expense.model")(sequelize, Sequelize);
 db.onboardingRequest = require("./onboardingRequest.model")(sequelize, Sequelize);
+db.onboardingStage = require("./onboardingStage.model")(sequelize, Sequelize);
+db.onboardingDocument = require("./onboardingDocument.model")(sequelize, Sequelize);
 db.assetAllocation = require("./assetAllocation.model")(sequelize, Sequelize);
+db.asset = require("./asset.model")(sequelize, Sequelize);
 
 
 // User Associations
@@ -83,27 +86,61 @@ db.deptAnnouncement.belongsTo(db.user, {foreignKey: {name: 'createdByUserId', al
 db.onboardingRequest.belongsTo(db.user, { 
   foreignKey: {
     name: 'userId',
-    allowNull: false // Should match your model definition
+    allowNull: false
   },
-  as: 'employee', // For eager loading
+  as: 'employee',
   onDelete: 'CASCADE' 
 });
 
-db.onboardingRequest.belongsTo(db.user, { 
+db.onboardingRequest.belongsTo(db.user, {
   foreignKey: {
     name: 'requestedBy',
     allowNull: false
   },
-  as: 'requestedByUser', // New alias for requestedByUser
-  onDelete: 'CASCADE' 
+  as: 'requester'
 });
 
-db.user.hasMany(db.onboardingRequest, { 
+db.onboardingRequest.belongsTo(db.department, {
   foreignKey: {
-    name: 'userId',
-    allowNull: false
+    name: 'departmentId',
+    allowNull: true
   },
-  as: 'onboardingRequests'
+  as: 'department'
+});
+
+db.onboardingRequest.hasMany(db.onboardingStage, {
+  foreignKey: 'requestId',
+  as: 'stages'
+});
+
+db.onboardingRequest.hasMany(db.onboardingDocument, {
+  foreignKey: 'requestId',
+  as: 'requestDocuments'
+});
+
+db.onboardingStage.belongsTo(db.onboardingRequest, {
+  foreignKey: 'requestId',
+  as: 'request'
+});
+
+db.onboardingStage.belongsTo(db.user, {
+  foreignKey: 'assignedTo',
+  as: 'assignee'
+});
+
+db.onboardingStage.belongsTo(db.user, {
+  foreignKey: 'completedBy',
+  as: 'completedByUser'
+});
+
+db.onboardingDocument.belongsTo(db.onboardingRequest, {
+  foreignKey: 'requestId',
+  as: 'request'
+});
+
+db.onboardingDocument.belongsTo(db.user, {
+  foreignKey: 'uploadedBy',
+  as: 'uploader'
 });
 
 // For AssetAllocation
@@ -122,6 +159,17 @@ db.user.hasMany(db.assetAllocation, {
     allowNull: false
   },
   as: 'allocatedAssets'
+});
+
+// For Asset and AssetAllocation
+db.asset.hasMany(db.assetAllocation, {
+  foreignKey: 'assetId',
+  as: 'allocations'
+});
+
+db.assetAllocation.belongsTo(db.asset, {
+  foreignKey: 'assetId',
+  as: 'asset'
 });
 
 module.exports = db;

@@ -61,10 +61,16 @@ export default class SidebarAdmin extends Component {
                   </p>
                 </NavLink>
               </li>
-              
 
+              <li className="nav-item">
+                <NavLink to="/assets/manage" className="nav-link" >
+                  <i className="nav-icon fas fa-laptop" />
+                  <p>
+                    Asset Management
+                  </p>
+                </NavLink>
+              </li>
 
-              
              
             </ul>
           </nav>

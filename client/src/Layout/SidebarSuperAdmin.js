@@ -95,6 +95,15 @@ export default class SidebarSuperAdmin extends Component {
                   </p>
                 </NavLink>
               </li>
+
+              <li className="nav-item">
+                <NavLink exact to="/onboarding-dashboard" className="nav-link">
+                  <i className="nav-icon fa fa-user-plus" />
+                  <p>
+                    Onboarding Dashboard
+                  </p>
+                </NavLink>
+              </li>
               
               <li className="nav-item">
                 <NavLink to="/job-list" className="nav-link">

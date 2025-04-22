@@ -3,7 +3,6 @@ import { Redirect } from 'react-router-dom';
 import { Card, Form, Button, Alert } from "react-bootstrap";
 import DatePicker from "react-datepicker";
 import axios from "axios";
-import moment from "moment";
 
 export default class EmployeeAdd extends Component {
   constructor(props) {
@@ -116,15 +115,7 @@ export default class EmployeeAdd extends Component {
       const userId = userRes.data.id;
       this.setState({ newEmployeeId: userId });
 
-      // 2. Create Onboarding Request (using your existing model)
-      await axios.post("/api/onboarding", {
-        employeeId: userId,
-        requestedBy: localStorage.getItem("userId")
-      }, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
-      });
-
-      // 3. Create Related Records
+      // 2. Create Related Records
       await this.createRelatedRecords(userId);
 
       this.setState({ 

@@ -4,6 +4,7 @@ var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 var withAuth = require("./withAuth");
+const { errorHandler } = require('./utils/errorHandler');
 
 const db = require("./models");
 require("dotenv").config();
@@ -11,11 +12,9 @@ require("dotenv").config();
 var api = require("./routes/api");
 var login = require("./routes/login/login.routes");
 var register = require("./routes/register/register.routes");
+var onboarding = require("./routes/onboarding.routes");
 
 var app = express();
-
-
-
 
 // global.__basedir = __dirname;
 
@@ -43,8 +42,12 @@ db.sequelize.sync({ alter: true });
 app.use("/api", api);
 app.use("/login", login);
 app.use("/register", register);
+app.use("/onboarding", onboarding);
 
 app.get("/checkToken", withAuth.checkToken);
+
+// Error handling middleware
+app.use(errorHandler);
 
 // Serve static assets if in production
 if (process.env.NODE_ENV === "production") {
@@ -59,7 +62,6 @@ if (process.env.NODE_ENV === "production") {
 app.get("/", (req, res) => {
   res.json({ success: true, message: "Server is running 🚀" });
 });
-
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -90,6 +92,7 @@ app.use(function (err, req, res, next) {
     }
   });
 });
+
 module.exports = app;
 
 

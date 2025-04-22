@@ -7,14 +7,9 @@ import axios from 'axios';
 import { useParams, Redirect } from 'react-router-dom';
 import AssetItem from './AssetItem';
 
-const authConfig = {
-  headers: { 
-    Authorization: `Bearer ${localStorage.getItem("token")}` 
-  }
-};
-
-const AssetAllocation = () => {
-  const { userId } = useParams();
+const AssetAllocation = ({ userId: propUserId, onBack }) => {
+  const { userId: paramUserId } = useParams();
+  const userId = propUserId || paramUserId;
   const [user, setUser] = useState(null);
   const [assets, setAssets] = useState([]);
   const [availableAssets, setAvailableAssets] = useState([]);
@@ -22,22 +17,47 @@ const AssetAllocation = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [redirectToOnboarding, setRedirectToOnboarding] = useState(false);
+  const [redirectToList, setRedirectToList] = useState(false);
+
+  const getAuthConfig = () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error('Authentication required');
+    }
+    return {
+      headers: { 
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    };
+  };
 
   useEffect(() => {
+    if (!userId) {
+      setError('User ID is required');
+      setLoading(false);
+      return;
+    }
+
     const fetchData = async () => {
       try {
+        const authConfig = getAuthConfig();
         const [userRes, assetsRes, availableRes] = await Promise.all([
-          axios.get(`/api/users/${userId}/summary`, authConfig()),
-          axios.get(`/api/assets/user/${userId}`, authConfig()),
-          axios.get('/api/assets/available', authConfig())
+          axios.get(`/api/users/${userId}`, authConfig),
+          axios.get(`/api/assets/user/${userId}`, authConfig),
+          axios.get('/api/assets/available', authConfig)
         ]);
         
         setUser(userRes.data);
-        setAssets(assetsRes.data);
-        setAvailableAssets(availableRes.data);
+        setAssets(assetsRes.data || []);
+        setAvailableAssets(availableRes.data || []);
       } catch (err) {
-        setError(err.response?.data?.message || 'Failed to load data');
+        console.error('Error fetching data:', err);
+        if (err.response?.status === 403) {
+          setError('Authentication failed. Please log in again.');
+        } else {
+          setError(err.response?.data?.message || 'Failed to load data');
+        }
       } finally {
         setLoading(false);
       }
@@ -55,20 +75,41 @@ const AssetAllocation = () => {
   };
 
   const handleSubmit = async () => {
+    if (!userId) {
+      setError('User ID is required for asset assignment');
+      return;
+    }
+
     try {
+      const authConfig = getAuthConfig();
       await axios.post('/api/assets/assign/bulk', {
-        userId,
+        userId: userId,
         assetIds: selectedAssets
-      }, authConfig());
-      setRedirectToOnboarding(true);
+      }, authConfig);
+      
+      setShowConfirmModal(false);
+      setRedirectToList(true);
     } catch (err) {
-      setError(err.response?.data?.message || 'Assignment failed');
+      console.error('Error assigning assets:', err);
+      if (err.response?.status === 403) {
+        setError('Authentication failed. Please log in again.');
+      } else {
+        setError(err.response?.data?.message || 'Assignment failed');
+      }
       setShowConfirmModal(false);
     }
   };
 
-  if (redirectToOnboarding && user?.currentOnboardingId) {
-    return <Redirect to={`/onboarding/${user.currentOnboardingId}`} />;
+  const onBackToList = () => {
+    if (onBack) {
+      onBack();
+    } else {
+      setRedirectToList(true);
+    }
+  };
+
+  if (redirectToList) {
+    return <Redirect to="/onboarding/list" />;
   }
 
   if (loading) {
@@ -95,18 +136,17 @@ const AssetAllocation = () => {
         <Card.Header className="bg-white">
           <div className="d-flex justify-content-between align-items-center">
             <div>
-              <h4>Assign Assets to {user?.full_name}</h4>
+              <h4>Assign Assets to {user?.fullName}</h4>
               <small className="text-muted">
-                {user?.department} • {user?.email}
+                {user?.department?.departmentName || 'No Department'} • {user?.email || 'No Email'}
               </small>
             </div>
             <Button 
               size="sm" 
               variant="outline-secondary" 
-              onClick={() => setRedirectToOnboarding(true)}
-              disabled={!user?.currentOnboardingId}
+              onClick={onBackToList}
             >
-              Back to Onboarding
+              Back to List
             </Button>
           </div>
         </Card.Header>
@@ -119,7 +159,20 @@ const AssetAllocation = () => {
                 <ListGroup variant="flush">
                   {assets.map(asset => (
                     <ListGroup.Item key={asset.id} className="py-2 px-3">
-                      <AssetItem asset={asset} />
+                      <div className="d-flex justify-content-between align-items-center">
+                        <div>
+                          <div className="fw-bold">{asset.assetName}</div>
+                          <small className="text-muted">
+                            {asset.assetType} • {asset.assetSerialNumber || 'No Serial'}
+                          </small>
+                          <div className="text-muted" style={{ fontSize: '0.8rem' }}>
+                            Assigned on: {new Date(asset.allocatedOn).toLocaleDateString()}
+                          </div>
+                        </div>
+                        <Badge bg={asset.status === 'active' ? 'success' : 'secondary'}>
+                          {asset.status}
+                        </Badge>
+                      </div>
                     </ListGroup.Item>
                   ))}
                 </ListGroup>
@@ -132,32 +185,38 @@ const AssetAllocation = () => {
 
             <div className="col-md-6">
               <h5 className="mb-3">Available Assets</h5>
-              <Table striped hover className="mb-0">
-                <thead>
-                  <tr>
-                    <th width="50px"></th>
-                    <th>Asset</th>
-                    <th>Type</th>
-                    <th>Serial</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {availableAssets.map(asset => (
-                    <tr key={asset.id}>
-                      <td>
-                        <Form.Check 
-                          type="checkbox"
-                          checked={selectedAssets.includes(asset.id)}
-                          onChange={() => handleAssetSelect(asset.id)}
-                        />
-                      </td>
-                      <td>{asset.assetName}</td>
-                      <td>{asset.assetType}</td>
-                      <td>{asset.assetSerialNumber || '-'}</td>
+              {availableAssets.length > 0 ? (
+                <Table striped hover className="mb-0">
+                  <thead>
+                    <tr>
+                      <th width="50px"></th>
+                      <th>Asset</th>
+                      <th>Type</th>
+                      <th>Serial</th>
                     </tr>
-                  ))}
-                </tbody>
-              </Table>
+                  </thead>
+                  <tbody>
+                    {availableAssets.map(asset => (
+                      <tr key={asset.id}>
+                        <td>
+                          <Form.Check 
+                            type="checkbox"
+                            checked={selectedAssets.includes(asset.id)}
+                            onChange={() => handleAssetSelect(asset.id)}
+                          />
+                        </td>
+                        <td>{asset.assetName}</td>
+                        <td>{asset.assetType}</td>
+                        <td>{asset.assetSerialNumber || '-'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+              ) : (
+                <Alert variant="info" className="mt-3">
+                  No available assets found
+                </Alert>
+              )}
             </div>
           </div>
 
@@ -190,13 +249,20 @@ const AssetAllocation = () => {
           <Modal.Title>Confirm Asset Assignment</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <p>Assign these assets to {user?.full_name}?</p>
+          <p>Assign these assets to {user?.fullName}?</p>
           <ListGroup variant="flush">
             {selectedAssets.map(assetId => {
               const asset = availableAssets.find(a => a.id === assetId);
               return asset ? (
                 <ListGroup.Item key={assetId} className="py-2 px-3">
-                  <AssetItem asset={asset} />
+                  <div className="d-flex justify-content-between align-items-center">
+                    <div>
+                      <div className="fw-bold">{asset.assetName}</div>
+                      <small className="text-muted">
+                        {asset.assetType} • {asset.assetSerialNumber || 'No Serial'}
+                      </small>
+                    </div>
+                  </div>
                 </ListGroup.Item>
               ) : null;
             })}
@@ -205,17 +271,15 @@ const AssetAllocation = () => {
         <Modal.Footer>
           <Button 
             variant="secondary" 
-            size="sm"
             onClick={() => setShowConfirmModal(false)}
           >
             Cancel
           </Button>
           <Button 
             variant="primary" 
-            size="sm"
             onClick={handleSubmit}
           >
-            Confirm
+            Confirm Assignment
           </Button>
         </Modal.Footer>
       </Modal>
