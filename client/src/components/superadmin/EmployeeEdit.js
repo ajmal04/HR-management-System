@@ -1,9 +1,9 @@
 import React, { Component } from "react";
 import { Card, Form, Button, Alert, Spinner } from "react-bootstrap";
-import { Redirect } from 'react-router-dom';
+import { Redirect } from "react-router-dom";
 import DatePicker from "react-datepicker";
-import axios from 'axios';
-import moment from 'moment';
+import axios from "axios";
+import moment from "moment";
 
 export default class EmployeeEdit extends Component {
   constructor(props) {
@@ -12,45 +12,45 @@ export default class EmployeeEdit extends Component {
     this.state = {
       user: {
         id: null,
-        fullName: '',
+        fullName: "",
         role: null,
         active: null,
         departmentId: null,
         college: null,
-        username: ''
+        username: "",
       },
       userPersonalInfo: {
         id: null,
         dateOfBirth: null,
-        gender: '',
-        maritalStatus: '',
-        fatherName: '',
-        idNumber: '',
-        address: '',
-        city: '',
-        country: '',
-        mobile: '',
-        phone: '',
-        emailAddress: ''
+        gender: "",
+        maritalStatus: "",
+        fatherName: "",
+        idNumber: "",
+        address: "",
+        city: "",
+        country: "",
+        mobile: "",
+        phone: "",
+        emailAddress: "",
       },
       userFinancialInfo: {
         id: null,
-        bankName: '',
-        accountName: '',
-        accountNumber: '',
-        iban: ''
+        bankName: "",
+        accountName: "",
+        accountNumber: "",
+        iban: "",
       },
       department: {
         departmentId: null,
-        departmentName: null
+        departmentName: null,
       },
       departments: [],
       colleges: [],
       job: {
         id: null,
-        jobTitle: '',
+        jobTitle: "",
         startDate: null,
-        endDate: null
+        endDate: null,
       },
       hasError: false,
       errMsg: "",
@@ -60,6 +60,7 @@ export default class EmployeeEdit extends Component {
       isLoadingEmployee: true,
       isLoadingDepartments: true,
       isLoadingColleges: true
+
     };
 
     this._isMounted = false;
@@ -68,7 +69,7 @@ export default class EmployeeEdit extends Component {
 
   componentDidMount() {
     this._isMounted = true;
-    
+
     if (!this.props.location.state?.selectedUser) {
       this.setState({ falseRedirect: true });
       return;
@@ -78,11 +79,11 @@ export default class EmployeeEdit extends Component {
     Promise.all([
       this.fetchEmployeeData(),
       this.fetchDepartments(),
-      this.fetchColleges()
-    ]).catch(err => {
+      this.fetchColleges(),
+    ]).catch((err) => {
       if (this._isMounted && !axios.isCancel(err)) {
-        this.setState({ 
-          hasError: true, 
+        this.setState({
+          hasError: true,
           errMsg: "Failed to load initial data",
           isLoadingEmployee: false,
           isLoadingDepartments: false,
@@ -94,59 +95,64 @@ export default class EmployeeEdit extends Component {
 
   componentWillUnmount() {
     this._isMounted = false;
-    this.cancelTokenSource.cancel('Component unmounted');
+    this.cancelTokenSource.cancel("Component unmounted");
   }
 
   fetchEmployeeData = async () => {
     try {
       const response = await axios({
-        method: 'get',
-        url: 'api/users/' + this.props.location.state.selectedUser.id,
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+        method: "get",
+        url: "api/users/" + this.props.location.state.selectedUser.id,
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         cancelToken: this.cancelTokenSource.token,
-        timeout: 10000
+        timeout: 10000,
       });
 
       if (!this._isMounted) return;
 
       const user = response.data;
-      
+
       const stateUpdates = {
         isLoadingEmployee: false,
         user: {
           ...this.state.user,
           ...user,
-          college: user.college || null
+          college: user.college || null,
         },
         userPersonalInfo: {
           ...this.state.userPersonalInfo,
           ...(user.user_personal_info || {}),
-          dateOfBirth: user.user_personal_info?.dateOfBirth 
-            ? moment(new Date(user.user_personal_info.dateOfBirth)).toDate() 
-            : null
+          dateOfBirth: user.user_personal_info?.dateOfBirth
+            ? moment(new Date(user.user_personal_info.dateOfBirth)).toDate()
+            : null,
         },
-        department: user.department || this.state.department
+        department: user.department || this.state.department,
       };
 
       if (user.user_financial_info) {
         stateUpdates.userFinancialInfo = {
           ...this.state.userFinancialInfo,
-          ...user.user_financial_info
+          ...user.user_financial_info,
         };
       }
 
       if (user.jobs?.length > 0) {
-        const currentJob = user.jobs.find(job => 
-          new Date(job.startDate) <= Date.now() && 
-          new Date(job.endDate) >= Date.now()
+        const currentJob = user.jobs.find(
+          (job) =>
+            new Date(job.startDate) <= Date.now() &&
+            new Date(job.endDate) >= Date.now()
         );
-        
+
         if (currentJob) {
           stateUpdates.job = {
             id: currentJob.id,
-            jobTitle: currentJob.jobTitle || '',
-            startDate: currentJob.startDate ? moment(new Date(currentJob.startDate)).toDate() : null,
-            endDate: currentJob.endDate ? moment(new Date(currentJob.endDate)).toDate() : null
+            jobTitle: currentJob.jobTitle || "",
+            startDate: currentJob.startDate
+              ? moment(new Date(currentJob.startDate)).toDate()
+              : null,
+            endDate: currentJob.endDate
+              ? moment(new Date(currentJob.endDate)).toDate()
+              : null,
           };
         }
       }
@@ -154,10 +160,11 @@ export default class EmployeeEdit extends Component {
       this.setState(stateUpdates);
     } catch (err) {
       if (this._isMounted && !axios.isCancel(err)) {
-        this.setState({ 
-          hasError: true, 
+        this.setState({
+          hasError: true,
           errMsg: err.response?.data?.message || "Failed to load employee data",
           isLoadingEmployee: false
+
         });
       }
     }
@@ -166,22 +173,23 @@ export default class EmployeeEdit extends Component {
   fetchDepartments = async () => {
     try {
       const response = await axios({
-        method: 'get',
-        url: '/api/departments',
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+        method: "get",
+        url: "/api/departments",
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         cancelToken: this.cancelTokenSource.token,
-        timeout: 10000
+        timeout: 10000,
       });
 
       if (this._isMounted) {
-        this.setState({ 
+        this.setState({
           departments: response.data,
           isLoadingDepartments: false
+
         });
       }
     } catch (err) {
       if (this._isMounted && !axios.isCancel(err)) {
-        this.setState({ 
+        this.setState({
           hasError: true,
           errMsg: "Failed to load departments",
           isLoadingDepartments: false
@@ -193,22 +201,22 @@ export default class EmployeeEdit extends Component {
   fetchColleges = async () => {
     try {
       const response = await axios({
-        method: 'get',
-        url: '/api/colleges',
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+        method: "get",
+        url: "/api/colleges",
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         cancelToken: this.cancelTokenSource.token,
-        timeout: 10000
+        timeout: 10000,
       });
-  
+
       if (this._isMounted) {
-        this.setState({ 
+        this.setState({
           colleges: response.data,
           isLoadingColleges: false
         });
       }
     } catch (err) {
       if (this._isMounted && !axios.isCancel(err)) {
-        this.setState({ 
+        this.setState({
           hasError: true,
           errMsg: "Failed to load colleges",
           isLoadingColleges: false
@@ -219,63 +227,67 @@ export default class EmployeeEdit extends Component {
 
   handleChangeUser = (event) => {
     const { value, name } = event.target;
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       user: {
         ...prevState.user,
-        [name]: value
-      }
+        [name]: value,
+      },
     }));
   };
 
   handleChangeJob = (event) => {
     const { value, name } = event.target;
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       job: {
         ...prevState.job,
-        [name]: value
-      }
+        [name]: value,
+      },
     }));
   };
 
   handleChangeDepartment = (event) => {
     const { value, name } = event.target;
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       department: {
         ...prevState.department,
-        [name]: value
-      }
+        [name]: value,
+      },
     }));
   };
 
   handleChangeUserPersonal = (event) => {
     const { value, name } = event.target;
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       userPersonalInfo: {
         ...prevState.userPersonalInfo,
-        [name]: value
-      }
+        [name]: value,
+      },
     }));
   };
 
   handleChangeUserFinancial = (event) => {
     const { value, name } = event.target;
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       userFinancialInfo: {
         ...prevState.userFinancialInfo,
-        [name]: value
-      }
+        [name]: value,
+      },
     }));
   };
 
   pushDepartments = () => {
     return this.state.departments.map((dept, index) => (
-      <option key={index} value={dept.id}>{dept.departmentName}</option>
+      <option key={index} value={dept.id}>
+        {dept.departmentName}
+      </option>
     ));
   };
 
   pushColleges = () => {
     return this.state.colleges.map((college, index) => (
-      <option key={index} value={college}>{college}</option>
+      <option key={index} value={college}>
+        {college}
+      </option>
     ));
   };
 
@@ -288,33 +300,33 @@ export default class EmployeeEdit extends Component {
 
       // Update user data
       const userResponse = await axios({
-        method: 'put',
-        url: '/api/users/' + this.props.location.state.selectedUser.id,
+        method: "put",
+        url: "/api/users/" + this.props.location.state.selectedUser.id,
         data: {
           fullName: user.fullName,
           role: user.role,
           departmentId: user.departmentId,
           college: user.college,
-          active: user.active
+          active: user.active,
         },
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-        timeout: 10000
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        timeout: 10000,
       });
 
       const userId = userResponse.data.id;
 
       // Update or create personal information
-      const personalInfoMethod = userPersonalInfo.id ? 'put' : 'post';
-      const personalInfoUrl = userPersonalInfo.id 
-        ? '/api/personalInformations/' + userPersonalInfo.id 
-        : '/api/personalInformations';
-      
+      const personalInfoMethod = userPersonalInfo.id ? "put" : "post";
+      const personalInfoUrl = userPersonalInfo.id
+        ? "/api/personalInformations/" + userPersonalInfo.id
+        : "/api/personalInformations";
+
       await axios({
         method: personalInfoMethod,
         url: personalInfoUrl,
         data: {
-          dateOfBirth: userPersonalInfo.dateOfBirth 
-            ? moment(userPersonalInfo.dateOfBirth).format('YYYY-MM-DD') 
+          dateOfBirth: userPersonalInfo.dateOfBirth
+            ? moment(userPersonalInfo.dateOfBirth).format("YYYY-MM-DD")
             : null,
           gender: userPersonalInfo.gender,
           maritalStatus: userPersonalInfo.maritalStatus,
@@ -326,20 +338,24 @@ export default class EmployeeEdit extends Component {
           mobile: userPersonalInfo.mobile,
           phone: userPersonalInfo.phone,
           emailAddress: userPersonalInfo.emailAddress,
-          userId: userId
+          userId: userId,
         },
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-        timeout: 10000
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        timeout: 10000,
       });
 
       // Update or create financial information if any fields are filled
-      if (userFinancialInfo.bankName || userFinancialInfo.accountName || 
-          userFinancialInfo.accountNumber || userFinancialInfo.iban) {
-        const financialInfoMethod = userFinancialInfo.id ? 'put' : 'post';
-        const financialInfoUrl = userFinancialInfo.id 
-          ? 'api/financialInformations/' + userFinancialInfo.id 
-          : 'api/financialInformations';
-        
+      if (
+        userFinancialInfo.bankName ||
+        userFinancialInfo.accountName ||
+        userFinancialInfo.accountNumber ||
+        userFinancialInfo.iban
+      ) {
+        const financialInfoMethod = userFinancialInfo.id ? "put" : "post";
+        const financialInfoUrl = userFinancialInfo.id
+          ? "api/financialInformations/" + userFinancialInfo.id
+          : "api/financialInformations";
+
         await axios({
           method: financialInfoMethod,
           url: financialInfoUrl,
@@ -348,29 +364,33 @@ export default class EmployeeEdit extends Component {
             accountName: userFinancialInfo.accountName,
             accountNumber: userFinancialInfo.accountNumber,
             iban: userFinancialInfo.iban,
-            userId: userId
+            userId: userId,
           },
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-          timeout: 10000
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+          timeout: 10000,
         });
       }
 
       // Update or create job if any fields are filled
       if (job.jobTitle || job.startDate || job.endDate) {
-        const jobMethod = job.id ? 'put' : 'post';
-        const jobUrl = job.id ? 'api/jobs/' + job.id : 'api/jobs';
-        
+        const jobMethod = job.id ? "put" : "post";
+        const jobUrl = job.id ? "api/jobs/" + job.id : "api/jobs";
+
         await axios({
           method: jobMethod,
           url: jobUrl,
           data: {
             jobTitle: job.jobTitle,
-            startDate: job.startDate ? moment(job.startDate).format('YYYY-MM-DD') : null,
-            endDate: job.endDate ? moment(job.endDate).format('YYYY-MM-DD') : null,
-            userId: userId
+            startDate: job.startDate
+              ? moment(job.startDate).format("YYYY-MM-DD")
+              : null,
+            endDate: job.endDate
+              ? moment(job.endDate).format("YYYY-MM-DD")
+              : null,
+            userId: userId,
           },
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-          timeout: 10000
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+          timeout: 10000,
         });
       }
 
@@ -379,10 +399,10 @@ export default class EmployeeEdit extends Component {
       }
     } catch (err) {
       if (this._isMounted && !axios.isCancel(err)) {
-        this.setState({ 
-          hasError: true, 
+        this.setState({
+          hasError: true,
           errMsg: err.response?.data?.message || "Failed to update employee",
-          isSubmitting: false 
+          isSubmitting: false,
         });
         window.scrollTo(0, 0);
       }
@@ -399,6 +419,7 @@ export default class EmployeeEdit extends Component {
       isLoadingDepartments,
       isLoadingColleges,
       isSubmitting
+
     } = this.state;
 
     if (falseRedirect) {
@@ -410,8 +431,8 @@ export default class EmployeeEdit extends Component {
         <Alert variant="danger" className="m-3">
           {errMsg || "Failed to load employee data"}
           <div className="mt-2">
-            <Button 
-              variant="primary" 
+            <Button
+              variant="primary"
               size="sm"
               onClick={() => window.location.reload()}
             >
@@ -498,12 +519,14 @@ export default class EmployeeEdit extends Component {
                             <Form.Label className="text-muted required">Date of Birth</Form.Label>
                             <DatePicker
                               selected={userPersonalInfo.dateOfBirth}
-                              onChange={dateOfBirth => this.setState(prevState => ({
-                                userPersonalInfo: {
-                                  ...prevState.userPersonalInfo,
-                                  dateOfBirth: dateOfBirth
-                                }
-                              }))}
+                              onChange={(dateOfBirth) =>
+                                this.setState((prevState) => ({
+                                  userPersonalInfo: {
+                                    ...prevState.userPersonalInfo,
+                                    dateOfBirth: dateOfBirth,
+                                  },
+                                }))
+                              }
                               showMonthDropdown
                               showYearDropdown
                               dropdownMode="select"
@@ -812,9 +835,9 @@ export default class EmployeeEdit extends Component {
                       )}
                     </Card.Body>
                   </Card>
-                  <Button 
-                    variant="primary" 
-                    type="submit" 
+                  <Button
+                    variant="primary"
+                    type="submit"
                     block
                     disabled={isLoadingEmployee || isLoadingDepartments || isLoadingColleges || isSubmitting}
                   >
@@ -829,7 +852,9 @@ export default class EmployeeEdit extends Component {
                         />
                         <span className="ml-2">Updating...</span>
                       </>
-                    ) : 'Update Employee'}
+                    ) : (
+                      "Update Employee"
+                    )}
                   </Button>
                 </div>
               </div>

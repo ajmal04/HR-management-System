@@ -1,16 +1,15 @@
 import React, { Component } from "react";
 import { Card, Badge, Button, Form, Modal, Alert, OverlayTrigger, Tooltip } from "react-bootstrap";
-import {Redirect} from 'react-router-dom'
-import MaterialTable from 'material-table'
-import DeleteModal from '../DeleteModal'
-import axios from 'axios'
-import { ThemeProvider } from '@material-ui/core'
-import { createMuiTheme } from '@material-ui/core/styles'
+import { Redirect } from 'react-router-dom';
+import MaterialTable from 'material-table';
+import DeleteModal from '../DeleteModal';
+import axios from 'axios';
+import { ThemeProvider } from '@material-ui/core';
+import { createMuiTheme } from '@material-ui/core/styles';
 
 export default class EmployeeList extends Component {
-  
   constructor(props) {
-    super(props)
+    super(props);
 
     this.state = {
       users: [],
@@ -22,7 +21,7 @@ export default class EmployeeList extends Component {
       error: null,
       loading: false,
       success: null
-    }
+    };
   }
 
   refreshEmployeeList = () => {
@@ -31,40 +30,38 @@ export default class EmployeeList extends Component {
       axios({
         method: 'get',
         url: '/api/users',
-        headers: {Authorization: `Bearer ${localStorage.getItem('token')}`}
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       }),
       axios({
         method: 'get',
         url: '/api/onboarding/requests',
-        headers: {Authorization: `Bearer ${localStorage.getItem('token')}`}
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       })
     ])
-    .then(([usersRes, requestsRes]) => {
-      const users = usersRes.data;
-      const requests = requestsRes.data.requests || [];
-      
-      // Create a map of user IDs to their onboarding request status
-      const userOnboardingMap = {};
-      requests.forEach(request => {
-        userOnboardingMap[request.userId] = true;
+      .then(([usersRes, requestsRes]) => {
+        const users = usersRes.data;
+        const requests = requestsRes.data.requests || [];
+
+        const userOnboardingMap = {};
+        requests.forEach(request => {
+          userOnboardingMap[request.userId] = true;
+        });
+
+        const updatedUsers = users.map(user => ({
+          ...user,
+          onboardingRequested: !!userOnboardingMap[user.id]
+        }));
+
+        this.setState({ users: updatedUsers, loading: false });
+      })
+      .catch(err => {
+        console.error('Failed to fetch data:', err);
+        this.setState({
+          error: 'Failed to load employee list. Please try again later.',
+          loading: false
+        });
       });
-      
-      // Update users with their onboarding status
-      const updatedUsers = users.map(user => ({
-        ...user,
-        onboardingRequested: !!userOnboardingMap[user.id]
-      }));
-      
-      this.setState({users: updatedUsers, loading: false});
-    })
-    .catch(err => {
-      console.error('Failed to fetch data:', err);
-      this.setState({
-        error: 'Failed to load employee list. Please try again later.',
-        loading: false
-      });
-    });
-  }
+  };
 
   componentDidMount() {
     this.refreshEmployeeList();
@@ -72,39 +69,37 @@ export default class EmployeeList extends Component {
 
   onView = (user) => {
     return (event) => {
-      event.preventDefault()
-      this.setState({selectedUser: user, viewRedirect: true})
-    } 
-  }
+      event.preventDefault();
+      this.setState({ selectedUser: user, viewRedirect: true });
+    };
+  };
 
   onEdit = (user) => {
     return (event) => {
-      event.preventDefault()
-      this.setState({selectedUser: user, editRedirect: true})
-    }
-  }
+      event.preventDefault();
+      this.setState({ selectedUser: user, editRedirect: true });
+    };
+  };
 
-  onDelete = user => {
-    return event => {
-      event.preventDefault()
-      this.setState({selectedUser: user, deleteModal: true})
-    }
-  }
+  onDelete = (user) => {
+    return (event) => {
+      event.preventDefault();
+      this.setState({ selectedUser: user, deleteModal: true });
+    };
+  };
 
   onRequestOnboarding = (user) => {
     return (event) => {
       event.preventDefault();
       this.setState({ selectedUser: user, onboardingConfirmModal: true });
     };
-  }
+  };
 
   handleOnboardingConfirm = async () => {
     try {
-      // Get the current user's role
       const currentUser = JSON.parse(localStorage.getItem("user"));
       const userRole = currentUser.role;
       
-      // Check if the user has the required role
       const hasPermission = ["ROLE_SUPER_ADMIN", "ROLE_SYSTEM_ADMIN", "ROLE_ADMIN", "ROLE_HOD"].includes(userRole);
       
       if (!hasPermission) {
@@ -122,13 +117,12 @@ export default class EmployeeList extends Component {
       await axios.post("/api/onboarding/requests", {
         userId: this.state.selectedUser.id,
         requestedBy: currentUser.id,
-        college: this.state.selectedUser.college || 'Engineering', // Default to Engineering if not specified
+        college: this.state.selectedUser.college || 'Engineering',
         departmentId: this.state.selectedUser.departmentId || null
       }, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
       });
       
-      // Update the user's onboarding status in the state
       const updatedUsers = this.state.users.map(user => {
         if (user.id === this.state.selectedUser.id) {
           return { ...user, onboardingRequested: true };
@@ -157,21 +151,21 @@ export default class EmployeeList extends Component {
         this.setState({ error: null });
       }, 3000);
     }
-  }
+  };
 
   render() {
-    let closeDeleteModel = () => this.setState({deleteModal: false})
-    let closeOnboardingConfirmModal = () => this.setState({onboardingConfirmModal: false})
+    const closeDeleteModel = () => this.setState({ deleteModal: false });
+    const closeOnboardingConfirmModal = () => this.setState({ onboardingConfirmModal: false });
 
     const theme = createMuiTheme({
-        overrides: {
-            MuiTableCell: {
-                root: {
-                    padding: '6px 6px 6px 6px'
-                }
-            }
-        }
-    })
+      overrides: {
+        MuiTableCell: {
+          root: {
+            padding: "6px 6px 6px 6px",
+          },
+        },
+      },
+    });
 
     const styles = {
       actionBtn: {
@@ -192,20 +186,24 @@ export default class EmployeeList extends Component {
     return (
       <div className="container-fluid pt-4">
         {this.state.error && (
-          <Alert variant="danger" onClose={() => this.setState({error: null})} dismissible>
+          <Alert variant="danger" onClose={() => this.setState({ error: null })} dismissible>
             {this.state.error}
           </Alert>
         )}
         {this.state.success && (
-          <Alert variant="success" onClose={() => this.setState({success: null})} dismissible>
+          <Alert variant="success" onClose={() => this.setState({ success: null })} dismissible>
             {this.state.success}
           </Alert>
         )}
-        {this.state.viewRedirect ? (<Redirect to={{pathname: '/employee-view', state: {selectedUser: this.state.selectedUser}}}></Redirect>) : (<></>)}
-        {this.state.editRedirect ? (<Redirect to={{pathname: '/employee-edit', state: {selectedUser: this.state.selectedUser}}}></Redirect>) : (<></>)}
-        {this.state.deleteModal ? (
+        {this.state.viewRedirect && (
+          <Redirect to={{ pathname: '/employee-view', state: { selectedUser: this.state.selectedUser }}} />
+        )}
+        {this.state.editRedirect && (
+          <Redirect to={{ pathname: '/employee-edit', state: { selectedUser: this.state.selectedUser }}} />
+        )}
+        {this.state.deleteModal && (
           <DeleteModal show={true} onHide={closeDeleteModel} data={this.state.selectedUser} onDeleteSuccess={this.refreshEmployeeList} />
-        ) :(<></>)}
+        )}
         {this.state.onboardingConfirmModal && (
           <Modal show={true} onHide={closeOnboardingConfirmModal}>
             <Modal.Header closeButton>
@@ -238,15 +236,15 @@ export default class EmployeeList extends Component {
             </Card.Header>
             <Card.Body>
               <ThemeProvider theme={theme}>
-                <MaterialTable 
+                <MaterialTable
                   columns={[
                     { 
                       title: '#', 
                       render: rowData => rowData.tableData.id + 1,
                       width: 50
                     },
-                    {title: 'Full Name', field: 'fullName'},
-                    {title: 'Department', field: 'department.departmentName'},
+                    { title: 'Full Name', field: 'fullName' },
+                    { title: 'Department', field: 'department.departmentName' },
                     {
                       title: 'Job Title', 
                       field: 'jobs',
@@ -270,17 +268,20 @@ export default class EmployeeList extends Component {
                         return currentJob ? currentJob.jobTitle : rowData.jobs[0].jobTitle;
                       }
                     },
-                    {title: 'Mobile', field: 'user_personal_info.mobile'},
+                    { title: 'Mobile', field: 'user_personal_info.mobile' },
                     {
-                      title: 'Status', 
+                      title: 'Status',
                       field: 'active',
-                      render: rowData => (
+                      render: (rowData) =>
                         rowData.active ? (
-                          <Badge pill variant="success">Active</Badge>
+                          <Badge pill variant="success">
+                            Active
+                          </Badge>
                         ) : (
-                          <Badge pill variant="danger">Inactive</Badge>
-                        )
-                      )
+                          <Badge pill variant="danger">
+                            Inactive
+                          </Badge>
+                        ),
                     },
                     {
                       title: 'Onboarding', 
@@ -314,7 +315,7 @@ export default class EmployeeList extends Component {
                             </Button>
                           </OverlayTrigger>
                         </Form>
-                      )
+                      ),
                     },
                     {
                       title: 'Actions',

@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Redirect } from 'react-router-dom';
+import { Redirect } from "react-router-dom";
 import { Card, Form, Button, Alert } from "react-bootstrap";
 import DatePicker from "react-datepicker";
 import axios from "axios";
@@ -43,7 +43,7 @@ export default class EmployeeAdd extends Component {
       hasError: false,
       errMsg: "",
       completed: false,
-      newEmployeeId: null // Only new state added
+      newEmployeeId: null, // Only new state added
     };
   }
 
@@ -100,29 +100,33 @@ export default class EmployeeAdd extends Component {
 
     try {
       // 1. Create User
-      const userRes = await axios.post("/api/users", {
-        username: this.state.username,
-        password: this.state.password || "1234",
-        fullname: `${this.state.fistname} ${this.state.lastname}`,
-        role: this.state.role,
-        departmentId: this.state.departmentId,
-        college: this.state.college,
-        active: 1,
-      }, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
-      });
+      const userRes = await axios.post(
+        "/api/users",
+        {
+          username: this.state.username,
+          password: this.state.password || "1234",
+          fullname: `${this.state.fistname} ${this.state.lastname}`,
+          role: this.state.role,
+          departmentId: this.state.departmentId,
+          college: this.state.college,
+          active: 1,
+        },
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        }
+      );
 
       const userId = userRes.data.id;
       this.setState({ newEmployeeId: userId });
 
+
       // 2. Create Related Records
       await this.createRelatedRecords(userId);
 
-      this.setState({ 
+      this.setState({
         completed: true,
-        redirectToList: true 
+        redirectToList: true,
       });
-
     } catch (err) {
       this.setState({
         hasError: true,
@@ -134,43 +138,55 @@ export default class EmployeeAdd extends Component {
 
   createRelatedRecords = async (userId) => {
     // Personal Info
-    await axios.post("/api/personalInformations", {
-      dateOfBirth: this.state.dateOfBirth,
-      gender: this.state.gender,
-      maritalStatus: this.state.maritalStatus,
-      fatherName: this.state.fathername,
-      idNumber: this.state.idNumber,
-      address: this.state.address,
-      city: this.state.city,
-      country: this.state.country,
-      mobile: this.state.mobile,
-      phone: this.state.phone,
-      emailAddress: this.state.email,
-      userId
-    }, {
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
-    });
+    await axios.post(
+      "/api/personalInformations",
+      {
+        dateOfBirth: this.state.dateOfBirth,
+        gender: this.state.gender,
+        maritalStatus: this.state.maritalStatus,
+        fatherName: this.state.fathername,
+        idNumber: this.state.idNumber,
+        address: this.state.address,
+        city: this.state.city,
+        country: this.state.country,
+        mobile: this.state.mobile,
+        phone: this.state.phone,
+        emailAddress: this.state.email,
+        userId,
+      },
+      {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      }
+    );
 
     // Financial Info
-    await axios.post("/api/financialInformations", {
-      bankName: this.state.bankName,
-      accountName: this.state.accountName,
-      accountNumber: this.state.accountNumber,
-      iban: this.state.iBan,
-      userId
-    }, {
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
-    });
+    await axios.post(
+      "/api/financialInformations",
+      {
+        bankName: this.state.bankName,
+        accountName: this.state.accountName,
+        accountNumber: this.state.accountNumber,
+        iban: this.state.iBan,
+        userId,
+      },
+      {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      }
+    );
 
     // Job Info
-    await axios.post("/api/jobs", {
-      jobTitle: this.state.jobTitle,
-      startDate: this.state.startDate,
-      endDate: this.state.endDate,
-      userId
-    }, {
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
-    });
+    await axios.post(
+      "/api/jobs",
+      {
+        jobTitle: this.state.jobTitle,
+        startDate: this.state.startDate,
+        endDate: this.state.endDate,
+        userId,
+      },
+      {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      }
+    );
   };
 
   pushDepartments = () => {
@@ -535,6 +551,29 @@ export default class EmployeeAdd extends Component {
                             {this.pushColleges()}
                           </Form.Control>
                         </Form.Group>
+                        <Form.Group controlId="formJobPosition">
+                          <Form.Label className="text-muted required">
+                            Job Position
+                          </Form.Label>
+                          <Form.Control
+                            as="select"
+                            value={this.state.jobPosition}
+                            onChange={this.handleChange}
+                            name="jobPosition"
+                            required
+                          >
+                            <option value="">Choose...</option>
+                            <option value="HOD">HOD</option>
+                            <option value="PRINCIPAL">principal</option>
+                            <option value="HOD">Hod</option>
+                            <option value="ASSOCIATE_PROFESSOR">
+                              Associate Professor
+                            </option>
+                            <option value="ASSISTANT_PROFESSOR">
+                              Assistant Professor
+                            </option>
+                          </Form.Control>
+                        </Form.Group>
                         <Form.Group controlId="formRole">
                           <Form.Label className="text-muted required">
                             Role
@@ -547,8 +586,12 @@ export default class EmployeeAdd extends Component {
                             required
                           >
                             <option value="">Choose...</option>
-                            <option value="ROLE_SUPER_ADMIN">Super Admin</option>
-                            <option value="ROLE_SYSTEM_ADMIN">System Admin</option>
+                            <option value="ROLE_SUPER_ADMIN">
+                              Super Admin
+                            </option>
+                            <option value="ROLE_SYSTEM_ADMIN">
+                              System Admin
+                            </option>
                             <option value="ROLE_ADMIN">Principal</option>
                             <option value="ROLE_HOD">HOD</option>
                             <option value="ROLE_FACULTY">Faculty</option>
@@ -562,7 +605,7 @@ export default class EmployeeAdd extends Component {
                   </Button>
                 </div>
               </div>
-              <div className="row">
+              {/* <div className="row">
                 <div className="col-sm-6">
                   <Card className="secondary-card">
                     <Card.Header>Job</Card.Header>
@@ -625,7 +668,7 @@ export default class EmployeeAdd extends Component {
                     </Card.Body>
                   </Card>
                 </div>
-              </div>
+              </div> */}
             </Card.Body>
           </Card>
         </div>
