@@ -5,13 +5,17 @@ var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 var withAuth = require("./withAuth");
+
+const { errorHandler } = require('./utils/errorHandler');
 const resignationRoutes = require("./routes/resignation.routes");
+
 const db = require("./models");
 require("dotenv").config();
 
 var api = require("./routes/api");
 var login = require("./routes/login/login.routes");
 var register = require("./routes/register/register.routes");
+var onboarding = require("./routes/onboarding.routes");
 
 var app = express();
 
@@ -43,6 +47,12 @@ db.sequelize.sync({ alter: true });
 app.use("/api", api);
 app.use("/login", login);
 app.use("/register", register);
+
+app.use("/onboarding", onboarding);
+
+// Error handling middleware
+app.use(errorHandler);
+
 app.use("/api/resignations", resignationRoutes);
 
 app.use(express.json());
@@ -104,4 +114,5 @@ app.use(function (err, req, res, next) {
     },
   });
 });
+
 module.exports = app;

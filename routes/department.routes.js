@@ -14,7 +14,7 @@ router.post(
 );
 
 //  Retrieve all Departments (All authenticated users)
-router.get("/", withAuth.verifyToken, department.findAll);
+router.get('/', withAuth.verifyToken, department.findAll);
 
 //  Retrieve a single Department with an ID (All authenticated users)
 router.get("/:id", withAuth.verifyToken, department.findOne);

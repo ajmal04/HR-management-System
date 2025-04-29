@@ -533,28 +533,26 @@ export default class EmployeeEdit extends Component {
                             <Form.Label className="text-muted required">
                               Date of Birth
                             </Form.Label>
-                            <div>
-                              <DatePicker
-                                selected={userPersonalInfo.dateOfBirth}
-                                onChange={(dateOfBirth) =>
-                                  this.setState((prevState) => ({
-                                    userPersonalInfo: {
-                                      ...prevState.userPersonalInfo,
-                                      dateOfBirth: dateOfBirth,
-                                    },
-                                  }))
-                                }
-                                showMonthDropdown
-                                showYearDropdown
-                                dropdownMode="select"
-                                name="dateOfBirth"
-                                dateFormat="yyyy-MM-dd"
-                                className="form-control"
-                                placeholderText="Select Date Of Birth"
-                                autoComplete="off"
-                                required
-                              />
-                            </div>
+                            <DatePicker
+                              selected={userPersonalInfo.dateOfBirth}
+                              onChange={(dateOfBirth) =>
+                                this.setState((prevState) => ({
+                                  userPersonalInfo: {
+                                    ...prevState.userPersonalInfo,
+                                    dateOfBirth: dateOfBirth,
+                                  },
+                                }))
+                              }
+                              showMonthDropdown
+                              showYearDropdown
+                              dropdownMode="select"
+                              name="dateOfBirth"
+                              dateFormat="yyyy-MM-dd"
+                              className="form-control"
+                              placeholderText="Select Date Of Birth"
+                              autoComplete="off"
+                              required
+                            />
                           </Form.Group>
                           <Form.Group controlId="formAge">
                             <Form.Label className="text-muted required">
@@ -679,13 +677,12 @@ export default class EmployeeEdit extends Component {
                         </div>
                       ) : (
                         <Card.Text>
-                          <Form.Group controlId="formPermanentAddress">
+                          <Form.Group controlId="formPhysicalAddress">
                             <Form.Label className="text-muted required">
-                              Permanent Address
+                              Physical Address
                             </Form.Label>
                             <Form.Control
-                              as="textarea"
-                              rows={3}
+                              type="text"
                               value={userPersonalInfo.address || ""}
                               onChange={this.handleChangeUserPersonal}
                               name="address"
@@ -749,8 +746,8 @@ export default class EmployeeEdit extends Component {
                             />
                           </Form.Group>
                           <Form.Group controlId="formPhone">
-                            <Form.Label className="text-muted required">
-                              Emergency Contact Number
+                            <Form.Label className="text-muted">
+                              Phone
                             </Form.Label>
                             <Form.Control
                               type="text"

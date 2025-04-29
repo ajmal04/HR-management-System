@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { withRouter } from "react-router-dom"; // Import withRouter
+import { withRouter } from "react-router-dom";
 import NewPasswordModal from '../components/NewPasswordModal';
 
 class Header extends Component {

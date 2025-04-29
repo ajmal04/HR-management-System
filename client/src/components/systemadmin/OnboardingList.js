@@ -7,6 +7,7 @@ import axios from 'axios';
 import moment from 'moment';
 import OnboardingDetail from './OnboardingDetail';
 import AssetAllocation from './AssetAllocation';
+import { useHistory } from 'react-router-dom';
 
 const OnboardingList = () => {
   const [requests, setRequests] = useState([]);
@@ -22,6 +23,12 @@ const OnboardingList = () => {
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [viewDetail, setViewDetail] = useState(false);
   const [viewAssetAllocation, setViewAssetAllocation] = useState(false);
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    total: 0
+  });
+  const history = useHistory();
 
   const authConfig = {
     headers: { 
@@ -33,25 +40,31 @@ const OnboardingList = () => {
   const fetchRequests = async () => {
     try {
       const res = await axios.get(
-        `/api/onboarding/pending?filter=${filter}&sort=${sortConfig.key}&order=${sortConfig.direction}`,
+        `/api/onboarding/requests?filter=${filter}&sort=${sortConfig.key}&order=${sortConfig.direction}&page=${pagination.currentPage}`,
         authConfig
       );
-      setRequests(res.data);
+      setRequests(res.data.requests || []);
+      setPagination({
+        currentPage: res.data.currentPage || 1,
+        totalPages: res.data.totalPages || 1,
+        total: res.data.total || 0
+      });
       setError(null);
     } catch (err) {
+      console.error('Error fetching requests:', err);
       setError(err.response?.data?.message || 'Failed to fetch requests');
+      setRequests([]); // Set empty array on error
     }
   };
 
   useEffect(() => {
     fetchRequests();
-  }, [filter, sortConfig]);
+  }, [filter, sortConfig, pagination.currentPage]);
 
   // Handler functions for navigation
   const onViewDetail = (request) => (e) => {
     e.preventDefault();
-    setSelectedRequest(request);
-    setViewDetail(true);
+    history.push(`/onboarding-detail/${request.id}`);
   };
 
   const onAssignAssets = (request) => (e) => {
@@ -91,17 +104,20 @@ const OnboardingList = () => {
   // Bulk complete
   const handleBulkComplete = async () => {
     try {
-      await axios.patch(
-        '/api/onboarding/bulk-complete', 
-        { ids: selectedRows },
-        authConfig
+      // Since there's no bulk complete endpoint, we'll complete each request individually
+      const promises = selectedRows.map(id => 
+        axios.patch(`/api/onboarding/requests/${id}/complete`, {}, authConfig)
       );
+      
+      await Promise.all(promises);
+      
       setSelectedRows([]);
       setIsAllSelected(false);
       setSuccess(`${selectedRows.length} request(s) completed successfully`);
       setTimeout(() => setSuccess(null), 3000);
       fetchRequests();
     } catch (err) {
+      console.error('Error completing requests:', err);
       setError(err.response?.data?.message || 'Failed to complete requests');
     }
   };
@@ -109,12 +125,13 @@ const OnboardingList = () => {
   // Handle single completion
   const handleComplete = async (id) => {
     try {
-      await axios.patch( `/api/onboarding/${id}/complete`,{},authConfig);
+      await axios.patch(`/api/onboarding/requests/${id}/complete`, {}, authConfig);
 
       setSuccess('Request completed successfully');
       setTimeout(() => setSuccess(null), 3000);
       fetchRequests();
     } catch (err) {
+      console.error('Error completing request:', err);
       setError(err.response?.data?.message || 'Failed to complete request');
     }
   };
@@ -209,8 +226,8 @@ const OnboardingList = () => {
                   onChange={handleSelectAll}
                 />
               </th>
-              <th onClick={() => handleSort('employee.full_name')}>
-                Employee {sortConfig.key === 'employee.full_name' && (
+              <th onClick={() => handleSort('employee.fullName')}>
+                Employee {sortConfig.key === 'employee.fullName' && (
                   sortConfig.direction === 'asc' ? '↑' : '↓'
                 )}
               </th>
@@ -235,7 +252,7 @@ const OnboardingList = () => {
                     />
                   </td>
                   <td>
-                    <div>{request.employee?.full_name || 'N/A'}</div>
+                    <div>{request.employee?.fullName || 'N/A'}</div>
                     <small className="text-muted">
                       User ID: {request.userId}
                     </small>
@@ -247,7 +264,7 @@ const OnboardingList = () => {
                     </div>
                   </td>
                   <td>
-                    {request.requestedByUser?.full_name || 'System'}
+                    {request.requester?.fullName || 'System'}
                   </td>
                   <td>
                     <Dropdown>
@@ -281,9 +298,23 @@ const OnboardingList = () => {
 
         {requests.length > 0 && (
           <Pagination className="justify-content-center mt-3">
-            <Pagination.Prev disabled />
-            <Pagination.Item active>{1}</Pagination.Item>
-            <Pagination.Next disabled />
+            <Pagination.Prev 
+              disabled={pagination.currentPage === 1}
+              onClick={() => setPagination(prev => ({...prev, currentPage: prev.currentPage - 1}))}
+            />
+            {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map(page => (
+              <Pagination.Item 
+                key={page}
+                active={page === pagination.currentPage}
+                onClick={() => setPagination(prev => ({...prev, currentPage: page}))}
+              >
+                {page}
+              </Pagination.Item>
+            ))}
+            <Pagination.Next 
+              disabled={pagination.currentPage === pagination.totalPages}
+              onClick={() => setPagination(prev => ({...prev, currentPage: prev.currentPage + 1}))}
+            />
           </Pagination>
         )}
       </Card.Body>

@@ -51,6 +51,14 @@ import AnnouncementEmployee from "./components/employee/Announcement";
 import Register from "./components/Register";
 import withAuth from "./withAuth";
 import Login from "./components/Login";
+
+
+import OnboardingList from './components/systemadmin/OnboardingList.js';
+import OnboardingDetail from './components/systemadmin/OnboardingDetail.js';
+import AssetAllocation from './components/systemadmin/AssetAllocation.js';
+import OnboardingDashboard from "./components/onboarding/OnboardingDashboard";
+import AssetManagement from './components/systemadmin/AssetManagement';
+
 // import JobListSuperAdmin from "./components/superadmin/JobList";
 // import JobListAdmin from "./components/admin/JobList";
 // import JobListHOD from "./components/hod/JobList";
@@ -58,9 +66,8 @@ import TerminationList from "./components/pages/TerminationList";
 import ResignationList from "./components/pages/ResignationList";
 import ResignationForm from "./components/pages/ResignationForm.js";
 import ResignationStatus from "./components/pages/ResignationStatus.js";
-import OnboardingList from "./components/systemadmin/OnboardingList.js";
-import OnboardingDetail from "./components/systemadmin/OnboardingDetail.js";
-import AssetAllocation from "./components/systemadmin/AssetAllocation.js";
+
+
 
 export default class App extends Component {
   render() {
@@ -139,7 +146,9 @@ const SuperAdminContainer = () => (
     <Header />
     <SidebarSuperAdmin />
     <Layout>
-      <Switch>
+      <Switch>  
+        <Route exact path="/onboarding-dashboard" component={OnboardingDashboard} />
+
         <Route exact path="/employee-list" component={EmployeeListSuperAdmin} />
         <Route exact path="/employee-add" component={EmployeeAddSuperAdmin} />
         <Route exact path="/employee-edit" component={EmployeeEditSuperAdmin} />
@@ -176,10 +185,12 @@ const SystemAdminContainer = () => (
     <Header />
     <SidebarSystemAdmin />
     <Layout>
-      <Switch>
+
+      <Switch>  
         <Route exact path="/onboarding/list" component={OnboardingList} />
-        <Route exact path="/onboarding-detail" component={OnboardingDetail} />
-        <Route exact path="/asset-allocation" component={AssetAllocation} />
+        <Route exact path="/onboarding-detail/:id" component={OnboardingDetail} />
+        <Route exact path="/asset-allocation/:userId" component={AssetAllocation} />
+        <Route exact path="/assets/manage" component={AssetManagement} />
       </Switch>
     </Layout>
     <Footer />
