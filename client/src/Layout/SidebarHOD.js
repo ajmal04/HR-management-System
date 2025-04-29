@@ -73,13 +73,6 @@ export default class SidebarManager extends Component {
                   </p>
                 </NavLink>
               </li> */}
-
-              <li className="nav-item">
-                <NavLink to="/termination-list" className="nav-link">
-                  <i className="nav-icon fas fa-user-slash" />
-                  <p>Termination List</p>
-                </NavLink>
-              </li>
               <li className="nav-item has-treeview">
                 <NavLink
                   to="/resignation"
@@ -89,7 +82,7 @@ export default class SidebarManager extends Component {
                   <i className="nav-icon fas fa-sign-out-alt" />{" "}
                   {/* Changed icon */}
                   <p>
-                    Resignation
+                    Exit Manager
                     <i className="right fas fa-angle-left" />
                   </p>
                 </NavLink>
@@ -138,7 +131,7 @@ export default class SidebarManager extends Component {
                 >
                   <i className="nav-icon fa fa-rocket" />
                   <p>
-                    Leave Request
+                    Leave
                     <i className="right fas fa-angle-left" />
                   </p>
                 </NavLink>

@@ -67,11 +67,6 @@ export default class ResignationList extends Component {
         action === "approved"
           ? `/api/resignations/admin/approve/${resignationId}`
           : `/api/resignations/admin/reject/${resignationId}`;
-    } else if (role === "ROLE_SUPER_ADMIN") {
-      endpoint =
-        action === "approved"
-          ? `/api/resignations/superadmin/approve/${resignationId}`
-          : `/api/resignations/superadmin/reject/${resignationId}`;
     }
 
     try {
@@ -82,12 +77,41 @@ export default class ResignationList extends Component {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
+
       setTimeout(() => {
         this.fetchResignations();
       }, 300);
-      this.fetchResignations();
     } catch (err) {
       console.error("Status update failed:", err);
+    }
+  };
+
+  handleSuperAdminApprove = async (resignationId) => {
+    const token = localStorage.getItem("token");
+
+    const leaveDays = parseInt(
+      prompt("Enter number of leave days taken during notice period:", "0")
+    );
+
+    if (isNaN(leaveDays) || leaveDays < 0) {
+      alert("Invalid number of leave days.");
+      return;
+    }
+
+    try {
+      await axios.put(
+        `/api/resignations/superadmin/approve/${resignationId}`,
+        { leaveDays },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      setTimeout(() => {
+        this.fetchResignations();
+      }, 300);
+    } catch (err) {
+      console.error("SuperAdmin approval failed:", err);
     }
   };
 
@@ -151,42 +175,67 @@ export default class ResignationList extends Component {
                     {
                       title: "Actions",
                       field: "actions",
-                      render: (rowData) => (
-                        <div>
-                          <button
-                            className="btn btn-sm btn-success mr-2"
-                            onClick={() =>
-                              this.handleStatusChange(rowData.id, "approved")
-                            }
-                            disabled={
-                              (this.state.role === "ROLE_HOD" &&
-                                rowData.hodStatus !== "pending") ||
-                              (this.state.role === "ROLE_ADMIN" &&
-                                rowData.principalStatus !== "pending") ||
-                              (this.state.role === "ROLE_SUPER_ADMIN" &&
-                                rowData.hrStatus !== "pending")
-                            }
-                          >
-                            Approve
-                          </button>
-                          <button
-                            className="btn btn-sm btn-danger"
-                            onClick={() =>
-                              this.handleStatusChange(rowData.id, "rejected")
-                            }
-                            disabled={
-                              (this.state.role === "ROLE_HOD" &&
-                                rowData.hodStatus !== "pending") ||
-                              (this.state.role === "ROLE_ADMIN" &&
-                                rowData.principalStatus !== "pending") ||
-                              (this.state.role === "ROLE_SUPER_ADMIN" &&
-                                rowData.hrStatus !== "pending")
-                            }
-                          >
-                            Reject
-                          </button>
-                        </div>
-                      ),
+                      render: (rowData) => {
+                        const { role } = this.state;
+                        const isHOD = role === "ROLE_HOD";
+                        const isAdmin = role === "ROLE_ADMIN";
+                        const isSuperAdmin = role === "ROLE_SUPER_ADMIN";
+
+                        return (
+                          <div>
+                            {(isHOD || isAdmin) && (
+                              <>
+                                <button
+                                  className="btn btn-sm btn-success mr-2"
+                                  onClick={() =>
+                                    this.handleStatusChange(
+                                      rowData.id,
+                                      "approved"
+                                    )
+                                  }
+                                  disabled={
+                                    (isHOD &&
+                                      rowData.hodStatus !== "pending") ||
+                                    (isAdmin &&
+                                      rowData.principalStatus !== "pending")
+                                  }
+                                >
+                                  Approve
+                                </button>
+                                <button
+                                  className="btn btn-sm btn-danger"
+                                  onClick={() =>
+                                    this.handleStatusChange(
+                                      rowData.id,
+                                      "rejected"
+                                    )
+                                  }
+                                  disabled={
+                                    (isHOD &&
+                                      rowData.hodStatus !== "pending") ||
+                                    (isAdmin &&
+                                      rowData.principalStatus !== "pending")
+                                  }
+                                >
+                                  Reject
+                                </button>
+                              </>
+                            )}
+
+                            {isSuperAdmin && (
+                              <button
+                                className="btn btn-sm btn-success"
+                                onClick={() =>
+                                  this.handleSuperAdminApprove(rowData.id)
+                                }
+                                disabled={rowData.hrStatus !== "pending"}
+                              >
+                                Approve
+                              </button>
+                            )}
+                          </div>
+                        );
+                      },
                       sorting: false,
                       filtering: false,
                     },

@@ -62,9 +62,9 @@ const ResignationStatus = () => {
           <p>
             <strong>HR Status:</strong> {resignation.hrStatus}
           </p>
-          <p>
+          {/* <p>
             <strong>Message:</strong> {resignation.resignationStatus}
-          </p>
+          </p> */}
 
           {resignation.hrStatus === "approved" && (
             <>
@@ -81,7 +81,9 @@ const ResignationStatus = () => {
                 <strong>Days Left:</strong> {countdown}
               </p>
               <p className="text-danger">
-                Note: No leave will be provided during the notice period.
+                Note: Please note that any leaves availed during the notice
+                period will be added to the notice duration, thereby extending
+                the overll notice period accordingly.
               </p>
             </>
           )}

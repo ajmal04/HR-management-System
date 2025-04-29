@@ -253,6 +253,7 @@ const FacultyContainer = () => (
           path="/application-list"
           component={ApplicationListEmployee}
         />
+        {/* <Route exact path="/apply-leave" component={Application} /> */}
         <Route exact path="/application" component={Application} />
         <Route exact path="/salary-view" component={SalaryViewEmployee} />
         <Route exact path="/announcement" component={AnnouncementEmployee} />

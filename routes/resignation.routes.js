@@ -181,15 +181,21 @@ router.put(
         return res.status(404).json({ message: "Resignation not found." });
       }
 
+      const leaveDays = req.body.leaveDays || 0; // 🟡 Accept leave days (default 0)
+
       const today = new Date();
       const endDate = new Date(today);
-      endDate.setMonth(endDate.getMonth() + 3);
+      endDate.setMonth(endDate.getMonth() + 3); // 📆 Add 3 months
+      endDate.setDate(endDate.getDate() + leaveDays); // ➕ Add leave days to it
 
       resignation.hrStatus = "approved";
       resignation.noticeStartDate = today.toISOString().split("T")[0];
       resignation.noticeEndDate = endDate.toISOString().split("T")[0];
       resignation.resignationStatus =
-        "The SuperAdmin approves the resignation and notice period was assigned.\nNo leave will be provided during the notice period.";
+        `The SuperAdmin approves the resignation and notice period was assigned.\nNo leave will be provided during the notice period.` +
+        (leaveDays > 0
+          ? `\n${leaveDays} leave day(s) taken during notice period have been added.`
+          : "");
 
       await resignation.save();
 

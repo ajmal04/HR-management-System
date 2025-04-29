@@ -142,7 +142,7 @@ export default class EmployeeList extends Component {
                     },
                     { title: "Full Name", field: "fullName" },
                     { title: "Department", field: "department.departmentName" },
-                    { title: "Job Position", field: "user.jobPosition" },
+                    { title: "Job Position", field: "jobPosition" },
                     // {
                     //   title: 'Job Title',
                     //   field: 'jobs',

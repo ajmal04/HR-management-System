@@ -14,7 +14,9 @@ export default class EmployeeAdd extends Component {
       fistname: "",
       lastname: "",
       dateOfBirth: "",
+      age: "",
       gender: "",
+      bloodGroup: "",
       maritalStatus: "",
       fathername: "",
       idNumber: "",
@@ -23,10 +25,11 @@ export default class EmployeeAdd extends Component {
       accountNumber: "",
       iBan: "",
       address: "",
+      tempAddress: "",
       country: "",
       city: "",
-      mobile: null,
-      phone: null,
+      mobile: "",
+      phone: "",
       email: "",
       username: "",
       password: "",
@@ -111,6 +114,7 @@ export default class EmployeeAdd extends Component {
           departmentId: this.state.departmentId,
           college: this.state.college,
           active: 1,
+          jobPosition: this.state.jobPosition,
         },
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
@@ -154,11 +158,14 @@ export default class EmployeeAdd extends Component {
       "/api/personalInformations",
       {
         dateOfBirth: this.state.dateOfBirth,
+        age: this.state.age,
         gender: this.state.gender,
+        bloodGroup: this.state.bloodGroup,
         maritalStatus: this.state.maritalStatus,
         fatherName: this.state.fathername,
         idNumber: this.state.idNumber,
         address: this.state.address,
+        tempAddress: this.state.tempAddress,
         city: this.state.city,
         country: this.state.country,
         mobile: this.state.mobile,
@@ -293,7 +300,19 @@ export default class EmployeeAdd extends Component {
                             />
                           </Form.Row>
                         </Form.Group>
-
+                        <Form.Group controlId="formAge">
+                          <Form.Label className="text-muted required">
+                            Age
+                          </Form.Label>
+                          <Form.Control
+                            type="text"
+                            placeholder="Enter Age"
+                            name="age"
+                            value={this.state.age}
+                            onChange={this.handleChange}
+                            required
+                          />
+                        </Form.Group>
                         <Form.Group controlId="formGender">
                           <Form.Label className="text-muted required">
                             Gender
@@ -310,7 +329,28 @@ export default class EmployeeAdd extends Component {
                             <option value="female">Female</option>
                           </Form.Control>
                         </Form.Group>
-
+                        <Form.Group controlId="formBloodGroup">
+                          <Form.Label className="text-muted required">
+                            Blood Group
+                          </Form.Label>
+                          <Form.Control
+                            as="select"
+                            value={this.state.bloodGroup}
+                            onChange={this.handleChange}
+                            name="bloodGroup"
+                            required
+                          >
+                            <option value="">Choose...</option>
+                            <option value="A+">A+</option>
+                            <option value="A-">A-</option>
+                            <option value="B+">B+</option>
+                            <option value="B-">B-</option>
+                            <option value="O+">O+</option>
+                            <option value="O-">O-</option>
+                            <option value="AB+">AB+</option>
+                            <option value="AB-">AB-</option>
+                          </Form.Control>
+                        </Form.Group>
                         <Form.Group controlId="formMaritalStatus">
                           <Form.Label className="text-muted required">
                             Marital Status
@@ -366,14 +406,29 @@ export default class EmployeeAdd extends Component {
                       <Card.Text>
                         <Form.Group controlId="formPhysicalAddress">
                           <Form.Label className="text-muted required">
-                            Physical Address
+                            Permanent Address
                           </Form.Label>
                           <Form.Control
-                            type="text"
+                            as="textarea"
+                            rows={3}
                             value={this.state.address}
                             onChange={this.handleChange}
                             name="address"
                             placeholder="Enter Address"
+                            required
+                          />
+                        </Form.Group>
+                        <Form.Group controlId="formTempAddress">
+                          <Form.Label className="text-muted required">
+                            Temporary Address
+                          </Form.Label>
+                          <Form.Control
+                            as="textarea"
+                            rows={3}
+                            value={this.state.tempAddress}
+                            onChange={this.handleChange}
+                            name="tempAddress"
+                            placeholder="Enter Temporary Address"
                             required
                           />
                         </Form.Group>
@@ -417,7 +472,9 @@ export default class EmployeeAdd extends Component {
                           />
                         </Form.Group>
                         <Form.Group controlId="formPhone">
-                          <Form.Label className="text-muted">Phone</Form.Label>
+                          <Form.Label className="text-muted required">
+                            Emergency Contact Number
+                          </Form.Label>
                           <Form.Control
                             type="text"
                             value={this.state.phone}

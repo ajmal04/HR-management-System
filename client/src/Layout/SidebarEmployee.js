@@ -74,7 +74,7 @@ export default class SidebarEmployee extends Component {
                   <i className="nav-icon fas fa-sign-out-alt" />{" "}
                   {/* Changed icon */}
                   <p>
-                    Resignation
+                    Exit Manager
                     <i className="right fas fa-angle-left" />
                   </p>
                 </NavLink>
@@ -112,7 +112,7 @@ export default class SidebarEmployee extends Component {
                 >
                   <i className="nav-icon fa fa-rocket" />
                   <p>
-                    Leave Request
+                    Leave
                     <i className="right fas fa-angle-left" />
                   </p>
                 </NavLink>
@@ -123,7 +123,7 @@ export default class SidebarEmployee extends Component {
                   <li className="nav-item">
                     <NavLink to="/application-list" className="nav-link">
                       <i className="fas fa-list-ul nav-icon" />
-                      <p>My Applications</p>
+                      <p>My Application Status</p>
                     </NavLink>
                   </li>
                   <li className="nav-item">

@@ -1,62 +1,79 @@
 module.exports = (sequelize, Sequelize) => {
-    const UserPersonalInfo = sequelize.define("user_personal_info", {
+  const UserPersonalInfo = sequelize.define(
+    "user_personal_info",
+    {
       id: {
         type: Sequelize.INTEGER,
         autoIncrement: true,
         primaryKey: true,
-        allowNull: false
+        allowNull: false,
       },
       dateOfBirth: {
         type: Sequelize.DATE,
-        allowNull: true
+        allowNull: true,
       },
       gender: {
         type: Sequelize.ENUM,
-        values: ['Male', 'Female'],
-        allowNull: true
+        values: ["Male", "Female"],
+        allowNull: true,
+      },
+      age: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      bloodGroup: {
+        type: Sequelize.ENUM,
+        values: ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"],
+        allowNull: true,
+      },
+      tempAddress: {
+        type: Sequelize.TEXT, // Changed to TEXT for longer addresses
+        allowNull: true,
       },
       maritalStatus: {
         type: Sequelize.ENUM,
-        values: ['Married', 'Single', 'Widowed'],
-        allowNull: true
+        values: ["Married", "Single", "Widowed"],
+        allowNull: true,
       },
       fatherName: {
         type: Sequelize.STRING,
-        allowNull: true
+        allowNull: true,
       },
       idNumber: {
         type: Sequelize.STRING,
-        allowNull: true
+        allowNull: true,
       },
       address: {
-        type: Sequelize.STRING,
-        allowNull: true
+        type: Sequelize.TEXT,
+        allowNull: true,
       },
       city: {
         type: Sequelize.STRING,
-        allowNull: true
+        allowNull: true,
       },
       country: {
         type: Sequelize.STRING,
-        allowNull: true
+        allowNull: true,
       },
       mobile: {
         type: Sequelize.STRING,
-        allowNull: true
+        allowNull: true,
       },
       phone: {
         type: Sequelize.STRING,
-        allowNull: true
+        allowNull: true,
       },
       emailAddress: {
         type: Sequelize.STRING,
-        allowNull: true
-      }
-    }, {
-        timestamps: false,
-        freezeTableName: true,
-        underscored: true
-    });
-  
-    return UserPersonalInfo;
-  };
+        allowNull: true,
+      },
+    },
+    {
+      timestamps: false,
+      freezeTableName: true,
+      underscored: true,
+    }
+  );
+
+  return UserPersonalInfo;
+};

@@ -1,11 +1,13 @@
 import React, { Component } from "react";
 import { Card, Button, Alert } from "react-bootstrap";
 import { Redirect } from "react-router-dom";
+import "react-bootstrap-table-next/dist/react-bootstrap-table2.min.css";
+import "react-bootstrap-table2-paginator/dist/react-bootstrap-table2-paginator.min.css";
 import axios from "axios";
-import moment from 'moment'
-import MaterialTable from 'material-table'
-import { ThemeProvider } from '@material-ui/core'
-import { createMuiTheme } from '@material-ui/core/styles'
+import moment from "moment";
+import MaterialTable from "material-table";
+import { ThemeProvider } from "@material-ui/core";
+import { createMuiTheme } from "@material-ui/core/styles";
 
 export default class CollegeApplicationList extends Component {
   constructor(props) {
@@ -27,21 +29,23 @@ export default class CollegeApplicationList extends Component {
       method: "get",
       url: "/api/applications/college",
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-    }).then((res) => {
-        const formattedData = res.data.map(app => ({
+    })
+      .then((res) => {
+        const formattedData = res.data.map((app) => ({
           ...app,
-          startDate: moment(app.startDate).format('YYYY-MM-DD'),
-          endDate: moment(app.endDate).format('YYYY-MM-DD')
+          startDate: moment(app.startDate).format("YYYY-MM-DD"),
+          endDate: moment(app.endDate).format("YYYY-MM-DD"),
         }));
         this.setState({ applications: formattedData });
-    })
-    .catch(err => {
+      })
+      .catch((err) => {
         this.setState({
           hasError: true,
-          errorMsg: err.response?.data?.message || 'Failed to fetch applications'
+          errorMsg:
+            err.response?.data?.message || "Failed to fetch applications",
         });
-        console.error('Error fetching college applications:', err);
-    })
+        console.error("Error fetching college applications:", err);
+      });
   }
 
   handleChange = (event) => {
@@ -59,7 +63,7 @@ export default class CollegeApplicationList extends Component {
         method: "put",
         url: "/api/applications/" + app.id,
         data: {
-          status: 'Approved'
+          status: "Approved",
         },
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       })
@@ -71,7 +75,7 @@ export default class CollegeApplicationList extends Component {
         .catch((err) => {
           this.setState({
             hasError: true,
-            errorMsg: err.response?.data?.message || 'Approval failed',
+            errorMsg: err.response?.data?.message || "Approval failed",
           });
         });
     };
@@ -79,13 +83,13 @@ export default class CollegeApplicationList extends Component {
 
   onReject(app) {
     return (event) => {
-      event.preventDefault()
+      event.preventDefault();
 
       axios({
         method: "put",
         url: "/api/applications/" + app.id,
         data: {
-          status: 'Rejected'
+          status: "Rejected",
         },
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       })
@@ -97,22 +101,22 @@ export default class CollegeApplicationList extends Component {
         .catch((err) => {
           this.setState({
             hasError: true,
-            errorMsg: err.response?.data?.message || 'Rejection failed',
+            errorMsg: err.response?.data?.message || "Rejection failed",
           });
         });
-    }
+    };
   }
 
   render() {
     const theme = createMuiTheme({
-        overrides: {
-            MuiTableCell: {
-                root: {
-                    padding: '6px 6px 6px 6px'
-                }
-            }
-        }
-    })
+      overrides: {
+        MuiTableCell: {
+          root: {
+            padding: "6px 6px 6px 6px",
+          },
+        },
+      },
+    });
 
     return (
       <div className="container-fluid pt-5">
@@ -126,56 +130,81 @@ export default class CollegeApplicationList extends Component {
             <Card.Body>
               <ThemeProvider theme={theme}>
                 <MaterialTable
-                    columns={[
-                        { 
-                            title: '#', 
-                            field: 'tableData.id',
-                            render: rowData => rowData.tableData.id + 1,
-                            width: 50,
-                            filtering: false
-                        },
-                        {title: 'Full Name', field: 'user.fullName'},
-                        {title: 'Department', field: 'user.department.departmentName'},
-                        {title: 'Start Date', field: 'startDate'},
-                        {title: 'End Date', field: 'endDate'},
-                        {title: 'Leave Type', field: 'type'},
-                        {title: 'Comments', field: 'reason'},
-                        {
-                            title: 'Status', 
-                            field: 'status',
-                            render: rowData => (
-                                <Button size="sm" variant={rowData.status==='Approved' ? "success" : rowData.status==='Pending' ? "warning" : "danger"}>{rowData.status}</Button>
-                            )
-                        },
-                        {
-                            title: 'Action',
-                            render: rowData => (
-                              rowData.user.id !== JSON.parse(localStorage.getItem('user')).id && rowData.status === "Pending" ? (
-                                <>
-                                  <Button onClick={this.onApprove(rowData)} variant="success" size="sm" className="mr-2">
-                                    <i className="fas fa-check"></i> Approve
-                                  </Button>
-                                  <Button onClick={this.onReject(rowData)} variant="danger" size="sm" className="ml-2">
-                                    <i className="fas fa-times"></i> Reject
-                                  </Button>
-                                </>
-                              ) : null
-                            )
-                        }
-                    ]}
-                    data={this.state.applications}
-                    options={{
-                      rowStyle: (rowData, index) => {
-                        if(index%2) {
-                          return {backgroundColor: '#f2f2f2'}
-                        }
-                      },
-                      pageSize: 10,
-                      pageSizeOptions: [10, 20, 30, 50, 75, 100],
-                      filtering: true,
-                      exportButton: true
-                    }}
-                    title="College-wide Applications"
+                  columns={[
+                    {
+                      title: "#",
+                      field: "tableData.id",
+                      render: (rowData) => rowData.tableData.id + 1,
+                      width: 50,
+                      filtering: false,
+                    },
+                    { title: "Full Name", field: "user.fullName" },
+                    {
+                      title: "Department",
+                      field: "user.department.departmentName",
+                    },
+                    { title: "Start Date", field: "startDate" },
+                    { title: "End Date", field: "endDate" },
+                    // {title: 'Leave Type', field: 'type'},
+                    { title: "Reason", field: "reason" },
+                    {
+                      title: "Status",
+                      field: "status",
+                      render: (rowData) => (
+                        <Button
+                          size="sm"
+                          variant={
+                            rowData.status === "Approved"
+                              ? "success"
+                              : rowData.status === "Pending"
+                              ? "warning"
+                              : "danger"
+                          }
+                        >
+                          {rowData.status}
+                        </Button>
+                      ),
+                    },
+                    {
+                      title: "Action",
+                      render: (rowData) =>
+                        rowData.user.id !==
+                          JSON.parse(localStorage.getItem("user")).id &&
+                        rowData.status === "Pending" ? (
+                          <>
+                            <Button
+                              onClick={this.onApprove(rowData)}
+                              variant="success"
+                              size="sm"
+                              className="mr-2"
+                            >
+                              <i className="fas fa-check"></i> Approve
+                            </Button>
+                            <Button
+                              onClick={this.onReject(rowData)}
+                              variant="danger"
+                              size="sm"
+                              className="ml-2"
+                            >
+                              <i className="fas fa-times"></i> Reject
+                            </Button>
+                          </>
+                        ) : null,
+                    },
+                  ]}
+                  data={this.state.applications}
+                  options={{
+                    rowStyle: (rowData, index) => {
+                      if (index % 2) {
+                        return { backgroundColor: "#f2f2f2" };
+                      }
+                    },
+                    pageSize: 10,
+                    pageSizeOptions: [10, 20, 30, 50, 75, 100],
+                    filtering: true,
+                    exportButton: true,
+                  }}
+                  title="College-wide Applications"
                 />
               </ThemeProvider>
             </Card.Body>

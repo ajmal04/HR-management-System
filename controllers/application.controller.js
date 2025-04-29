@@ -1,9 +1,9 @@
 const db = require("../models");
 const Application = db.application;
 const User = db.user;
-const Department = db.department
+const Department = db.department;
 const Op = db.Sequelize.Op;
-const moment = require('moment');
+const moment = require("moment");
 const { department } = require("../models");
 
 // Create and Save a new Application
@@ -43,7 +43,7 @@ exports.create = (req, res) => {
 // Retrieve all Applications from the database.
 exports.findAll = (req, res) => {
   Application.findAll({
-    include: User
+    include: User,
   })
     .then((data) => {
       res.send(data);
@@ -61,23 +61,29 @@ exports.findAllRecent = (req, res) => {
   Application.findAll({
     where: {
       [Op.and]: [
-        {startDate: {
-          [Op.gte]: moment().subtract(14, 'days').toDate()
-        }},
-        {startDate : {
-          [Op.lte]: moment().add(7, 'days').toDate()
-        }}
-      ]
+        {
+          startDate: {
+            [Op.gte]: moment().subtract(14, "days").toDate(),
+          },
+        },
+        {
+          startDate: {
+            [Op.lte]: moment().add(7, "days").toDate(),
+          },
+        },
+      ],
     },
-    include: [{
-      model: User
-    }]
+    include: [
+      {
+        model: User,
+      },
+    ],
   })
-    .then(data => {
+    .then((data) => {
       res.send(data);
     })
-    .catch(err => {
-      console.log(err)
+    .catch((err) => {
+      console.log(err);
       res.status(500).send({
         message:
           err.message || "Some error occurred while retrieving Applications.",
@@ -90,23 +96,29 @@ exports.findAllRecent = (req, res) => {
   Application.findAll({
     where: {
       [Op.and]: [
-        {startDate: {
-          [Op.gte]: moment().subtract(14, 'days').toDate()
-        }},
-        {startDate : {
-          [Op.lte]: moment().add(7, 'days').toDate()
-        }}
-      ]
+        {
+          startDate: {
+            [Op.gte]: moment().subtract(14, "days").toDate(),
+          },
+        },
+        {
+          startDate: {
+            [Op.lte]: moment().add(7, "days").toDate(),
+          },
+        },
+      ],
     },
-    include: [{
-      model: User
-    }]
+    include: [
+      {
+        model: User,
+      },
+    ],
   })
-    .then(data => {
+    .then((data) => {
       res.send(data);
     })
-    .catch(err => {
-      console.log(err)
+    .catch((err) => {
+      console.log(err);
       res.status(500).send({
         message:
           err.message || "Some error occurred while retrieving Applications.",
@@ -115,29 +127,35 @@ exports.findAllRecent = (req, res) => {
 };
 
 exports.findAllRecentAndDept = (req, res) => {
-  const id = req.params.id
+  const id = req.params.id;
 
   Application.findAll({
     where: {
       [Op.and]: [
-        {startDate: {
-          [Op.gte]: moment().subtract(14, 'days').toDate()
-        }},
-        {startDate : {
-          [Op.lte]: moment().add(7, 'days').toDate()
-        }}
-      ]
+        {
+          startDate: {
+            [Op.gte]: moment().subtract(14, "days").toDate(),
+          },
+        },
+        {
+          startDate: {
+            [Op.lte]: moment().add(7, "days").toDate(),
+          },
+        },
+      ],
     },
-    include: [{
-      model: User,
-      where: {departmentId: id}
-    }]
+    include: [
+      {
+        model: User,
+        where: { departmentId: id },
+      },
+    ],
   })
-    .then(data => {
+    .then((data) => {
       res.send(data);
     })
-    .catch(err => {
-      console.log(err)
+    .catch((err) => {
+      console.log(err);
       res.status(500).send({
         message:
           err.message || "Some error occurred while retrieving Applications.",
@@ -146,29 +164,35 @@ exports.findAllRecentAndDept = (req, res) => {
 };
 
 exports.findAllRecentAndUser = (req, res) => {
-  const id = req.params.id
+  const id = req.params.id;
 
   Application.findAll({
     where: {
       [Op.and]: [
-        {startDate: {
-          [Op.gte]: moment().subtract(14, 'days').toDate()
-        }},
-        {startDate : {
-          [Op.lte]: moment().add(7, 'days').toDate()
-        }}
-      ]
+        {
+          startDate: {
+            [Op.gte]: moment().subtract(14, "days").toDate(),
+          },
+        },
+        {
+          startDate: {
+            [Op.lte]: moment().add(7, "days").toDate(),
+          },
+        },
+      ],
     },
-    include: [{
-      model: User,
-      where: {id: id}
-    }]
+    include: [
+      {
+        model: User,
+        where: { id: id },
+      },
+    ],
   })
-    .then(data => {
+    .then((data) => {
       res.send(data);
     })
-    .catch(err => {
-      console.log(err)
+    .catch((err) => {
+      console.log(err);
       res.status(500).send({
         message:
           err.message || "Some error occurred while retrieving Applications.",
@@ -181,20 +205,22 @@ exports.findAllByDeptId = (req, res) => {
   const deptId = req.params.id;
 
   Application.findAll({
-    include: [{
-      model: User,
-      where: {departmentId: deptId}
-    }]
+    include: [
+      {
+        model: User,
+        where: { departmentId: deptId },
+      },
+    ],
   })
-  .then(data => {
-    res.send(data)
-  })
-  .catch(err => {
-    res.status(500).send({
-      message:
-        err.message || "Some error occurred while retrieving Applications.",
+    .then((data) => {
+      res.send(data);
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message:
+          err.message || "Some error occurred while retrieving Applications.",
+      });
     });
-  })
 };
 
 //Retrieve all Applications By User Id
@@ -202,11 +228,13 @@ exports.findAllByUserId = (req, res) => {
   const userId = req.params.id;
 
   User.findByPk(userId).then((user) => {
-    Application.findAll({ 
-      include: [{
-        model: User
-      }],
-      where: { userId: userId } 
+    Application.findAll({
+      include: [
+        {
+          model: User,
+        },
+      ],
+      where: { userId: userId },
     })
       .then((data) => {
         res.send(data);
@@ -322,14 +350,13 @@ exports.deleteAllByUserId = (req, res) => {
     });
 };
 
-
 exports.getApplicationsByCollege = async (req, res) => {
   try {
     // 1. Get admin's college from the authenticated user
     const adminCollege = req.user.college;
-    
+
     if (!adminCollege) {
-      return res.status(400).json({ message: 'Admin college not specified' });
+      return res.status(400).json({ message: "Admin college not specified" });
     }
 
     // 2. Find all applications from users in the same college
@@ -338,31 +365,34 @@ exports.getApplicationsByCollege = async (req, res) => {
         {
           model: User,
           where: { college: adminCollege },
-          attributes: ['id', 'fullName'],
-          include: [{
-            model: Department,
-            attributes: ['id', ['department_name', 'departmentName']]
-        }],
-          required: true
-        }
+          attributes: ["id", "fullName"],
+          include: [
+            {
+              model: Department,
+              attributes: ["id", ["department_name", "departmentName"]],
+            },
+          ],
+          required: true,
+        },
       ],
-      order: [['start_date', 'DESC']]
+      order: [["start_date", "DESC"]],
     });
 
     // 3. Format the response
-    const formattedApplications = applications.map(app => ({
+    const formattedApplications = applications.map((app) => ({
       ...app.get({ plain: true }),
-      startDate: app.startDate ? moment(app.startDate).format('YYYY-MM-DD') : null,
-      endDate: app.endDate ? moment(app.endDate).format('YYYY-MM-DD') : null
+      startDate: app.startDate
+        ? moment(app.startDate).format("YYYY-MM-DD")
+        : null,
+      endDate: app.endDate ? moment(app.endDate).format("YYYY-MM-DD") : null,
     }));
 
     res.status(200).json(formattedApplications);
-    
   } catch (err) {
-    console.error('Error fetching college applications:', err);
-    res.status(500).json({ 
-      message: 'Failed to fetch applications',
-      error: process.env.NODE_ENV === 'development' ? err.message : undefined
+    console.error("Error fetching college applications:", err);
+    res.status(500).json({
+      message: "Failed to fetch applications",
+      error: process.env.NODE_ENV === "development" ? err.message : undefined,
     });
   }
 };
