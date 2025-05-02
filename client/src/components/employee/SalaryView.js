@@ -1,8 +1,6 @@
 import React, { Component } from "react";
 import { Card, Row, Col, Form } from "react-bootstrap";
-import { Redirect } from 'react-router-dom'
 import axios from 'axios'
-import moment from 'moment'
 
 export default class SalaryViewEmployee extends Component {
   constructor(props) {
@@ -25,11 +23,14 @@ export default class SalaryViewEmployee extends Component {
             console.log(res)
             this.setState({user: res.data}, () => {
                 if(this.state.user.jobs) {
-                    this.state.user.jobs.map(job => {
-                        if(new Date(job.startDate).setHours(0) < new Date() && new Date(job.endDate).setHours(24) > new Date()) {
-                            this.setState({currentJobTitle: job.jobTitle})
-                        }
-                    })
+                    const currentJob = this.state.user.jobs.find(job => 
+                        new Date(job.startDate).setHours(0) < new Date() && 
+                        new Date(job.endDate).setHours(24) > new Date()
+                      );
+                      
+                      if (currentJob) {
+                        this.setState({currentJobTitle: currentJob.jobTitle});
+                      }
                 }
             })
         })
@@ -52,7 +53,7 @@ export default class SalaryViewEmployee extends Component {
                                     <Col lg={12}>
                                         <Row className="pt-4">
                                             <Col lg={3}>
-                                                <img className="img-circle elevation-1 bp-2" src={process.env.PUBLIC_URL + '/user-128.png'}></img>
+                                                <img className="img-circle elevation-1 bp-2" src={process.env.PUBLIC_URL + '/user-128.png'} alt="" />
                                             </Col>
                                             <Col className="pt-4" lg={9}>
                                                 <div className="emp-view-list">

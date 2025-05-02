@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { Card, Row, Col, Form } from "react-bootstrap";
-import { Redirect } from "react-router-dom";
 import axios from "axios";
 import moment from "moment";
 
@@ -48,14 +47,12 @@ export default class EmployeeViewEmployee extends Component {
         this.setState({ user: user }, () => {
           if (user.jobs) {
             let jobs = user.jobs;
-            jobs.map((job) => {
-              if (
-                new Date(job.startDate) <= Date.now() &&
-                new Date(job.endDate) >= Date.now()
-              ) {
-                this.setState({ job: job });
-              }
-            });
+            const currentJob = jobs.find(job => (
+              new Date(job.startDate) <= Date.now() && new Date(job.endDate) >= Date.now()
+            ));
+            if (currentJob) {
+              this.setState({ job: currentJob });
+            }
           }
           if (user.department) {
             this.setState({ department: user.department });
@@ -100,8 +97,7 @@ export default class EmployeeViewEmployee extends Component {
                 <Col lg={3}>
                   <img
                     className="img-circle elevation-1 bp-2"
-                    src={process.env.PUBLIC_URL + "/user-128.png"}
-                  ></img>
+                    src={process.env.PUBLIC_URL + "/user-128.png"} alt="" />
                 </Col>
                 <Col className="pt-4" lg={9}>
                   <div className="emp-view-list">

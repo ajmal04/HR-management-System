@@ -1,9 +1,6 @@
 import React, { Component } from "react";
-import { Redirect } from 'react-router-dom'
 import { Modal, Button, Form, Alert } from "react-bootstrap";
-import moment from 'moment'
 import axios from 'axios'
-import DatePicker from 'react-datepicker'
 import "react-datepicker/dist/react-datepicker.css"
 
 

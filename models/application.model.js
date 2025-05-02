@@ -6,6 +6,23 @@ module.exports = (sequelize, Sequelize) => {
             primaryKey: true,
             allowNull: false
         },
+        type: {
+            type: Sequelize.ENUM,
+            values: [
+                'annual_leave',
+                'sick_leave',
+                'medical_leave',
+                'maternity_paternity',
+                'bereavement_leave',
+                'business_trip',
+                'remote_work',
+                'training',
+                'personal_development',
+                'volunteer',
+                'other'
+            ],
+            allowNull: false
+        },
         reason: {
             type: Sequelize.STRING,
             allowNull: true
@@ -21,15 +38,15 @@ module.exports = (sequelize, Sequelize) => {
         status: {
             type: Sequelize.ENUM,
             values: ['Approved', 'Rejected', 'Pending'],
+            defaultValue: 'Pending',
             allowNull: false
         },
-        type: {
-            type: Sequelize.ENUM,
-            values: ['Normal', 'Student', 'Illness', 'Marriage'],
+        userId: {
+            type: Sequelize.INTEGER,
             allowNull: false
         }
     }, {
-        timestamps: false,
+        timestamps: true, // Recommended to keep track of creation/update
         underscored: true,
         freezeTableName: true,
     });

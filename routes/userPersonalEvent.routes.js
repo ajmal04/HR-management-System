@@ -17,12 +17,12 @@ router.get('/:id', withAuth.verifyToken, withAuth.withAdminOrSelf, personalEvent
 router.put('/:id', withAuth.verifyToken, withAuth.withHigherRoles, personalEvent.update);
 
 // ✅ Delete a Personal Event with an id (Admins OR the Event Owner)
-router.delete('/:id', withAuth.verifyToken, withAuth.withAdminOrSelf, personalEvent.delete);
+router.delete('/:id', withAuth.verifyToken, personalEvent.delete);
 
 // ✅ Delete all Personal Events by User Id (Only Admins)
-router.delete('/user/:id', withAuth.verifyToken, withAuth.withAdmin, personalEvent.deleteAllByUserId);
+router.delete('/user/:id', withAuth.verifyToken, withAuth.withHigherRoles, personalEvent.deleteAllByUserId);
 
 // ✅ Delete all Personal Events (Only Admins)
-router.delete('/', withAuth.verifyToken, withAuth.withAdmin, personalEvent.deleteAll);
+router.delete('/', withAuth.verifyToken, withAuth.withHigherRoles, personalEvent.deleteAll);
 
 module.exports = router;

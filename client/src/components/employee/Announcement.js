@@ -1,6 +1,5 @@
 import React, { Component } from "react";
-import { Card, Button, Form, Alert } from "react-bootstrap";
-import { Redirect, NavLink } from 'react-router-dom'
+import { Card, Alert } from "react-bootstrap";
 import axios from 'axios'
 import MaterialTable from 'material-table'
 import { ThemeProvider } from '@material-ui/core'
@@ -48,7 +47,6 @@ export default class Announcement extends Component {
 
 
   render() {
-    let closeAlertModel = () => this.setState({showAlertModel: false})
 
     const theme = createMuiTheme({
         overrides: {

@@ -167,22 +167,6 @@ export default class EmployeeList extends Component {
       },
     });
 
-    const styles = {
-      actionBtn: {
-        width: '32px',
-        height: '32px',
-        padding: '0',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderRadius: '4px',
-        transition: 'all 0.2s ease',
-        '&:hover': {
-          transform: 'scale(1.1)',
-        }
-      }
-    };
-
     return (
       <div className="container-fluid pt-4">
         {this.state.error && (

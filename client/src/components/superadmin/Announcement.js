@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { Card, Button, Form, Alert, Spinner, Modal } from "react-bootstrap";
-import { Redirect } from 'react-router-dom';
 import axios from 'axios';
 import MaterialTable from 'material-table';
 import { ThemeProvider } from '@material-ui/core';

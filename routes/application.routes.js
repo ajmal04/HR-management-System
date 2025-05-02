@@ -22,6 +22,9 @@ router.get('/department/:id', withAuth.verifyToken, withAuth.withHOD, applicatio
 // 📌 Retrieve Recent Applications (2 weeks old) (Admin & Manager only)
 router.get('/recent', withAuth.verifyToken, withAuth.withHigherRoles, application.findAllRecent);
 
+// In your routes file
+router.get('/recent/college', withAuth.verifyToken, withAuth.withHigherRoles, application.findAllRecentByCollege);
+
 // 📌 Retrieve Recent Applications by Department (Manager only)
 router.get('/recent/department/:id', withAuth.verifyToken, withAuth.withHigherRoles, application.findAllRecentAndDept);
 

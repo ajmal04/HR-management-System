@@ -98,6 +98,23 @@ exports.findTotal = (req, res) => {
         });
 };
 
+exports.findTotalByCollege = (req, res) => {
+
+    const adminCollege = req.user.college;
+    
+    User.count({
+        where: { college: adminCollege }
+    })
+    .then(data => {
+        res.send(data.toString());
+    })
+    .catch(err => {
+        res.status(500).send({
+            message: err.message || "Some error occurred while retrieving the Users."
+        });
+    });
+};
+
 // Retrieve all Users from the database.
 exports.findTotalByDept = (req, res) => {
     const id = req.params.id

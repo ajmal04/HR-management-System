@@ -464,7 +464,6 @@ export default class EmployeeEdit extends Component {
       userFinancialInfo, 
       departments,
       colleges,
-      job
     } = this.state;
 
     return (

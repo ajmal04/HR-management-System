@@ -10,34 +10,60 @@ const { department } = require("../models");
 exports.create = (req, res) => {
   // Validate request
   if (!req.body) {
-    res.status(400).send({
-      message: "Content can not be empty!",
-    });
-    return;
+      return res.status(400).send({
+          message: "Content cannot be empty!"
+      });
   }
 
-  // Create a Application
+  // Validate application type
+  const validTypes = [
+      'annual_leave',
+      'sick_leave',
+      'medical_leave',
+      'maternity_paternity',
+      'bereavement_leave',
+      'business_trip',
+      'remote_work',
+      'training',
+      'personal_development',
+      'volunteer',
+      'other'
+  ];
+
+  if (!validTypes.includes(req.body.type)) {
+      return res.status(400).send({
+          message: "Invalid application type"
+      });
+  }
+
+  // Date validation
+  if (new Date(req.body.startDate) > new Date(req.body.endDate)) {
+      return res.status(400).send({
+          message: "End date must be after start date"
+      });
+  }
+
+  // Create application object
   const application = {
-    reason: req.body.reason,
-    startDate: req.body.startDate,
-    endDate: req.body.endDate,
-    status: "pending",
-    type: req.body.type,
-    userId: req.body.userId,
+      reason: req.body.reason,
+      startDate: req.body.startDate,
+      endDate: req.body.endDate,
+      status: "Pending", // Ensure case matches ENUM
+      type: req.body.type,
+      userId: req.body.userId
   };
 
-  // Save Application in the database
-
+  // Save to database
   Application.create(application)
-    .then((data) => {
-      res.send(data);
-    })
-    .catch((err) => {
-      res.status(500).send({
-        message:
-          err.message || "Some error occurred while creating the Application.",
+      .then(data => {
+          res.status(201).send(data);
+      })
+      .catch(err => {
+          console.error("Application creation error:", err);
+          res.status(500).send({
+              message: err.message || "Error creating application"
+          });
       });
-    });
 };
 
 // Retrieve all Applications from the database.
@@ -365,4 +391,46 @@ exports.getApplicationsByCollege = async (req, res) => {
       error: process.env.NODE_ENV === 'development' ? err.message : undefined
     });
   }
+};
+
+exports.findAllRecentByCollege = (req, res) => {
+  const userCollege = req.user.college; // Get admin's college from JWT token
+  
+  Application.findAll({
+    where: {
+      [Op.and]: [
+        { 
+          startDate: {
+            [Op.gte]: moment().subtract(14, 'days').toDate()
+          }
+        },
+        {
+          startDate: {
+            [Op.lte]: moment().add(7, 'days').toDate()
+          }
+        }
+      ]
+    },
+    include: [{
+      model: User,
+      where: { college: userCollege },
+      attributes: ['id', 'fullName'] 
+    }]
+  })
+  .then(applications => {
+    
+    const formattedData = applications.map(app => ({
+      ...app.get({ plain: true }),
+      applicantName: app.User ? app.User.fullName : null
+    }));
+    
+    res.send(formattedData);
+  })
+  .catch(err => {
+    console.error('Error fetching college applications:', err);
+    res.status(500).send({
+      message: "Error retrieving college applications",
+      error: err.message
+    });
+  });
 };

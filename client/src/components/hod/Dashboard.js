@@ -3,12 +3,12 @@ import React, { Component } from "react";
 import "../../App.css";
 import Infobox from "../infobox";
 import Calendar from "../Calendar";
-import ExpenseChartsPage from "../manager/ExpenseChartsPage";
-import RecentApplciations from "../manager/RecentApplications";
+import ExpenseChartsPage from "./ExpenseChartsPage";  
+import RecentApplciations from "./RecentApplications";
 import RecentAnnouncements from "../RecentAnnouncementsManagerEmp";
 import axios from "axios";
 
-export default class DashboardManager extends Component {
+export default class DashboardHOD extends Component {
   constructor(props) {
     super(props);
 
@@ -36,7 +36,7 @@ export default class DashboardManager extends Component {
     //Fetch Expenses Total
     axios({
       method: "get",
-      url: "/api/expenses/year/2021/department/" + departmentId,
+      url: "/api/expenses/year/2025/department/" + departmentId,
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     }).then((res) => {
       let array = res.data;
@@ -50,67 +50,67 @@ export default class DashboardManager extends Component {
     });
   }
   render() {
-    return (
-      <div>
-        {/* First Row with small info-boxes */}
-        <div className="row pt-4">
-          {/* First info-box */}
-          <div className="col-md-4 col-sm-6 col-xs-12">
-            <Infobox
-              title="Department Employees"
-              description={this.state.totalEmployees}
-              color="bg-success"
-              icon="fa fa-users"
-            />
+      return (
+        <div>
+          {/* First Row with small info-boxes */}
+          <div className="row pt-4">
+            {/* First info-box */}
+            <div className="col-md-4 col-sm-6 col-xs-12">
+              <Infobox
+                title="Total Employees"
+                description={this.state.totalEmployees}
+                color="bg-success"
+                icon="fa fa-users"
+              />
+            </div>
+            {/* Second info-box */}
+            <div className="col-md-4 col-sm-6 col-xs-12">
+              <Infobox
+                title="Total Expenses"
+                description={"₹" + this.state.totalExpenses}
+                color="bg-warning"
+                icon="fa fa-shopping-cart"
+              />
+            </div>
           </div>
-          {/* Second info-box */}
-          <div className="col-md-4 col-sm-6 col-xs-12">
-            <Infobox
-              title="Department Expenses"
-              description={this.state.totalExpenses + "€"}
-              color="bg-warning"
-              icon="fa fa-shopping-cart"
-            />
+          {/* Second Row with Calendar and Expense Report */}
+          <div className="row pt-4">
+            {/* Calendar */}
+            <div className="col-sm-6">
+              <Calendar />
+              <div className="panel panel-default">
+                <div
+                  className="panel-heading with-border"
+                  style={{ backgroundColor: "#515e73", color: "white" }}
+                >
+                  <h3 className="panel-title">Recent Applications</h3>
+                </div>
+                <RecentApplciations />
+              </div>
+            </div>
+            {/* Expense Report & Recent Applications */}
+            <div className="col-md-6">
+              <div className="panel panel-default">
+                <div
+                  className="panel-heading with-border"
+                  style={{ backgroundColor: "#515e73", color: "white" }}
+                >
+                  <h3 className="panel-title">Expense Report</h3>
+                </div>
+                <ExpenseChartsPage />
+              </div>
+              <div className="panel panel-default">
+                <div
+                  className="panel-heading with-border"
+                  style={{ backgroundColor: "#515e73", color: "white" }}
+                >
+                  <h3 className="panel-title">Recent Announcements</h3>
+                </div>
+                <RecentAnnouncements />
+              </div>
+            </div>
           </div>
         </div>
-        {/* Second Row with Calendar and Expense Report */}
-        <div className="row pt-4">
-          {/* Calendar */}
-          <div className="col-sm-6">
-            <Calendar />
-          </div>
-          {/* Expense Report & Recent Applications */}
-          <div className="col-md-6">
-            <div className="panel panel-default">
-              <div
-                className="panel-heading with-border"
-                style={{ backgroundColor: "#515e73", color: "white" }}
-              >
-                <h3 className="panel-title">Department Expense Report</h3>
-              </div>
-              <ExpenseChartsPage />
-            </div>
-            <div className="panel panel-default">
-              <div
-                className="panel-heading with-border"
-                style={{ backgroundColor: "#515e73", color: "white" }}
-              >
-                <h3 className="panel-title">Recent Applications</h3>
-              </div>
-              <RecentApplciations />
-            </div>
-            <div className="panel panel-default">
-              <div
-                className="panel-heading with-border"
-                style={{ backgroundColor: "#515e73", color: "white" }}
-              >
-                <h3 className="panel-title">Recent Announcements</h3>
-              </div>
-              <RecentAnnouncements />
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+      );
+    }
   }
-}

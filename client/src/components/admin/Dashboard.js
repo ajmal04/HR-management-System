@@ -3,12 +3,12 @@ import React, { Component } from "react";
 import "../../App.css";
 import Infobox from "../infobox";
 import Calendar from "../Calendar";
-import ExpenseChartsPage from "../manager/ExpenseChartsPage";
-import RecentApplciations from "../manager/RecentApplications";
-import RecentAnnouncements from "../RecentAnnouncementsManagerEmp";
+import ExpenseChartsPage from "./ExpenseChartsPage";
+import RecentApplciations from "./RecentApplications";
+import RecentAnnouncements from "../superadmin/RecentAnnouncements";
 import axios from "axios";
 
-export default class DashboardManager extends Component {
+export default class Dashboard extends Component {
   constructor(props) {
     super(props);
 
@@ -21,11 +21,10 @@ export default class DashboardManager extends Component {
   }
 
   componentDidMount() {
-    let departmentId = JSON.parse(localStorage.getItem("user")).departmentId;
     // Fetch Employees Total
     axios({
       method: "get",
-      url: "/api/users/total/department/" + departmentId,
+      url: "/api/users/total/college",
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     })
       .then((res) => {
@@ -36,7 +35,7 @@ export default class DashboardManager extends Component {
     //Fetch Expenses Total
     axios({
       method: "get",
-      url: "/api/expenses/year/2021/department/" + departmentId,
+      url: `/api/expenses/college/year/2025`,
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     }).then((res) => {
       let array = res.data;
@@ -48,6 +47,7 @@ export default class DashboardManager extends Component {
       } else {
       }
     });
+
   }
   render() {
     return (
@@ -57,7 +57,7 @@ export default class DashboardManager extends Component {
           {/* First info-box */}
           <div className="col-md-4 col-sm-6 col-xs-12">
             <Infobox
-              title="Department Employees"
+              title="Total Employees"
               description={this.state.totalEmployees}
               color="bg-success"
               icon="fa fa-users"
@@ -66,8 +66,8 @@ export default class DashboardManager extends Component {
           {/* Second info-box */}
           <div className="col-md-4 col-sm-6 col-xs-12">
             <Infobox
-              title="Department Expenses"
-              description={this.state.totalExpenses + "€"}
+              title="Total Expenses"
+              description={"₹" + this.state.totalExpenses}
               color="bg-warning"
               icon="fa fa-shopping-cart"
             />
@@ -78,18 +78,6 @@ export default class DashboardManager extends Component {
           {/* Calendar */}
           <div className="col-sm-6">
             <Calendar />
-          </div>
-          {/* Expense Report & Recent Applications */}
-          <div className="col-md-6">
-            <div className="panel panel-default">
-              <div
-                className="panel-heading with-border"
-                style={{ backgroundColor: "#515e73", color: "white" }}
-              >
-                <h3 className="panel-title">Department Expense Report</h3>
-              </div>
-              <ExpenseChartsPage />
-            </div>
             <div className="panel panel-default">
               <div
                 className="panel-heading with-border"
@@ -98,6 +86,18 @@ export default class DashboardManager extends Component {
                 <h3 className="panel-title">Recent Applications</h3>
               </div>
               <RecentApplciations />
+            </div>
+          </div>
+          {/* Expense Report & Recent Applications */}
+          <div className="col-md-6">
+            <div className="panel panel-default">
+              <div
+                className="panel-heading with-border"
+                style={{ backgroundColor: "#515e73", color: "white" }}
+              >
+                <h3 className="panel-title">Expense Report</h3>
+              </div>
+              <ExpenseChartsPage />
             </div>
             <div className="panel panel-default">
               <div

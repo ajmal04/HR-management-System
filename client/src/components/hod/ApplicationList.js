@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Card, Button, Form, Alert } from "react-bootstrap";
+import { Card, Button, Alert } from "react-bootstrap";
 import { Redirect } from "react-router-dom";
 import "react-bootstrap-table-next/dist/react-bootstrap-table2.min.css";
 import "react-bootstrap-table2-paginator/dist/react-bootstrap-table2-paginator.min.css";
@@ -25,24 +25,22 @@ export default class ApplicationList extends Component {
   }
 
   componentDidMount() {
-      let deptId = JSON.parse(localStorage.getItem('user')).departmentId
+    let deptId = JSON.parse(localStorage.getItem('user')).departmentId;
     axios({
-      method: "get",
-      url: "/api/applications/department/" + deptId,
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        method: "get",
+        url: "/api/applications/department/" + deptId,
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     }).then((res) => {
-        res.data.map(app => {
-            app.startDate=moment(app.startDate).format('YYYY-MM-DD')
-            app.endDate=moment(app.endDate).format('YYYY-MM-DD')
-        })
-        this.setState({ applications: res.data }, () => {
-            console.log('applications', this.state.aplications)
+        res.data.forEach(app => {  // Changed from map to forEach
+            app.startDate = moment(app.startDate).format('YYYY-MM-DD');
+            app.endDate = moment(app.endDate).format('YYYY-MM-DD');
         });
+        this.setState({ applications: res.data });
     })
     .catch(err => {
-        console.log(err)
-    })
-  }
+        console.log(err);
+    });
+}
 
   handleChange = (event) => {
     const { value, name } = event.target;
@@ -145,7 +143,7 @@ export default class ApplicationList extends Component {
                         {
                             title: 'Action',
                             render: rowData => (
-                              rowData.user.id != JSON.parse(localStorage.getItem('user')).id ? (
+                              rowData.user.id !== JSON.parse(localStorage.getItem('user')).id ? (
                                 rowData.status==="Pending" ? (
                                   <>
                                     <Button onClick={this.onApprove(rowData)} variant="success" size="sm" className="mr-2"><i className="fas fa-edit"></i>Approve</Button>

@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Badge, Button, Tabs, Tab, Alert } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button, Tabs, Tab, Alert } from 'react-bootstrap';
 import axios from 'axios';
 import { useHistory } from 'react-router-dom';
 import OnboardingRequestList from './OnboardingRequestList';
 import OnboardingRequestDetail from './OnboardingRequestDetail';
-import OnboardingStageProgress from './OnboardingStageProgress';
 import DocumentUpload from './DocumentUpload';
 
 const OnboardingDashboard = () => {

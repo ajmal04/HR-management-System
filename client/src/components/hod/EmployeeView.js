@@ -49,11 +49,12 @@ export default class EmployeeView extends Component {
                 this.setState({user: user}, () => {
                     if(user.jobs) {
                         let jobs = user.jobs
-                        jobs.map(job => {
-                            if(new Date(job.startDate) <= Date.now() && new Date(job.endDate) >= Date.now()) {
-                                this.setState({job: job})
-                            }
-                        })
+                        const currentJob = jobs.find(job => (
+                            new Date(job.startDate) <= Date.now() && new Date(job.endDate) >= Date.now()
+                          ));
+                          if (currentJob) {
+                            this.setState({ job: currentJob });
+                          }
                     }
                     if(user.department) {
                         this.setState({department: user.department})
@@ -96,7 +97,11 @@ export default class EmployeeView extends Component {
                                 <Col lg={12}>
                                     <Row className="pt-4">
                                         <Col lg={3}>
-                                            <img className="img-circle elevation-1 bp-2" src={process.env.PUBLIC_URL + '/user-128.png'}></img>
+                                        <img 
+                                            className="img-circle elevation-1 bp-2" 
+                                            src={process.env.PUBLIC_URL + '/user-128.png'} 
+                                            alt="" 
+                                        />
                                         </Col>
                                         <Col className="pt-4" lg={9}>
                                             <div className="emp-view-list">

@@ -13,6 +13,8 @@ router.get('/', withAuth.verifyToken, withAuth.withHigherRoles, user.findAll);
 //  Retrieve total user count (Admins, System Admin)
 router.get('/total', withAuth.verifyToken, withAuth.withHigherRoles, user.findTotal);
 
+router.get('/total/college', withAuth.verifyToken, withAuth.withAdmin, user.findTotalByCollege);
+
 //  Retrieve user count by department (Admins, HODs)
 router.get('/total/department/:id', withAuth.verifyToken, withAuth.withAdminOrHOD, user.findTotalByDept);
 

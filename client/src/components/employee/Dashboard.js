@@ -20,10 +20,7 @@ export default class Dashboard extends Component {
 
 
 
-  componentDidMount() {
-      let departmentId = JSON.parse(localStorage.getItem('user')).departmentId;
-
-  }
+  
   render() {    
     return (
       <div>

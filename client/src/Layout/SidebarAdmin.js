@@ -32,13 +32,13 @@ export default class SidebarAdmin extends Component {
               <img
                 src={process.env.PUBLIC_URL + "/user-64.png"}
                 className="img-circle elevation-2"
-                alt="User Image"
+                alt="User profile"
               />
             </div>
             <div className="info">
-              <a href="#" className="d-block">
+              <span className="d-block">
                 {this.state.user.fullname}
-              </a>
+              </span>
             </div>
           </div>
           {/* Sidebar Menu */}

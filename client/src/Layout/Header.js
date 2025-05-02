@@ -25,7 +25,7 @@ class Header extends Component {
 
   render() {
     const closeModal = () => this.setState({ showModal: false });
-    const user = JSON.parse(localStorage.getItem('user')); // Safely get user data
+    const user = JSON.parse(localStorage.getItem('user'));
 
     return (
       <nav className="main-header navbar navbar-expand navbar-white navbar-light">
@@ -34,29 +34,48 @@ class Header extends Component {
         {/* Left navbar: Sidebar toggle */}
         <ul className="navbar-nav">
           <li className="nav-item">
-            <a className="nav-link" data-widget="pushmenu" href="#" role="button">
+            <button 
+              className="nav-link" 
+              onClick={(e) => e.preventDefault()} 
+              data-widget="pushmenu"
+              aria-label="Toggle sidebar"
+            >
               <i className="fas fa-bars" />
-            </a>
+            </button>
           </li>
         </ul>
 
         {/* Right navbar: User dropdown */}
         <ul className="navbar-nav ml-auto">
           <li className="nav-item dropdown">
-            <a className="nav-link" data-toggle="dropdown" href="#">
+            <button 
+              className="nav-link" 
+              data-toggle="dropdown"
+              aria-haspopup="true"
+              aria-expanded="false"
+              aria-label="User menu"
+            >
               <i className="fas fa-user" />
               <span className="pl-1">{user?.fullname || "User"}</span>
-            </a>
+            </button>
             <div className="dropdown-menu dropdown-menu-lg dropdown-menu-right">
               <span className="dropdown-header">Options</span>
               <div className="dropdown-divider" />
-              <a onClick={this.newPassword} href="#" className="dropdown-item">
+              <button 
+                onClick={this.newPassword} 
+                className="dropdown-item text-left w-100" 
+                style={{ background: 'none', border: 'none' }}
+              >
                 <i className="fas fa-key mr-2" /> Change Password
-              </a>
+              </button>
               <div className="dropdown-divider" />
-              <a onClick={this.onLogout} href="#" className="dropdown-item">
+              <button 
+                onClick={this.onLogout} 
+                className="dropdown-item text-left w-100" 
+                style={{ background: 'none', border: 'none' }}
+              >
                 <i className="fas fa-sign-out-alt mr-2" /> Log out
-              </a>
+              </button>
             </div>
           </li>
         </ul>

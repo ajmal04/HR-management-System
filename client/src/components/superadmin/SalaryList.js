@@ -1,8 +1,7 @@
 import React, { Component } from "react";
-import { Card, Badge, Button, Form, Modal } from "react-bootstrap";
+import { Card, Button, Form } from "react-bootstrap";
 import {Redirect} from 'react-router-dom'
 import MaterialTable from 'material-table'
-import DeleteModal from '../DeleteModal'
 import axios from 'axios'
 import { ThemeProvider } from '@material-ui/core'
 import { createMuiTheme } from '@material-ui/core/styles'

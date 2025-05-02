@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { Redirect } from 'react-router-dom'
 import { Modal, Button, Form, Alert } from "react-bootstrap";
-import moment from 'moment'
 import axios from 'axios'
 import DatePicker from 'react-datepicker'
 import "react-datepicker/dist/react-datepicker.css"
@@ -43,15 +42,13 @@ export default class JobAddModal extends Component {
 
   fetchUsers = () => {
       let users = []
-        this.state.departments.map(dept => {
-        console.log(dept.id, this.state.selectedDepartment)
-        if(dept.id == this.state.selectedDepartment) {
-            dept.users.map((user, index) => {
-                users.push(user)
-            })
-            this.setState({users: users})
-        }
-        })
+      const selectedDept = this.state.departments.find(
+        dept => dept.id === this.state.selectedDepartment
+      );
+      if (selectedDept) {
+        selectedDept.users.forEach(user => users.push(user));
+        this.setState({ users });
+      }
   }
 
   handleChange = (event) => {
@@ -72,19 +69,15 @@ export default class JobAddModal extends Component {
   }
 
   pushDepartments = () => {
-      let items = []
-      this.state.departments.map((dept, index) => {
-        items.push(<option key={index} value={dept.id}>{dept.departmentName}</option>)
-      })
-      return items
+      return this.state.departments.map((dept, index) => (
+        <option key={index} value={dept.id}>{dept.departmentName}</option>
+      ));
   }
 
   pushUsers = () => {
-      let items = []
-      this.state.users.map((user, index) => {
-          items.push(<option key={index} value={user.id}>{user.fullName}</option>)
-      })
-      return items
+    return this.state.users.map((user, index) => (
+      <option key={index} value={user.id}>{user.fullName}</option>
+    ));
   }
 
   onSubmit = (e) => {

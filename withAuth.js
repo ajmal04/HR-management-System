@@ -100,8 +100,8 @@ exports.withSuperAdminOrAdmin = checkRole(["ROLE_SUPER_ADMIN", "ROLE_ADMIN"]);
 
 
 exports.withAdminOrSelf = (req, res, next) => {
-    if (req.user.role === "ROLE_ADMIN" || req.user.id === req.params.id) {
-        return next();  // Allow access
+    if (req.user.role === "ROLE_ADMIN" || String(req.user.id) === String(req.params.id)) {
+        return next();
     }
     return res.status(403).json({ message: "Access denied" });
 };

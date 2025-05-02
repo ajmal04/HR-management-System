@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback  } from 'react';
 import {
   Card,
   Table,
@@ -34,7 +34,7 @@ const AssetManagement = () => {
     headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
   };
 
-  const fetchAssets = async () => {
+  const fetchAssets = useCallback(async () => {
     try {
       const res = await axios.get('/api/assets', authConfig);
       setAssets(res.data || []);
@@ -45,11 +45,11 @@ const AssetManagement = () => {
     } finally {
       setLoading(false);
     }
-  };
-
+  }, [authConfig]);
+  
   useEffect(() => {
     fetchAssets();
-  }, []);
+  }, [fetchAssets]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
