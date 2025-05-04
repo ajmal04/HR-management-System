@@ -92,4 +92,20 @@ router.delete(
   application.deleteAllByUserId
 );
 
+// ✅ HOD updates status
+router.put(
+  "/hod/approve/:id",
+  withAuth.verifyToken,
+  withAuth.withHOD,
+  application.hodUpdate
+);
+
+// ✅ Admin updates status
+router.put(
+  "/admin/approve/:id",
+  withAuth.verifyToken,
+  withAuth.withAdmin,
+  application.adminUpdate
+);
+
 module.exports = router;

@@ -5,6 +5,7 @@ import Calendar from "../Calendar";
 import RecentApplciations from "../employee/RecentApplications";
 import RecentAnnouncements from "../RecentAnnouncementsManagerEmp";
 import EmployeeViewDashboard from "./EmployeeViewDashboard";
+import LeaveDetails from "./LeaveDetails";
 
 export default class Dashboard extends Component {
   constructor(props) {
@@ -48,6 +49,7 @@ export default class Dashboard extends Component {
               <RecentApplciations />
             </div> */}
             <Calendar />
+            <LeaveDetails />
             <div className="panel panel-default">
               <div
                 className="panel-heading with-border"

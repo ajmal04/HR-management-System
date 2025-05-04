@@ -24,6 +24,10 @@ exports.create = (req, res) => {
     status: "pending",
     type: req.body.type,
     userId: req.body.userId,
+    hodStatus: "Pending",
+    hodComment: null,
+    adminStatus: "Pending",
+    adminComment: null,
   };
 
   // Save Application in the database
@@ -287,6 +291,54 @@ exports.update = (req, res) => {
         message: "Error updating Application with id=" + id,
       });
     });
+};
+
+exports.hodUpdate = async (req, res) => {
+  const id = req.params.id;
+  const { status, comment } = req.body;
+
+  try {
+    const updateData = {
+      hodStatus: status,
+      hodComment: comment,
+    };
+
+    // ✅ If rejected by HOD, update main status too
+    if (status === "Rejected") {
+      updateData.status = "Rejected";
+    }
+
+    await Application.update(updateData, { where: { id } });
+
+    res.send({ message: "HOD decision recorded." });
+  } catch (err) {
+    res.status(500).send({ message: "Error updating HOD status." });
+  }
+};
+
+exports.adminUpdate = async (req, res) => {
+  const id = req.params.id;
+  const { status, comment } = req.body;
+
+  try {
+    const updateData = {
+      adminStatus: status,
+      adminComment: comment,
+    };
+
+    // ✅ Update main status field based on admin decision
+    if (status === "Approved") {
+      updateData.status = "Approved";
+    } else if (status === "Rejected") {
+      updateData.status = "Rejected";
+    }
+
+    await Application.update(updateData, { where: { id } });
+
+    res.send({ message: "Admin decision recorded." });
+  } catch (err) {
+    res.status(500).send({ message: "Error updating Admin status." });
+  }
 };
 
 // Delete a Application with the specified id in the request

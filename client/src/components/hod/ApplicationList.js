@@ -1,104 +1,106 @@
 import React, { Component } from "react";
-import { Card, Button, Form, Alert } from "react-bootstrap";
-import { Redirect } from "react-router-dom";
-import "react-bootstrap-table-next/dist/react-bootstrap-table2.min.css";
-import "react-bootstrap-table2-paginator/dist/react-bootstrap-table2-paginator.min.css";
+import { Card, Button, Form, Modal, Alert } from "react-bootstrap";
 import axios from "axios";
 import moment from "moment";
 import MaterialTable from "material-table";
 import { ThemeProvider } from "@material-ui/core";
 import { createMuiTheme } from "@material-ui/core/styles";
 
-export default class ApplicationList extends Component {
+export default class HODApplicationList extends Component {
   constructor(props) {
     super(props);
-
     this.state = {
       applications: [],
-      selectedApplications: null,
-      done: false,
+      showModal: false,
+      selectedApp: null,
+      comment: "",
       hasError: false,
       errorMsg: "",
       completed: false,
-      showModel: false,
     };
   }
 
   componentDidMount() {
-    let deptId = JSON.parse(localStorage.getItem("user")).departmentId;
-    axios({
-      method: "get",
-      url: "/api/applications/department/" + deptId,
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-    })
+    const user = JSON.parse(localStorage.getItem("user"));
+    const token = localStorage.getItem("token");
+
+    axios
+      .get(`/api/applications/department/${user.departmentId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
       .then((res) => {
-        res.data.map((app) => {
+        const filtered = res.data.filter((app) => app.hodStatus === "Pending");
+
+        filtered.forEach((app) => {
           app.startDate = moment(app.startDate).format("YYYY-MM-DD");
           app.endDate = moment(app.endDate).format("YYYY-MM-DD");
         });
-        this.setState({ applications: res.data }, () => {
-          console.log("applications", this.state.aplications);
-        });
+
+        this.setState({ applications: filtered });
       })
       .catch((err) => {
-        console.log(err);
+        console.error("Error fetching applications:", err);
+        this.setState({
+          hasError: true,
+          errorMsg: "Failed to load applications",
+        });
       });
   }
 
-  handleChange = (event) => {
-    const { value, name } = event.target;
-    this.setState({
-      [name]: value,
-    });
+  handleApprove = (id) => {
+    const token = localStorage.getItem("token");
+    axios
+      .put(
+        `/api/applications/hod/approve/${id}`,
+        { status: "Approved", comment: "" },
+        { headers: { Authorization: `Bearer ${token}` } }
+      )
+      .then(() => {
+        console.log("Approved successfully");
+        this.componentDidMount(); // Refresh
+      })
+      .catch((err) => {
+        console.error("Approval error:", err);
+        this.setState({
+          hasError: true,
+          errorMsg: "Approval failed. Check console for details.",
+        });
+      });
   };
 
-  onApprove(app) {
-    return (event) => {
-      event.preventDefault();
+  handleRejectClick = (app) => {
+    this.setState({ showModal: true, selectedApp: app, comment: "" });
+  };
 
-      axios({
-        method: "put",
-        url: "/api/applications/" + app.id,
-        data: {
-          status: "Approved",
-        },
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+  handleRejectSubmit = () => {
+    const { selectedApp, comment } = this.state;
+    const token = localStorage.getItem("token");
+
+    if (!selectedApp || !selectedApp.id) {
+      console.error("No selected application for rejection.");
+      this.setState({ showModal: false });
+      return;
+    }
+
+    axios
+      .put(
+        `/api/applications/hod/approve/${selectedApp.id}`,
+        { status: "Rejected", comment },
+        { headers: { Authorization: `Bearer ${token}` } }
+      )
+      .then(() => {
+        console.log("Rejected successfully");
+        this.setState({ showModal: false, comment: "", selectedApp: null });
+        this.componentDidMount(); // Refresh
       })
-        .then((res) => {
-          this.setState({ completed: true });
-        })
-        .catch((err) => {
-          this.setState({
-            hasError: true,
-            errorMsg: err.response.data.message,
-          });
+      .catch((err) => {
+        console.error("Rejection error:", err);
+        this.setState({
+          hasError: true,
+          errorMsg: "Rejection failed. Check console for details.",
         });
-    };
-  }
-
-  onReject(app) {
-    return (event) => {
-      event.preventDefault();
-
-      axios({
-        method: "put",
-        url: "/api/applications/" + app.id,
-        data: {
-          status: "Rejected",
-        },
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      })
-        .then((res) => {
-          this.setState({ completed: true });
-        })
-        .catch((err) => {
-          this.setState({
-            hasError: true,
-            errorMsg: err.response.data.message,
-          });
-        });
-    };
-  }
+      });
+  };
 
   render() {
     const theme = createMuiTheme({
@@ -117,7 +119,7 @@ export default class ApplicationList extends Component {
           <Card>
             <Card.Header style={{ backgroundColor: "#515e73", color: "white" }}>
               <div className="panel-title">
-                <strong>Application List</strong>
+                <strong>HOD Leave Applications</strong>
               </div>
             </Card.Header>
             <Card.Body>
@@ -132,52 +134,27 @@ export default class ApplicationList extends Component {
                     { title: "Full Name", field: "user.fullName" },
                     { title: "Start Date", field: "startDate" },
                     { title: "End Date", field: "endDate" },
-                    // { title: "Leave Type", field: "type" },
                     { title: "Reason", field: "reason" },
                     {
-                      title: "Status",
-                      field: "status",
+                      title: "Actions",
                       render: (rowData) => (
-                        <Button
-                          size="sm"
-                          variant={
-                            rowData.status === "Approved"
-                              ? "success"
-                              : rowData.status === "Pending"
-                              ? "warning"
-                              : "danger"
-                          }
-                        >
-                          {rowData.status}
-                        </Button>
+                        <>
+                          <Button
+                            variant="success"
+                            size="sm"
+                            onClick={() => this.handleApprove(rowData.id)}
+                          >
+                            Approve
+                          </Button>{" "}
+                          <Button
+                            variant="danger"
+                            size="sm"
+                            onClick={() => this.handleRejectClick(rowData)}
+                          >
+                            Reject
+                          </Button>
+                        </>
                       ),
-                    },
-                    {
-                      title: "Action",
-                      render: (rowData) =>
-                        rowData.user.id !=
-                        JSON.parse(localStorage.getItem("user")).id ? (
-                          rowData.status === "Pending" ? (
-                            <>
-                              <Button
-                                onClick={this.onApprove(rowData)}
-                                variant="success"
-                                size="sm"
-                                className="mr-2"
-                              >
-                                <i className="fas fa-edit"></i>Approve
-                              </Button>
-                              <Button
-                                onClick={this.onReject(rowData)}
-                                variant="danger"
-                                size="sm"
-                                className="ml-2"
-                              >
-                                <i className="fas fa-trash"></i>Reject
-                              </Button>
-                            </>
-                          ) : null
-                        ) : null,
                     },
                   ]}
                   data={this.state.applications}
@@ -188,23 +165,52 @@ export default class ApplicationList extends Component {
                       }
                     },
                     pageSize: 10,
-                    pageSizeOptions: [10, 20, 30, 50, 75, 100],
+                    pageSizeOptions: [10, 20, 30],
                   }}
-                  title="Applications"
+                  title="Pending Applications"
                 />
               </ThemeProvider>
             </Card.Body>
           </Card>
         </div>
+
+        {/* Rejection Reason Modal */}
+        <Modal
+          show={this.state.showModal}
+          onHide={() => this.setState({ showModal: false })}
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>Rejection Reason</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Form.Group>
+              <Form.Label>Enter Reason for Rejection:</Form.Label>
+              <Form.Control
+                as="textarea"
+                rows={3}
+                value={this.state.comment}
+                onChange={(e) => this.setState({ comment: e.target.value })}
+              />
+            </Form.Group>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button
+              variant="secondary"
+              onClick={() => this.setState({ showModal: false })}
+            >
+              Cancel
+            </Button>
+            <Button variant="danger" onClick={this.handleRejectSubmit}>
+              Submit Rejection
+            </Button>
+          </Modal.Footer>
+        </Modal>
+
         {this.state.hasError ? (
-          <Alert variant="danger" className="m-3" block>
-            {this.state.errMsg}
+          <Alert variant="danger" className="m-3">
+            {this.state.errorMsg}
           </Alert>
-        ) : this.state.completed ? (
-          <Redirect to="/application-list" />
-        ) : (
-          <></>
-        )}
+        ) : null}
       </div>
     );
   }
