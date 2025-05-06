@@ -16,27 +16,25 @@ export default class CollegeApplicationList extends Component {
       comment: "",
       hasError: false,
       errorMsg: "",
-      completed: false,
     };
   }
 
   componentDidMount() {
+    this.fetchApplications();
+  }
+
+  fetchApplications = () => {
     axios({
       method: "get",
       url: "/api/applications/college",
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     })
       .then((res) => {
-        const filtered = res.data.filter(
-          (app) => app.hodStatus === "Approved" && app.adminStatus === "Pending"
-        );
-
-        const formattedData = filtered.map((app) => ({
+        const formattedData = res.data.map((app) => ({
           ...app,
           startDate: moment(app.startDate).format("YYYY-MM-DD"),
           endDate: moment(app.endDate).format("YYYY-MM-DD"),
         }));
-
         this.setState({ applications: formattedData });
       })
       .catch((err) => {
@@ -46,7 +44,7 @@ export default class CollegeApplicationList extends Component {
             err.response?.data?.message || "Failed to fetch applications",
         });
       });
-  }
+  };
 
   handleApprove = (id) => {
     axios
@@ -58,8 +56,7 @@ export default class CollegeApplicationList extends Component {
         }
       )
       .then(() => {
-        this.setState({ completed: true });
-        this.componentDidMount(); // refresh list
+        this.fetchApplications(); // Refresh the list
       })
       .catch((err) => {
         this.setState({
@@ -70,7 +67,7 @@ export default class CollegeApplicationList extends Component {
   };
 
   handleRejectClick = (app) => {
-    this.setState({ selectedApp: app, showModal: true });
+    this.setState({ selectedApp: app, showModal: true, comment: "" });
   };
 
   submitRejection = () => {
@@ -85,8 +82,8 @@ export default class CollegeApplicationList extends Component {
         }
       )
       .then(() => {
-        this.setState({ showModal: false, comment: "", selectedApp: null });
-        this.componentDidMount(); // refresh list
+        this.setState({ showModal: false });
+        this.fetchApplications(); // Refresh the list
       })
       .catch((err) => {
         this.setState({
@@ -135,28 +132,42 @@ export default class CollegeApplicationList extends Component {
                     { title: "Reason", field: "reason" },
                     { title: "HOD Status", field: "hodStatus" },
                     { title: "HOD Comment", field: "hodComment" },
+                    { title: "Admin Status", field: "adminStatus" },
+                    { title: "Admin Comment", field: "adminComment" },
                     {
                       title: "Action",
-                      render: (rowData) => (
-                        <>
-                          <Button
-                            onClick={() => this.handleApprove(rowData.id)}
-                            variant="success"
-                            size="sm"
-                            className="mr-2"
-                          >
-                            <i className="fas fa-check"></i> Approve
-                          </Button>
-                          <Button
-                            onClick={() => this.handleRejectClick(rowData)}
-                            variant="danger"
-                            size="sm"
-                            className="ml-2"
-                          >
-                            <i className="fas fa-times"></i> Reject
-                          </Button>
-                        </>
-                      ),
+                      render: (rowData) => {
+                        // Check if the applicant is HOD
+                        const isHodApplicant =
+                          rowData.user.jobPosition === "HOD";
+
+                        // Only disable if it's NOT HOD and needs HOD approval
+                        const isDisabled =
+                          !isHodApplicant &&
+                          (rowData.adminStatus !== "Pending" ||
+                            rowData.hodStatus === "Rejected");
+
+                        return (
+                          <div style={{ display: "flex", gap: "8px" }}>
+                            <Button
+                              onClick={() => this.handleApprove(rowData.id)}
+                              variant="success"
+                              size="sm"
+                              disabled={isDisabled}
+                            >
+                              Approve
+                            </Button>
+                            <Button
+                              onClick={() => this.handleRejectClick(rowData)}
+                              variant="danger"
+                              size="sm"
+                              disabled={isDisabled}
+                            >
+                              Reject
+                            </Button>
+                          </div>
+                        );
+                      },
                     },
                   ]}
                   data={this.state.applications}
@@ -170,13 +181,14 @@ export default class CollegeApplicationList extends Component {
                     filtering: false,
                     exportButton: true,
                   }}
-                  title="Pending Applications for Admin"
+                  title="Leave Applications for Admin"
                 />
               </ThemeProvider>
             </Card.Body>
           </Card>
         </div>
 
+        {/* Modal for Rejection Comment */}
         <Modal
           show={this.state.showModal}
           onHide={() => this.setState({ showModal: false })}

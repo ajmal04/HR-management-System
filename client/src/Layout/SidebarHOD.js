@@ -151,6 +151,12 @@ export default class SidebarManager extends Component {
                       <p>Add Application</p>
                     </NavLink>
                   </li>
+                  <li className="nav-item">
+                    <NavLink to="/application-status" className="nav-link">
+                      <i className="fas fa-info-circle nav-icon" />
+                      <p>Application Status</p>
+                    </NavLink>
+                  </li>
                 </ul>
               </li>
               <li className="nav-item has-treeview">

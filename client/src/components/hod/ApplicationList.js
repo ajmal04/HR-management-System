@@ -16,7 +16,6 @@ export default class HODApplicationList extends Component {
       comment: "",
       hasError: false,
       errorMsg: "",
-      completed: false,
     };
   }
 
@@ -29,14 +28,12 @@ export default class HODApplicationList extends Component {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
-        const filtered = res.data.filter((app) => app.hodStatus === "Pending");
-
-        filtered.forEach((app) => {
+        res.data.forEach((app) => {
           app.startDate = moment(app.startDate).format("YYYY-MM-DD");
           app.endDate = moment(app.endDate).format("YYYY-MM-DD");
         });
 
-        this.setState({ applications: filtered });
+        this.setState({ applications: res.data });
       })
       .catch((err) => {
         console.error("Error fetching applications:", err);
@@ -135,26 +132,32 @@ export default class HODApplicationList extends Component {
                     { title: "Start Date", field: "startDate" },
                     { title: "End Date", field: "endDate" },
                     { title: "Reason", field: "reason" },
+                    { title: "Status", field: "hodStatus" },
                     {
                       title: "Actions",
-                      render: (rowData) => (
-                        <>
-                          <Button
-                            variant="success"
-                            size="sm"
-                            onClick={() => this.handleApprove(rowData.id)}
-                          >
-                            Approve
-                          </Button>{" "}
-                          <Button
-                            variant="danger"
-                            size="sm"
-                            onClick={() => this.handleRejectClick(rowData)}
-                          >
-                            Reject
-                          </Button>
-                        </>
-                      ),
+                      render: (rowData) => {
+                        const isProcessed = rowData.hodStatus !== "Pending";
+                        return (
+                          <>
+                            <Button
+                              variant="success"
+                              size="sm"
+                              onClick={() => this.handleApprove(rowData.id)}
+                              disabled={isProcessed}
+                            >
+                              Approve
+                            </Button>{" "}
+                            <Button
+                              variant="danger"
+                              size="sm"
+                              onClick={() => this.handleRejectClick(rowData)}
+                              disabled={isProcessed}
+                            >
+                              Reject
+                            </Button>
+                          </>
+                        );
+                      },
                     },
                   ]}
                   data={this.state.applications}
@@ -167,7 +170,7 @@ export default class HODApplicationList extends Component {
                     pageSize: 10,
                     pageSizeOptions: [10, 20, 30],
                   }}
-                  title="Pending Applications"
+                  title="Leave Applications"
                 />
               </ThemeProvider>
             </Card.Body>

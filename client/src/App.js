@@ -65,6 +65,7 @@ import TerminationList from "./components/pages/TerminationList";
 import ResignationList from "./components/pages/ResignationList";
 import ResignationForm from "./components/pages/ResignationForm.js";
 import ResignationStatus from "./components/pages/ResignationStatus.js";
+import ApplicationStatus from "./components/hod/ApplicationStatus.js";
 
 export default class App extends Component {
   render() {
@@ -248,6 +249,7 @@ const HODContainer = () => (
         <Route exact path="/resignation-list" component={ResignationList} />
         <Route exact path="/resignation-form" component={ResignationForm} />
         {/* <Route exact path="/job-list" component={JobListHOD} /> */}
+        <Route exact path="/application-status" component={ApplicationStatus} />
         <Route exact path="/application-list" component={ApplicationListHOD} />
         <Route exact path="/application" component={Application} />
         <Route exact path="/expense" component={ExpenseHOD} />

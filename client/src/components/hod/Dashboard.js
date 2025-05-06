@@ -6,6 +6,7 @@ import Calendar from "../Calendar";
 import ExpenseChartsPage from "../manager/ExpenseChartsPage";
 import RecentApplciations from "../manager/RecentApplications";
 import RecentAnnouncements from "../RecentAnnouncementsManagerEmp";
+import LeaveDetails from "./LeaveDetails";
 import axios from "axios";
 
 export default class DashboardManager extends Component {
@@ -78,6 +79,7 @@ export default class DashboardManager extends Component {
           {/* Calendar */}
           <div className="col-sm-6">
             <Calendar />
+            <LeaveDetails />
           </div>
           {/* Expense Report & Recent Applications */}
           <div className="col-md-6">
