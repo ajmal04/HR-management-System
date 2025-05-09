@@ -750,7 +750,7 @@ export default class EmployeeEdit extends Component {
                           </Form.Group>
                           <Form.Group controlId="formPhone">
                             <Form.Label className="text-muted required">
-                              Phone
+                              Emergency Contact Number
                             </Form.Label>
                             <Form.Control
                               type="text"
