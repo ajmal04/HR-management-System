@@ -5,7 +5,7 @@ import Calendar from "../Calendar";
 import RecentApplciations from "../employee/RecentApplications";
 import RecentAnnouncements from "../RecentAnnouncementsManagerEmp";
 import EmployeeViewDashboard from "./EmployeeViewDashboard";
-import LeaveDetails from "./LeaveDetails";
+import LeaveDetails from "../LeaveDetails";
 
 export default class Dashboard extends Component {
   constructor(props) {

@@ -8,6 +8,24 @@ export default class Application extends Component {
   constructor(props) {
     super(props);
 
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    const maleLeaveOptions = [
+      "Casual leave",
+      "Sick / Medical leave",
+      "Vacation leave",
+      "On Duty leave",
+      "Paternity leave",
+    ];
+
+    const femaleLeaveOptions = [
+      "Casual leave",
+      "Sick / Medical leave",
+      "Vacation leave",
+      "On Duty leave",
+      "Maternity leave",
+    ];
+
     this.state = {
       type: "",
       startDate: null,
@@ -16,6 +34,9 @@ export default class Application extends Component {
       hasError: false,
       errMsg: "",
       completed: false,
+      gender: user.gender, // assuming 'gender' is stored in the user object
+      leaveOptions:
+        user.gender === "Male" ? maleLeaveOptions : femaleLeaveOptions,
     };
   }
 
@@ -76,25 +97,6 @@ export default class Application extends Component {
           <Card.Body>
             <Card.Text>
               <Form onSubmit={this.onSubmit}>
-                {/*<Form.Group controlId="formDepartmentName">
-                        <Form.Label>
-                            Type
-                        </Form.Label>
-                             <Form.Control
-                                as="select"
-                                name="type"
-                                style={{width: "50%"}}
-                                value={this.state.type}
-                                onChange={this.handleChange}
-                                required
-                            >
-                                <option value="">Choose one</option>
-                                <option value="normal">Normal</option>
-                                <option value="illness">Illness</option>
-                                <option value="student">Student</option>
-                                <option value="marriage">Marriage</option>
-                            </Form.Control> 
-                        </Form.Group>*/}
                 <Form.Group>
                   <Form.Label>Start Date</Form.Label>
                   <Form.Row>
@@ -122,15 +124,21 @@ export default class Application extends Component {
                   </Form.Row>
                 </Form.Group>
                 <Form.Group>
-                  <Form.Label>
-                    Reason <span className="text-muted">(Comments)</span>
-                  </Form.Label>
+                  <Form.Label>Reason</Form.Label>
                   <Form.Control
-                    type="text"
+                    as="select"
                     name="reason"
                     value={this.state.reason}
                     onChange={this.handleChange}
-                  />
+                    required
+                  >
+                    <option value="">Choose leave type</option>
+                    {this.state.leaveOptions.map((option, index) => (
+                      <option key={index} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </Form.Control>
                 </Form.Group>
                 <Button variant="primary" type="submit" className="mt-2">
                   Add

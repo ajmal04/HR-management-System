@@ -155,7 +155,28 @@ exports.findAllByUserId = (req, res) => {
       where: { userId: userId },
       include: [User],
     })
-      .then((data) => res.send(data))
+      .then((applications) => {
+        const updatedApplications = applications.map((app) => {
+          const appData = app.toJSON();
+
+          if (appData.hodStatus === "Approved" && !appData.hodComment) {
+            appData.hodComment = "-";
+          }
+
+          if (appData.adminStatus === "Approved" && !appData.adminComment) {
+            appData.adminComment = "-";
+          }
+
+          if (appData.hodStatus === "Rejected") {
+            appData.adminStatus = "NA";
+            appData.adminComment = "NA";
+          }
+
+          return appData;
+        });
+
+        res.send(updatedApplications);
+      })
       .catch((err) =>
         res.status(500).send({
           message:
@@ -208,7 +229,7 @@ exports.hodUpdate = async (req, res) => {
   try {
     const updateData = {
       hodStatus: status,
-      hodComment: comment,
+      hodComment: status == "Approved" ? "NA" : comment,
     };
 
     if (status === "Rejected") {
@@ -312,7 +333,7 @@ exports.getApplicationsByCollege = async (req, res) => {
         {
           model: User,
           where: { college: adminCollege },
-          attributes: ["id", "fullName", "college"],
+          attributes: ["id", "fullName", "college", "jobPosition"],
           include: [
             {
               model: Department,
@@ -323,7 +344,30 @@ exports.getApplicationsByCollege = async (req, res) => {
       ],
     });
 
-    res.send(applications);
+    // ✅ Convert "Pending" to "NA" if user is a HOD
+    const updatedApplications = applications.map((app) => {
+      const appData = app.toJSON();
+      const isHod = appData.user?.jobPosition === "HOD";
+
+      if (isHod && appData.hodStatus === "Pending") {
+        appData.hodStatus = "NA";
+        appData.hodComment = "NA";
+      }
+      if (!isHod && appData.hodStatus === "Approved" && !appData.hodComment) {
+        appData.hodComment = "-";
+      }
+      if (appData.adminStatus === "Approved" && !appData.adminComment) {
+        appData.adminComment = "-";
+      }
+      //HOD Reject the application, then the admin's status and comment should be filled with NA
+      if (appData.hodStatus === "Rejected") {
+        appData.adminStatus = "NA";
+        appData.adminComment = "NA";
+      }
+      return appData;
+    });
+
+    res.send(updatedApplications);
   } catch (err) {
     console.error(err);
     res.status(500).send({

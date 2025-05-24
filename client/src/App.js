@@ -219,6 +219,7 @@ const AdminContainer = () => (
         <Route exact path="/termination-list" component={TerminationList} />
         <Route exact path="/resignation-list" component={ResignationList} />
         <Route exact path="/resignation-form" component={ResignationForm} />
+        <Route exact path="/resignation-status" component={ResignationStatus} />
         <Route
           exact
           path="/application-list"
@@ -248,6 +249,7 @@ const HODContainer = () => (
         <Route exact path="/termination-list" component={TerminationList} />
         <Route exact path="/resignation-list" component={ResignationList} />
         <Route exact path="/resignation-form" component={ResignationForm} />
+        <Route exact path="/resignation-status" component={ResignationStatus} />
         {/* <Route exact path="/job-list" component={JobListHOD} /> */}
         <Route exact path="/application-status" component={ApplicationStatus} />
         <Route exact path="/application-list" component={ApplicationListHOD} />

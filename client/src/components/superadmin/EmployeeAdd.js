@@ -123,7 +123,6 @@ export default class EmployeeAdd extends Component {
       const userId = userRes.data.id;
       this.setState({ newEmployeeId: userId });
 
-
       // 2. Create Related Records
       await this.createRelatedRecords(userId);
 
@@ -620,9 +619,10 @@ export default class EmployeeAdd extends Component {
                             required
                           >
                             <option value="">Choose...</option>
-                            <option value="HOD">HOD</option>
+                            <option value="HR">HR</option>
                             <option value="PRINCIPAL">principal</option>
                             <option value="HOD">Hod</option>
+                            <option value="SYSTEM_ADMIN">System Admin</option>
                             <option value="ASSOCIATE_PROFESSOR">
                               Associate Professor
                             </option>

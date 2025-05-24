@@ -208,7 +208,7 @@ export default class DepartmentList extends Component {
                       // },
                       {
                         title: "Action",
-                        width: 250,
+                        width: 300,
                         render: (rowData) => (
                           <Form className="row">
                             <div className="col pl-5">

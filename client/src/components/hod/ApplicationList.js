@@ -136,7 +136,11 @@ export default class HODApplicationList extends Component {
                     {
                       title: "Actions",
                       render: (rowData) => {
+                        const user = JSON.parse(localStorage.getItem("user"));
                         const isProcessed = rowData.hodStatus !== "Pending";
+                        const isOwnApplication =
+                          rowData.user && rowData.user.id === user.id;
+                        if (isOwnApplication) return null;
                         return (
                           <>
                             <Button

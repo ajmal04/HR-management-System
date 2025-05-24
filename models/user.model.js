@@ -36,11 +36,11 @@ module.exports = (sequelize, Sequelize) => {
           "HR",
           "PRINCIPAL",
           "HOD",
+          "SYSTEM_ADMIN",
           "ASSOCIATE_PROFESSOR",
           "ASSISTANT_PROFESSOR",
         ],
         allowNull: false,
-        defaultValue: "ASSISTANT_PROFESSOR",
       },
       role: {
         type: Sequelize.ENUM,

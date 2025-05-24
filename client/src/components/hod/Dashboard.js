@@ -6,7 +6,7 @@ import Calendar from "../Calendar";
 import ExpenseChartsPage from "../manager/ExpenseChartsPage";
 import RecentApplciations from "../manager/RecentApplications";
 import RecentAnnouncements from "../RecentAnnouncementsManagerEmp";
-import LeaveDetails from "./LeaveDetails";
+import LeaveDetails from "../LeaveDetails";
 import axios from "axios";
 
 export default class DashboardManager extends Component {
