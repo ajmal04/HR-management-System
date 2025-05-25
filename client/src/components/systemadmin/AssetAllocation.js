@@ -5,7 +5,6 @@ import {
 } from 'react-bootstrap';
 import axios from 'axios';
 import { useParams, Redirect } from 'react-router-dom';
-import AssetItem from './AssetItem';
 
 const AssetAllocation = ({ userId: propUserId, onBack }) => {
   const { userId: paramUserId } = useParams();

@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Card, Button, Form, Alert } from "react-bootstrap";
+import { Card, Button, Alert } from "react-bootstrap";
 import { Redirect } from "react-router-dom";
 import "react-bootstrap-table-next/dist/react-bootstrap-table2.min.css";
 import "react-bootstrap-table2-paginator/dist/react-bootstrap-table2-paginator.min.css";
@@ -31,13 +31,11 @@ export default class ApplicationList extends Component {
       url: "/api/applications/user/" + userId,
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     }).then((res) => {
-      res.data.map((app) => {
+      res.data.forEach((app) => {  // Changed from map to forEach
         app.startDate = moment(app.startDate).format("YYYY-MM-DD");
         app.endDate = moment(app.endDate).format("YYYY-MM-DD");
       });
-      this.setState({ applications: res.data }, () => {
-        console.log("applications", this.state.aplications);
-      });
+      this.setState({ applications: res.data });
     });
   }
 

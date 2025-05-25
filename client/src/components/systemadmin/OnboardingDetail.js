@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Card, Alert, Spinner, Tab, Tabs, 
   Badge, ListGroup, Button, Modal 
@@ -22,7 +22,7 @@ const OnboardingDetail = ({ onBack }) => {
   const [redirectToAssetAllocation, setRedirectToAssetAllocation] = useState(false);
   const [redirectToList, setRedirectToList] = useState(false);
 
-  const fetchRequest = async () => {
+  const fetchRequest = useCallback(async () => {
     try {
       const res = await axios.get(`/api/onboarding/requests/${id}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
@@ -63,7 +63,7 @@ const OnboardingDetail = ({ onBack }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
 
   const handleComplete = async () => {
     try {
@@ -94,7 +94,7 @@ const OnboardingDetail = ({ onBack }) => {
 
   useEffect(() => { 
     fetchRequest(); 
-  }, [id]);
+  }, [fetchRequest]);
 
   if (redirectToAssetAllocation) {
     return <Redirect to={`/asset-allocation/${request.userId}`} />;

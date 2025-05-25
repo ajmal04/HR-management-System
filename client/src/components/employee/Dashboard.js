@@ -19,10 +19,17 @@ export default class Dashboard extends Component {
     };
   }
 
+<<<<<<< HEAD
   componentDidMount() {
     let departmentId = JSON.parse(localStorage.getItem("user")).departmentId;
   }
   render() {
+=======
+
+
+  
+  render() {    
+>>>>>>> e0349e3f2d10d722e3d8954792197004c6aee799
     return (
       <div>
         {/* Second Row with Calendar and Expense Report */}

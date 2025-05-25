@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { Card, Row, Col, Form } from "react-bootstrap";
 import { Redirect } from 'react-router-dom'
 import axios from 'axios'
-import moment from 'moment'
 
 export default class SalaryView extends Component {
   constructor(props) {
@@ -11,7 +10,8 @@ export default class SalaryView extends Component {
     this.state = {
       user: null,
       currentJobTitle: null,
-      falseRedirect: false
+      falseRedirect: false,
+      editRedirect: false
     };
   }
 
@@ -27,11 +27,14 @@ export default class SalaryView extends Component {
               console.log(res)
               this.setState({user: res.data}, () => {
                   if(this.state.user.jobs) {
-                      this.state.user.jobs.map(job => {
-                          if(new Date(job.startDate).setHours(0) < new Date() && new Date(job.endDate).setHours(24) > new Date()) {
-                              this.setState({currentJobTitle: job.jobTitle})
-                          }
-                      })
+                    const currentJob = this.state.user.jobs.find(job => 
+                        new Date(job.startDate).setHours(0) < new Date() && 
+                        new Date(job.endDate).setHours(24) > new Date()
+                      );
+                      
+                      if (currentJob) {
+                        this.setState({currentJobTitle: currentJob.jobTitle});
+                      }
                   }
               })
           })
@@ -43,22 +46,27 @@ export default class SalaryView extends Component {
       }
   }
 
+  onEdit = () => {
+    this.setState({editRedirect: true})
+  }
+
   render() {
     return (
         <div className="container-fluid pt-3">
             {this.state.falseRedirect ? <Redirect to="/" /> : (<></>)}
+            {this.state.editRedirect ? (<Redirect to={{pathname: "/salary-details", state: {selectedUser: this.state.user}}} />) : null}
             {this.state.user ? (
                 <Row>
                     <Col sm={12}>
                         <Card>
-                            <Card.Header style={{ backgroundColor: "#515e73", color: "white", fontSize: '17px' }}>Employee Salary Detail</Card.Header>
+                            <Card.Header style={{ backgroundColor: "#515e73", color: "white", fontSize: '17px' }}>Employee Salary Detail <Form className="float-right"><span style={{cursor: 'pointer'}} onClick={this.onEdit}><i className="far fa-edit"></i> Edit</span></Form></Card.Header>
                             <Card.Body>
                                 <Card.Title><strong>{this.state.user.fullName}</strong></Card.Title>
                                 <Card.Text>
                                     <Col lg={12}>
                                         <Row className="pt-4">
                                             <Col lg={3}>
-                                                <img className="img-circle elevation-1 bp-2" src={process.env.PUBLIC_URL + '/user-128.png'}></img>
+                                                <img className="img-circle elevation-1 bp-2" src={process.env.PUBLIC_URL + '/user-128.png'} alt="" />
                                             </Col>
                                             <Col className="pt-4" lg={9}>
                                                 <div className="emp-view-list">

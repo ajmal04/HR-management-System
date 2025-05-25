@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { Card, Button, Alert, Spinner, Modal } from "react-bootstrap";
-import { Redirect } from "react-router-dom";
 import axios from "axios";
 import moment from "moment";
 import MaterialTable from "material-table";
@@ -179,11 +178,11 @@ export default class ApplicationList extends Component {
                         field: "endDate",
                         cellStyle: { minWidth: 120 },
                       },
-                      // {
-                      //   title: 'Leave Type',
-                      //   field: 'type',
-                      //   cellStyle: { minWidth: 120 }
-                      // },
+                      {
+                        title: 'Leave Type',
+                        field: 'type',
+                        cellStyle: { minWidth: 120 }
+                      },
                       {
                         title: "Reason",
                         field: "reason",
@@ -257,13 +256,7 @@ export default class ApplicationList extends Component {
                       }),
                       pageSize: 10,
                       pageSizeOptions: [10, 20, 30, 50, 75, 100],
-                      headerStyle: {
-                        backgroundColor: "#515e73",
-                        color: "#FFF",
-                        fontSize: "14px",
-                      },
                       emptyRowsWhenPaging: false,
-                      padding: "dense",
                       search: true,
                       filtering: false,
                     }}

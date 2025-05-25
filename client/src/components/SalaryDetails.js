@@ -1,15 +1,6 @@
 import React, { Component } from "react";
-import { Card, Button, Form, Alert, Badge } from "react-bootstrap";
-import { Redirect } from 'react-router-dom'
-import JobAddModal from './JobAddModal'
-import JobEditModal from './JobEditModal'
-import JobDeleteModal from './JobDeleteModal'
+import { Card, Button, Form, Alert } from "react-bootstrap";
 import axios from 'axios'
-import moment from 'moment'
-import MaterialTable from 'material-table'
-import { ThemeProvider } from '@material-ui/core'
-import { createMuiTheme } from '@material-ui/core/styles'
-import AlertModal from './AlertModal'
 
 export default class SalaryDetails extends Component {
 
@@ -88,9 +79,9 @@ export default class SalaryDetails extends Component {
             let department = res.data
             let users = [];
 
-            department.users.map(user => {
+            department.users.forEach(user => {
                 users.push(user)
-            })
+              })
             
             this.setState({users: users})
         })
@@ -109,11 +100,11 @@ export default class SalaryDetails extends Component {
             let departments = res.data
             let users = [];
 
-            departments.map(dept => {
-                dept.users.map(user => {
-                    users.push(user)
+            departments.forEach(dept => {
+                dept.users.forEach(user => {
+                  users.push(user)
                 })
-            })
+              })
             
             this.setState({users: users})
         })
@@ -125,22 +116,22 @@ export default class SalaryDetails extends Component {
     pushDepartments = () => {
         let items= []
         items.push(<option key={584390} value="all">All departments</option>)
-        this.state.departments.map((dept, index) => {
-            if(this.state.selectedDepartment == dept.id) {
-                items.push(<option key={index} value={dept.id} defaultValue>{dept.departmentName}</option>)
+        this.state.departments.forEach((dept, index) => {
+            if(this.state.selectedDepartment === dept.id) {
+              items.push(<option key={index} value={dept.id} defaultValue>{dept.departmentName}</option>)
             } else {
-                items.push(<option key={index} value={dept.id}>{dept.departmentName}</option>)
+              items.push(<option key={index} value={dept.id}>{dept.departmentName}</option>)
             }
-        })
+          })
         return items
     }
 
     pushUsers = () => {
         let items = []
         
-        this.state.users.map((user, index) => {
+        this.state.users.forEach((user, index) => {
             items.push(<option key={index} value={user.id}>{user.fullName}</option>)
-        })
+          })
 
         return items
     }
@@ -156,8 +147,8 @@ export default class SalaryDetails extends Component {
     }
 
     handleUserChange = (event) => {
-        this.state.users.map(user => {
-            if(user.id == event.target.value) {
+        this.state.users.forEach(user => {
+            if(user.id === event.target.value) {
                 this.setState({selectedUser: event.target.value}, () => {
                     axios({
                         method: 'get',
@@ -199,8 +190,6 @@ export default class SalaryDetails extends Component {
         let data = {
             employmentType: this.state.employmentType,
             salaryBasic: this.state.salaryBasic,
-            salaryGross: this.salaryGross,
-            salaryNet: this.salaryNet,
             allowanceHouseRent: this.state.allowanceHouseRent,
             allowanceMedical: this.state.allowanceMedical,
             allowanceSpecial: this.state.allowanceSpecial,

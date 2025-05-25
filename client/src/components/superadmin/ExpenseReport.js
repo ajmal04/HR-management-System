@@ -32,17 +32,18 @@ export default class ExpenseReport extends Component {
     
     this.setState({ isLoading: true, hasError: false });
     
+    const year = this.state.selectedDate.getFullYear();
+    const month = this.state.selectedDate.getMonth() + 1;
+    
     axios({
       method: 'get',
-      url: '/api/expenses',
+      url: `/api/expenses/monthly?year=${year}&month=${month}`,
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     })
     .then(res => {
-      const filteredExpenses = this.filterExpensesByMonth(res.data);
-      const total = this.calculateTotal(filteredExpenses);
       this.setState({
-        expenses: filteredExpenses,
-        totalAmount: total,
+        expenses: res.data.expenses,
+        totalAmount: res.data.totalAmount,
         isLoading: false
       });
     })
@@ -53,23 +54,6 @@ export default class ExpenseReport extends Component {
         isLoading: false
       });
     });
-  };
-
-  filterExpensesByMonth = (expenses) => {
-    if (!this.state.selectedDate) return [];
-    
-    return expenses.filter(expense => {
-      const expenseDate = new Date(expense.date);
-      const selectedDate = new Date(this.state.selectedDate);
-      return (
-        expenseDate.getMonth() === selectedDate.getMonth() &&
-        expenseDate.getFullYear() === selectedDate.getFullYear()
-      );
-    });
-  };
-
-  calculateTotal = (expenses) => {
-    return expenses.reduce((sum, expense) => sum + parseFloat(expense.amount), 0);
   };
 
   handleDateChange = (newDate) => {
@@ -189,9 +173,9 @@ export default class ExpenseReport extends Component {
                   columns={[
                     { 
                       title: '#', 
-                      render: rowData => rowData.tableData.id + 1,  // Show raw row number
+                      render: rowData => rowData.tableData.id + 1,
                       width: 50
-                  },
+                    },
                     { title: 'Item Name', field: 'expenseItemName' },
                     { title: 'Purchased From', field: 'expenseItemStore' },
                     {

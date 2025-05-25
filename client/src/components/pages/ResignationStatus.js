@@ -34,7 +34,7 @@ const ResignationStatus = () => {
         console.error("Failed to fetch resignation status", err);
         setLoading(false);
       });
-  }, []);
+  }, [token]);
 
   if (loading) return <p>Loading...</p>;
   if (!resignation) return <p>No resignation data found.</p>;

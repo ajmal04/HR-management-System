@@ -78,6 +78,43 @@ exports.findAllByYear = (req, res) => {
     });
 };
 
+exports.findMonthly = async (req, res) => {
+  try {
+    const { year, month } = req.query;
+    
+    if (!year || !month) {
+      return res.status(400).send({
+        message: "Year and month parameters are required"
+      });
+    }
+
+    const expenses = await Expense.findAll({
+      where: {
+        [Op.and]: [
+          sequelize.where(sequelize.fn('YEAR', sequelize.col('date')), year),
+          sequelize.where(sequelize.fn('MONTH', sequelize.col('date')), month)
+        ]
+      },
+      include: [{
+        model: Department,
+        attributes: ['departmentName']
+      }],
+      order: [['date', 'DESC']]
+    });
+
+    const totalAmount = expenses.reduce((sum, exp) => sum + parseFloat(exp.amount), 0);
+
+    res.send({
+      expenses,
+      totalAmount: parseFloat(totalAmount.toFixed(2))
+    });
+  } catch (err) {
+    res.status(500).send({
+      message: "Error retrieving monthly expenses: " + err.message
+    });
+  }
+};
+
 exports.findAllByYearAndDept = (req, res) => {
   const year = req.params.id;
   const deptId = req.params.id2;
@@ -274,3 +311,30 @@ exports.deleteAllByDeptId = (req, res) => {
       });
     }
   };
+
+exports.getCollegeExpensesByYear = async (req, res) => {
+  try {
+    const year = req.params.year;
+    const userCollege = req.user.college;
+
+    const expenses = await Expense.findAll({
+      include: [{
+        model: Department,
+        where: { college: userCollege },
+        attributes: []
+      }],
+      where: sequelize.where(sequelize.fn('YEAR', sequelize.col('date')), year),
+      attributes: [
+        [sequelize.fn('monthname', sequelize.col('date')), 'month'],
+        [sequelize.fn('sum', sequelize.col('amount')), 'expenses']
+      ],
+      group: [sequelize.fn('month', sequelize.col('date'))],
+      order: [sequelize.fn('month', sequelize.col('date'))]
+    });
+
+    res.json(expenses);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};

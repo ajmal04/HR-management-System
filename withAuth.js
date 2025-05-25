@@ -117,6 +117,14 @@ exports.withAdminOrSelf = (req, res, next) => {
     return next(); // Allow access
   }
   return res.status(403).json({ message: "Access denied" });
+
+  if (
+    req.user.role === "ROLE_ADMIN" ||
+    String(req.user.id) === String(req.params.id)
+  ) {
+    return next();
+  }
+  return res.status(403).json({ message: "Access denied" });
 };
 
 exports.withAuth = checkRole;

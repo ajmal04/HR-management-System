@@ -53,7 +53,7 @@ exports.authenticate = (req, res) => {
             process.env.SECRET_KEY,
             { expiresIn: "30m" },
             (err, token) => {
-              console.log("Generated Token:", token);
+              
               res.cookie("token", token);
               res.status(200).send({
                 token: token,

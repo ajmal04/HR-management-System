@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
-  Table, Card, Button, Badge, 
+  Table, Card, Button, 
   Dropdown, Pagination, Form, Alert 
 } from 'react-bootstrap';
 import axios from 'axios';
@@ -37,7 +37,7 @@ const OnboardingList = () => {
   };
 
   // Fetch data with filters
-  const fetchRequests = async () => {
+  const fetchRequests = useCallback(async () => {
     try {
       const res = await axios.get(
         `/api/onboarding/requests?filter=${filter}&sort=${sortConfig.key}&order=${sortConfig.direction}&page=${pagination.currentPage}`,
@@ -53,13 +53,13 @@ const OnboardingList = () => {
     } catch (err) {
       console.error('Error fetching requests:', err);
       setError(err.response?.data?.message || 'Failed to fetch requests');
-      setRequests([]); // Set empty array on error
+      setRequests([]);
     }
-  };
-
+  }, [filter, sortConfig, pagination.currentPage, authConfig]);
+  
   useEffect(() => {
     fetchRequests();
-  }, [filter, sortConfig, pagination.currentPage]);
+  }, [fetchRequests]);
 
   // Handler functions for navigation
   const onViewDetail = (request) => (e) => {

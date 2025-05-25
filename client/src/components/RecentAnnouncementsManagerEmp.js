@@ -1,7 +1,5 @@
 import * as React from "react";
 import axios from "axios";
-import CalendarIcon from 'react-calendar-icon'
-import { ThemeProvider } from "styled-components";
 
 export default class RecentAnnouncements extends React.Component {
   
@@ -35,13 +33,13 @@ export default class RecentAnnouncements extends React.Component {
   }
 
   render() {
-    const theme = {
-        calendarIcon: {
-          textColor: "white", // text color of the header and footer
-          primaryColor: "#0da472", // background of the header and footer
-          backgroundColor: "#fafafa"
-        }
-      };
+    // const theme = {
+    //     calendarIcon: {
+    //       textColor: "white", // text color of the header and footer
+    //       primaryColor: "#0da472", // background of the header and footer
+    //       backgroundColor: "#fafafa"
+    //     }
+    //   };
 
       const days = ["Monday", "Tuesday", "Wendesday", "Thursday", "Friday", "Saturday", "Sunday"]
       const monthNames = ["January", "February", "March", "April", "May", "June",

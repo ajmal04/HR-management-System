@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Redirect } from 'react-router-dom'
-import { Modal, Alert, Button } from "react-bootstrap";
+import { Modal, Button } from "react-bootstrap";
 import axios from 'axios'
 
 

@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Card, Button, Form, Alert, Spinner } from "react-bootstrap";
-import { Redirect, NavLink } from "react-router-dom";
+import { Redirect, } from "react-router-dom";
 import PropTypes from "prop-types";
 import AddDepartment from "../DepartmentAdd";
 import DepartmentEdit from "../DepartmentEdit";

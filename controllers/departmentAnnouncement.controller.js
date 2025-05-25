@@ -64,7 +64,7 @@ exports.findAllRecent = (req, res) => {
     }, {
       model: Department
     }],
-    order: [["createdAt", "DESC"]],
+    order: [["created_at", "DESC"]],
     limit: 2
   })
     .then(data => {
@@ -88,7 +88,7 @@ exports.findAllRecentByDeptId = (req, res) => {
       model: Department,
       where: {id: deptId}
     }],
-    order: [["createdAt", "DESC"]],
+    order: [["created_at", "DESC"]],
     limit: 2
   })
     .then(data => {

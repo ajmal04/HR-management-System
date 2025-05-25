@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { Card, Button, Form, Alert } from "react-bootstrap";
 import { Redirect } from 'react-router-dom';
 import axios from 'axios';
-import moment from 'moment';
 import DatePicker from 'react-datepicker';
 
 export default class Expense extends Component {

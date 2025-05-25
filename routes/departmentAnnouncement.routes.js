@@ -5,10 +5,10 @@ const withAuth = require('../withAuth');
 
 const departmentAnnouncement = require("../controllers/departmentAnnouncement.controller.js");
 
-// 📌 Create a new Department Announcement (Only Admin & HOD)
+// Create a new Department Announcement (Only Admin & HOD)
 router.post('/', withAuth.verifyToken, withAuth.withHigherRoles, departmentAnnouncement.create);
 
-// 📌 Retrieve all Announcements (All authenticated users)
+// Retrieve all Announcements (All authenticated users)
 router.get('/', withAuth.verifyToken, departmentAnnouncement.findAll);
 
 router.get('/college', withAuth.verifyToken, withAuth.withAdmin, departmentAnnouncement.getCollegeAnnouncements);

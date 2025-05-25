@@ -1,12 +1,11 @@
 import React, { Component } from "react";
-
 import "../../App.css";
 import Infobox from "../infobox";
 import Calendar from "../Calendar";
-import ExpenseChartsPage from "../ExpenseChartsPage";
-import PaymentChartsPage from "../PaymentChartsPage";
-import RecentApplciations from "../RecentApplications";
-import RecentAnnouncements from "../RecentAnnouncements";
+import ExpenseChartsPage from "./ExpenseChartsPage";
+import PaymentChartsPage from "./PaymentChartsPage";
+import RecentApplciations from "./RecentApplications";
+import RecentAnnouncements from "./RecentAnnouncements";
 import axios from "axios";
 
 export default class Dashboard extends Component {

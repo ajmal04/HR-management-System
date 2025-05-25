@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Card, Button, Form, Table, Badge, Alert, Spinner } from 'react-bootstrap';
+import React, { useState, useEffect, useCallback  } from 'react';
+import { Card, Button, Form, Table, Alert, Spinner } from 'react-bootstrap';
 import axios from 'axios';
 
 const DocumentUpload = ({ requestId, onUpdate, userRole }) => {
@@ -11,11 +11,8 @@ const DocumentUpload = ({ requestId, onUpdate, userRole }) => {
   const [documentType, setDocumentType] = useState('');
   const [description, setDescription] = useState('');
 
-  useEffect(() => {
-    fetchDocuments();
-  }, [requestId]);
 
-  const fetchDocuments = async () => {
+  const fetchDocuments = useCallback(async () => {
     try {
       setLoading(true);
       const response = await axios.get(`/api/onboarding/requests/${requestId}/documents`, {
@@ -28,7 +25,11 @@ const DocumentUpload = ({ requestId, onUpdate, userRole }) => {
       setError('Failed to load documents. Please try again later.');
       setLoading(false);
     }
-  };
+  }, [requestId]);
+
+  useEffect(() => {
+    fetchDocuments();
+  }, [requestId, fetchDocuments]);
 
   const handleFileChange = (e) => {
     setSelectedFile(e.target.files[0]);

@@ -18,12 +18,15 @@ export default class EmployeeView extends Component {
       },
       userPersonalInfo: {
         dateOfBirth: null,
+        age: null,
         gender: null,
+        bloodGroup: null,
         maritalStatus: null,
         fatherName: null,
         country: null,
         address: null,
         mobile: null,
+        phone: null,
         emailAddress: null,
       },
       userFinancialInfo: {
@@ -38,7 +41,7 @@ export default class EmployeeView extends Component {
   }
 
   componentDidMount() {
-<<<<<<< HEAD
+<<<<<<< HEAD:client/src/components/admin/EmployeeProfile.js
     if (this.props.location.state) {
       axios({
         method: "get",
@@ -120,7 +123,7 @@ export default class EmployeeView extends Component {
       } else {
           this.setState({falseRedirect: true})
       }
->>>>>>> e0349e3f2d10d722e3d8954792197004c6aee799
+>>>>>>> e0349e3f2d10d722e3d8954792197004c6aee799:client/src/components/admin/EmployeeView.js
   }
 
   onEdit = () => {
@@ -129,7 +132,7 @@ export default class EmployeeView extends Component {
 
   render() {
     return (
-<<<<<<< HEAD
+<<<<<<< HEAD:client/src/components/admin/EmployeeProfile.js
       <div className="container-fluid pt-3">
         {this.state.falseRedirect ? <Redirect to="/" /> : <></>}
         {this.state.editRedirect ? (
@@ -151,11 +154,6 @@ export default class EmployeeView extends Component {
                 }}
               >
                 Employee Detail{" "}
-                <Form className="float-right">
-                  <span style={{ cursor: "pointer" }} onClick={this.onEdit}>
-                    <i className="far fa-edit"></i> Edit
-                  </span>
-                </Form>
               </Card.Header>
               <Card.Body>
                 <Card.Title>
@@ -253,7 +251,7 @@ export default class EmployeeView extends Component {
             <Row>
                 <Col sm={12}>
                     <Card>
-                        <Card.Header style={{ backgroundColor: "#515e73", color: "white", fontSize: '17px' }}>Employee Detail <Form className="float-right"><span style={{cursor: 'pointer'}} onClick={this.onEdit}><i className="far fa-edit"></i> Edit</span></Form></Card.Header>
+                        <Card.Header style={{ backgroundColor: "#515e73", color: "white", fontSize: '17px' }}>Employee Detail </Card.Header>
                         <Card.Body>
                             <Card.Title><strong>{this.state.user.fullName}</strong></Card.Title>
                             <Card.Text>
@@ -407,7 +405,7 @@ export default class EmployeeView extends Component {
                                         </Col>
                                     </Row>
                                 </Col>
->>>>>>> e0349e3f2d10d722e3d8954792197004c6aee799
+>>>>>>> e0349e3f2d10d722e3d8954792197004c6aee799:client/src/components/admin/EmployeeView.js
                             </Card.Text>
                           </Card.Body>
                         </Card>

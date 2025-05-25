@@ -18,6 +18,8 @@ router.get(
   user.findTotal
 );
 
+router.get('/total/college', withAuth.verifyToken, withAuth.withAdmin, user.findTotalByCollege);
+
 //  Retrieve user count by department (Admins, HODs)
 router.get(
   "/total/department/:id",

@@ -13,6 +13,7 @@ import SidebarAdmin from "./Layout/SidebarAdmin";
 import SidebarHOD from "./Layout/SidebarHOD";
 import SidebarEmployee from "./Layout/SidebarEmployee";
 import DashboardSuperAdmin from "./components/superadmin/Dashboard.js";
+import DashboardAdmin from "./components/admin/Dashboard.js";
 import DashboardHOD from "./components/hod/Dashboard";
 import DashboardEmployee from "./components/employee/Dashboard";
 import Layout from "./Layout/Layout";
@@ -21,8 +22,8 @@ import EmployeeListAdmin from "./components/admin/EmployeeList";
 import EmployeeListHOD from "./components/hod/EmployeeList";
 import EmployeeAddSuperAdmin from "./components/superadmin/EmployeeAdd";
 import EmployeeViewSuperAdmin from "./components/superadmin/EmployeeView";
-import EmployeeViewAdmin from "./components/admin/EmployeeProfile";
-import EmployeeViewHOD from "./components/hod/EmployeeProfile";
+import EmployeeViewAdmin from "./components/admin/EmployeeView.js";
+import EmployeeViewHOD from "./components/hod/EmployeeView.js";
 import EmployeeViewEmployee from "./components/employee/EmployeeView";
 import EmployeeEditSuperAdmin from "./components/superadmin/EmployeeEdit";
 import DepartmentListSuperAdmin from "./components/superadmin/DepartmentList";
@@ -33,12 +34,10 @@ import ApplicationListEmployee from "./components/employee/ApplicationList";
 import Application from "./components/Application";
 import SalaryDetails from "./components/SalaryDetails";
 import SalaryListSuperAdmin from "./components/superadmin/SalaryList";
-import SalaryView from "./components/SalaryView";
+import SalaryViewSuperAdmin from "./components/superadmin/SalaryView.js";
 import SalaryViewAdmin from "./components/admin/SalaryView";
 import SalaryViewHOD from "./components/hod/SalaryView";
-import SalaryViewManager from "./components/manager/SalaryView";
 import SalaryViewEmployee from "./components/employee/SalaryView";
-import Payment from "./components/Payment";
 import Expense from "./components/Expense";
 import ExpenseReportAdmin from "./components/admin/ExpenseReport";
 import ExpenseReportHOD from "./components/hod/ExpenseReport";
@@ -173,7 +172,7 @@ const SuperAdminContainer = () => (
         />
         <Route exact path="/salary-list" component={SalaryListSuperAdmin} />
         <Route exact path="/salary-details" component={SalaryDetails} />
-        <Route exact path="/salary-view" component={SalaryView} />
+        <Route exact path="/salary-view" component={SalaryViewSuperAdmin} />
         <Route exact path="/expense" component={Expense} />
         <Route
           exact
@@ -225,18 +224,26 @@ const AdminContainer = () => (
         <Route exact path="/termination-list" component={TerminationList} />
         <Route exact path="/resignation-list" component={ResignationList} />
         <Route exact path="/resignation-form" component={ResignationForm} />
+
         <Route exact path="/resignation-status" component={ResignationStatus} />
         <Route
           exact
           path="/application-list"
           component={ApplicationListAdmin}
         />
+
+        <Route
+          exact
+          path="/application-list"
+          component={ApplicationListAdmin}
+        />
+
         <Route exact path="/application" component={Application} />
         <Route exact path="/expense-report" component={ExpenseReportAdmin} />
         <Route exact path="/expense" component={Expense} />
 
         <Route exact path="/announcement" component={AnnouncementAdmin} />
-        <Route exact path="/" component={DashboardSuperAdmin} />
+        <Route exact path="/" component={DashboardAdmin} />
       </Switch>
     </Layout>
     <Footer />
