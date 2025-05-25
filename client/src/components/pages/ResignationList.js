@@ -116,6 +116,23 @@ export default class ResignationList extends Component {
     }
   };
 
+  forwardToSystemAdmin = async (resignationId) => {
+    const token = localStorage.getItem("token");
+
+    try {
+      await axios.put(
+        `/api/resignations/forward-system-admin/${resignationId}`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      alert("Forwarded to System Admin successfully");
+      this.fetchResignations();
+    } catch (err) {
+      console.error("Error forwarding to System Admin", err);
+      alert("Failed to forward to System Admin");
+    }
+  };
+
   submitRejectReason = async () => {
     const { role, selectedResignationId, rejectReason } = this.state;
     const token = localStorage.getItem("token");

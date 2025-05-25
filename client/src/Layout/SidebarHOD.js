@@ -195,6 +195,12 @@ export default class SidebarManager extends Component {
                   <p>Announcements</p>
                 </NavLink>
               </li>
+              <li className="nav-item">
+                <NavLink to="/job-requisition-form" className="nav-link">
+                  <i className="nav-icon fas fa-briefcase" />
+                  <p>Job Requisition From</p>
+                </NavLink>
+              </li>
             </ul>
           </nav>
           {/* /.sidebar-menu */}

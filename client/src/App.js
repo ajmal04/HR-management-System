@@ -67,6 +67,10 @@ import ResignationForm from "./components/pages/ResignationForm.js";
 import ResignationStatus from "./components/pages/ResignationStatus.js";
 import ApplicationStatus from "./components/hod/ApplicationStatus.js";
 
+import JobRequisitionForm from "./components/recruitment/JobRequisitionForm.js";
+import JobList from "./components/recruitment/jobList.js";
+import JobApplicationForm from "./components/recruitment/jobApplicationForm.js";
+
 export default class App extends Component {
   render() {
     return (
@@ -74,6 +78,8 @@ export default class App extends Component {
         <Switch>
           <Route exact path="/login" component={LoginContainer} />
           <Route exact path="/register" component={RegisterContainer} />
+          <Route exact path="/jobs" component={JobList} />
+          <Route exact path="/apply/:jobId" component={JobApplicationForm} />
           <Route path="/" component={withAuth(DefaultContainer)} />
         </Switch>
       </Router>
@@ -256,6 +262,11 @@ const HODContainer = () => (
         <Route exact path="/application" component={Application} />
         <Route exact path="/expense" component={ExpenseHOD} />
         <Route exact path="/expense-report" component={ExpenseReportHOD} />
+        <Route
+          exact
+          path="/job-requisition-form"
+          component={JobRequisitionForm}
+        />
         <Route exact path="/announcement" component={AnnouncementHOD} />
         <Route exact path="/" component={DashboardHOD} />
       </Switch>
