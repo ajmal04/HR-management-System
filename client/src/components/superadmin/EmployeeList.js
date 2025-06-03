@@ -188,7 +188,6 @@ export default class EmployeeList extends Component {
       },
     });
 
-<<<<<<< HEAD
     const styles = {
       actionBtn: {
         width: "32px",
@@ -205,8 +204,6 @@ export default class EmployeeList extends Component {
       },
     };
 
-=======
->>>>>>> e0349e3f2d10d722e3d8954792197004c6aee799
     return (
       <div className="container-fluid pt-4">
         {this.state.error && (

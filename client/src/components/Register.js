@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import axios from "axios";
 import { Alert } from "react-bootstrap";
-import {NavLink} from 'react-router-dom'
+import { NavLink } from "react-router-dom";
 
 export default class Register extends Component {
   constructor(props) {
@@ -65,12 +65,12 @@ export default class Register extends Component {
         data: newUser,
       })
         .then((res) => {
-          this.setState({completed: true, hasError: false})
+          this.setState({ completed: true, hasError: false });
         })
         .catch((err) => {
           this.setState({
             hasError: true,
-            errorMessage: err.response.data.message 
+            errorMessage: err.response.data.message,
           });
         });
     }
@@ -78,26 +78,31 @@ export default class Register extends Component {
 
   render() {
     return (
-      <div className="register-box">
-        <div className="register-logo">
-          <a href="../../index2.html">
-            <b>HR</b>MS{" "}
-            {/* <small style={{ fontSize: "10px" }}>by Mantzaris Vasileios</small> */}
-          </a>
-        </div>
-        <div className="card">
-          <div className="card-body register-card-body">
-            {this.state.hasError ? (
-              <Alert variant="danger">{this.state.errorMessage}</Alert>
-            ) : null}
-            {this.state.completed ? (
-              <Alert variant="success">
-                You have been registered successfully. <NavLink to="/login">Go to Login.</NavLink>
-              </Alert>
-            ) : null}
-            <p className="login-box-msg">Register</p>
-            <form onSubmit={this.onSubmit}>
-              <div>
+      <div className="login-background">
+        <div className="login-container">
+          <div className="register-box">
+            <div className="register-logo">
+              <img
+                src="/clg-logo.png"
+                alt="College Logo"
+                style={{ width: "300px", marginBottom: "20px" }}
+              />
+              <div className="login-heading">HR Management</div>
+              <p className="login-box-msg">Register</p>
+            </div>
+            {/* <div className="card"> */}
+            <div className="card-body register-card-body">
+              {this.state.hasError && (
+                <Alert variant="danger">{this.state.errorMessage}</Alert>
+              )}
+              {this.state.completed && (
+                <Alert variant="success">
+                  You have been registered successfully.{" "}
+                  <NavLink to="/login">Go to Login.</NavLink>
+                </Alert>
+              )}
+
+              <form onSubmit={this.onSubmit}>
                 <div className="input-group mb-3">
                   <input
                     type="text"
@@ -114,6 +119,7 @@ export default class Register extends Component {
                     </div>
                   </div>
                 </div>
+
                 <div className="input-group mb-3">
                   <input
                     type="text"
@@ -130,9 +136,10 @@ export default class Register extends Component {
                     </div>
                   </div>
                 </div>
+
                 <div className="input-group mb-3">
                   <input
-                    type="password"
+                    type={this.state.passwordShow ? "text" : "password"}
                     className="form-control"
                     name="password"
                     id="password"
@@ -154,14 +161,20 @@ export default class Register extends Component {
                             ? "fas fa-eye"
                             : "fas fa-eye-slash"
                         }
-                        onClick={this.passwordVisibilityHandler}
+                        onClick={() =>
+                          this.setState((prevState) => ({
+                            passwordShow: !prevState.passwordShow,
+                          }))
+                        }
+                        style={{ cursor: "pointer" }}
                       />
                     </div>
                   </div>
                 </div>
+
                 <div className="input-group mb-3">
                   <input
-                    type="password"
+                    type={this.state.passwordCheckShow ? "text" : "password"}
                     className="form-control"
                     name="checkPassword"
                     id="checkPassword"
@@ -175,7 +188,6 @@ export default class Register extends Component {
                       <span className="fas fa-lock" />
                     </div>
                   </div>
-
                   <div className="input-group-append">
                     <div className="input-group-text">
                       <span
@@ -184,32 +196,29 @@ export default class Register extends Component {
                             ? "fas fa-eye"
                             : "fas fa-eye-slash"
                         }
-                        onClick={this.passwordVisibilityHandlerCheck}
+                        onClick={() =>
+                          this.setState((prevState) => ({
+                            passwordCheckShow: !prevState.passwordCheckShow,
+                          }))
+                        }
+                        style={{ cursor: "pointer" }}
                       />
                     </div>
                   </div>
                 </div>
-              </div>
-              <div className="row">
-                <div className="col-8"></div>
-                {/* /.col */}
-                <div className="col-4">
-                  <button type="submit" className="btn btn-primary btn-block">
-                    Register
-                  </button>
-                </div>
-                {/* /.col */}
-              </div>
-            </form>
-            <a href="/login" className="text-center mt-1">
-              Already have an account? Login
-            </a>
-            <hr className="mt-3" />
-            {/* <p className="mb-0">by Mantzaris Vasileios</p> */}
+
+                <button type="submit" className="btn btn-primary btn-block">
+                  Register
+                </button>
+              </form>
+
+              <a href="/login" className="text-center mt-1">
+                Already have an account? Login
+              </a>
+            </div>
+            {/* </div> */}
           </div>
-          {/* /.form-box */}
         </div>
-        {/* /.card */}
       </div>
     );
   }

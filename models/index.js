@@ -51,7 +51,6 @@ db.assetAllocation = require("./assetAllocation.model")(sequelize, Sequelize);
 db.asset = require("./asset.model")(sequelize, Sequelize);
 
 db.JobRequisition = require("./jobRequisition.model")(sequelize, Sequelize);
-db.JobApplication = require("./jobApplication.model")(sequelize, Sequelize);
 
 // User Associations
 db.user.hasOne(db.userPersonalInfo, { foreignKey: { allowNull: false } });

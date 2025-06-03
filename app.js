@@ -8,7 +8,7 @@ var withAuth = require("./withAuth");
 
 const { errorHandler } = require("./utils/errorHandler");
 const resignationRoutes = require("./routes/resignation.routes");
-const recruitmentRoutes = require("./routes/recruitment.routes");
+const requisitionRoutes = require("./routes/jobRequisition.routes");
 
 const db = require("./models");
 require("dotenv").config();
@@ -55,7 +55,7 @@ app.use("/onboarding", onboarding);
 app.use(errorHandler);
 
 app.use("/api/resignations", resignationRoutes);
-app.use("/api/recruitment", recruitmentRoutes);
+app.use("/api/requisition", requisitionRoutes);
 
 app.use(express.json());
 

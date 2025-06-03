@@ -21,12 +21,9 @@ export default class Login extends Component {
   }
 
   passwordVisibilityHandler = () => {
-    var x = document.getElementById("password");
-    if (x.type === "password") {
-      x.type = "text";
-    } else {
-      x.type = "password";
-    }
+    this.setState((prevState) => ({
+      passwordShow: !prevState.passwordShow,
+    }));
   };
 
   onChange = (event) => {
@@ -64,88 +61,81 @@ export default class Login extends Component {
 
   render() {
     return (
-      <div className="register-box">
-        <div className="register-logo">
-          <a href="/">
-            {this.state.done ? <Redirect to="/" /> : <></>}
-            <b>HR</b>MS{" "}
-            {/* <small style={{ fontSize: "10px" }}>by Mantzaris Vasileios</small> */}
-          </a>
-        </div>
-        <div className="card">
-          <div className="card-body register-card-body">
-            {this.state.hasError ? (
+      <div className="login-background">
+        <div className="login-container">
+          {this.state.done ? <Redirect to="/" /> : null}
+
+          <div className="login-box">
+            <div className="login-logo">
+              <img src="/clg-logo.png" alt="College Logo" />
+            </div>
+
+            <div className="login-heading">HR Management</div>
+            <p className="login-box-msg">Login to your account</p>
+
+            {this.state.hasError && (
               <Alert variant="danger">{this.state.errorMessage}</Alert>
-            ) : null}
-            <p className="login-box-msg">Login</p>
+            )}
+
             <form onSubmit={this.onSubmit}>
-              <div>
-                <div className="input-group mb-3">
-                  <input
-                    type="text"
-                    className="form-control"
-                    name="username"
-                    placeholder="Username"
-                    value={this.state.username}
-                    onChange={this.onChange}
-                    required
-                  />
-                  <div className="input-group-append">
-                    <div className="input-group-text">
-                      <span className="fas fa-user" />
-                    </div>
-                  </div>
-                </div>
-                <div className="input-group mb-3">
-                  <input
-                    type="password"
-                    className="form-control"
-                    name="password"
-                    id="password"
-                    placeholder="Password"
-                    value={this.state.password}
-                    onChange={this.onChange}
-                    required
-                  />
-                  <div className="input-group-append">
-                    <div className="input-group-text">
-                      <span className="fas fa-lock" />
-                    </div>
-                  </div>
-                  <div className="input-group-append">
-                    <div className="input-group-text">
-                      <span
-                        className={
-                          this.state.passwordShow
-                            ? "fas fa-eye"
-                            : "fas fa-eye-slash"
-                        }
-                        onClick={this.passwordVisibilityHandler}
-                      />
-                    </div>
+              <div className="input-group mb-3">
+                <input
+                  type="text"
+                  className="form-control"
+                  name="username"
+                  placeholder="Username"
+                  value={this.state.username}
+                  onChange={this.onChange}
+                  required
+                />
+                <div className="input-group-append">
+                  <div className="input-group-text">
+                    <span className="fas fa-user" />
                   </div>
                 </div>
               </div>
-              <div className="row">
-                <div className="col-8"></div>
-                {/* /.col */}
-                <div className="col-4">
-                  <button type="submit" className="btn btn-primary btn-block">
-                    Login
-                  </button>
+
+              <div className="input-group mb-3">
+                <input
+                  type={this.state.passwordShow ? "text" : "password"}
+                  className="form-control"
+                  name="password"
+                  id="password"
+                  placeholder="Password"
+                  value={this.state.password}
+                  onChange={this.onChange}
+                  required
+                />
+
+                <div className="input-group-append">
+                  <div className="input-group-text">
+                    <span className="fas fa-lock" />
+                  </div>
                 </div>
-                {/* /.col */}
+                <div className="input-group-append">
+                  <div className="input-group-text">
+                    <span
+                      className={
+                        this.state.passwordShow
+                          ? "fas fa-eye"
+                          : "fas fa-eye-slash"
+                      }
+                      onClick={this.passwordVisibilityHandler}
+                    />
+                  </div>
+                </div>
               </div>
+
+              <button type="submit" className="btn btn-primary btn-block">
+                Login
+              </button>
             </form>
+
             <a href="/register" className="text-center mt-1">
               Don't have an account? Register
             </a>
-            <hr className="mt-3" />
-            {/* <p className="mb-0">by Mantzaris Vasileios</p> */}
           </div>
-          {/* /.form-box */}
         </div>
-        {/* /.card */}
       </div>
     );
   }

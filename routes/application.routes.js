@@ -42,9 +42,6 @@ router.get(
   application.findAllRecent
 );
 
-// In your routes file
-router.get('/recent/college', withAuth.verifyToken, withAuth.withHigherRoles, application.findAllRecentByCollege);
-
 // 📌 Retrieve Recent Applications by Department (Manager only)
 router.get(
   "/recent/department/:id",

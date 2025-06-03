@@ -22,9 +22,7 @@ export default class SidebarManager extends Component {
       <aside className="main-sidebar sidebar-dark-primary elevation-4">
         {/* Brand Logo */}
         <a href="/" className="brand-link">
-          <span className="brand-text font-weight-light ml-1">
-            HRMS Manager
-          </span>
+          <span className="brand-text font-weight-light ml-1">HRMS HOD</span>
         </a>
         {/* Sidebar */}
         <div className="sidebar">
@@ -38,9 +36,7 @@ export default class SidebarManager extends Component {
               />
             </div>
             <div className="info">
-              <span className="d-block">
-                {this.state.user.fullname}
-              </span>
+              <span className="d-block">{this.state.user.fullname}</span>
             </div>
           </div>
           {/* Sidebar Menu */}
@@ -65,6 +61,13 @@ export default class SidebarManager extends Component {
                   <p>My Employees</p>
                 </NavLink>
               </li>
+              <li className="nav-item">
+                <NavLink to="/job-requisition" className="nav-link">
+                  <i className="fa fa-file-alt nav-icon" />
+                  <p>Job Requisition</p>
+                </NavLink>
+              </li>
+
               {/* <li className="nav-item">
                 <NavLink to="/job-list" className="nav-link">
                   <i className="nav-icon fas fa-briefcase" />
@@ -193,12 +196,6 @@ export default class SidebarManager extends Component {
                 <NavLink exact to="/announcement" className="nav-link">
                   <i className="nav-icon fa fa-bell" />
                   <p>Announcements</p>
-                </NavLink>
-              </li>
-              <li className="nav-item">
-                <NavLink to="/job-requisition-form" className="nav-link">
-                  <i className="nav-icon fas fa-briefcase" />
-                  <p>Job Requisition From</p>
                 </NavLink>
               </li>
             </ul>

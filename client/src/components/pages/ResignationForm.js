@@ -25,18 +25,13 @@ export default function ResignationForm() {
 
   const [departments, setDepartments] = useState([]);
   const [colleges, setColleges] = useState([]);
-  const roles = [
+  const [roles, setRoles] = useState([
     "ROLE_SUPER_ADMIN",
     "ROLE_SYSTEM_ADMIN",
     "ROLE_ADMIN",
     "ROLE_HOD",
     "ROLE_FACULTY",
-<<<<<<< HEAD
   ]);
-=======
-    "ROLE_EMPLOYEE"
-  ];
->>>>>>> e0349e3f2d10d722e3d8954792197004c6aee799
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hasError, setHasError] = useState(false);
@@ -87,7 +82,7 @@ export default function ResignationForm() {
 
   const handleDepartmentChange = (e) => {
     const selectedId = parseInt(e.target.value);
-    const selectedDept = departments.find((d) => d.id === selectedId);
+    const selectedDept = departments.find((d) => d.id == selectedId);
 
     setFormData((prev) => ({
       ...prev,

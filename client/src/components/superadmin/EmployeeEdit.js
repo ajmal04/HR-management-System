@@ -468,10 +468,7 @@ export default class EmployeeEdit extends Component {
       userFinancialInfo,
       departments,
       colleges,
-<<<<<<< HEAD
       job,
-=======
->>>>>>> e0349e3f2d10d722e3d8954792197004c6aee799
     } = this.state;
 
     return (
@@ -939,6 +936,7 @@ export default class EmployeeEdit extends Component {
                               <option value="HR">HR</option>
                               <option value="PRINCIPAL">principal</option>
                               <option value="HOD">Hod</option>
+                              <option value="SUPER_ADMIN">Super Admin</option>
                               <option value="ASSOCIATE_PROFESSOR">
                                 Associate Professor
                               </option>

@@ -67,8 +67,7 @@ import ResignationStatus from "./components/pages/ResignationStatus.js";
 import ApplicationStatus from "./components/hod/ApplicationStatus.js";
 
 import JobRequisitionForm from "./components/recruitment/JobRequisitionForm.js";
-import JobList from "./components/recruitment/jobList.js";
-import JobApplicationForm from "./components/recruitment/jobApplicationForm.js";
+import RequisitionListAdmin from "./components/recruitment/RequisitionListAdmin.js";
 
 export default class App extends Component {
   render() {
@@ -77,8 +76,6 @@ export default class App extends Component {
         <Switch>
           <Route exact path="/login" component={LoginContainer} />
           <Route exact path="/register" component={RegisterContainer} />
-          <Route exact path="/jobs" component={JobList} />
-          <Route exact path="/apply/:jobId" component={JobApplicationForm} />
           <Route path="/" component={withAuth(DefaultContainer)} />
         </Switch>
       </Router>
@@ -161,7 +158,6 @@ const SuperAdminContainer = () => (
         <Route exact path="/employee-edit" component={EmployeeEditSuperAdmin} />
         <Route exact path="/employee-view" component={EmployeeViewSuperAdmin} />
         <Route exact path="/departments" component={DepartmentListSuperAdmin} />
-        {/* <Route exact path="/job-list" component={JobListSuperAdmin} /> */}
         <Route exact path="/termination-list" component={TerminationList} />
         <Route exact path="/resignation-list" component={ResignationList} />
         <Route exact path="/resignation-form" component={ResignationForm} />
@@ -224,7 +220,6 @@ const AdminContainer = () => (
         <Route exact path="/termination-list" component={TerminationList} />
         <Route exact path="/resignation-list" component={ResignationList} />
         <Route exact path="/resignation-form" component={ResignationForm} />
-
         <Route exact path="/resignation-status" component={ResignationStatus} />
         <Route
           exact
@@ -244,6 +239,11 @@ const AdminContainer = () => (
 
         <Route exact path="/announcement" component={AnnouncementAdmin} />
         <Route exact path="/" component={DashboardAdmin} />
+        <Route
+          exact
+          path="/requisition-list-admin"
+          Component={RequisitionListAdmin}
+        />
       </Switch>
     </Layout>
     <Footer />
@@ -263,19 +263,14 @@ const HODContainer = () => (
         <Route exact path="/resignation-list" component={ResignationList} />
         <Route exact path="/resignation-form" component={ResignationForm} />
         <Route exact path="/resignation-status" component={ResignationStatus} />
-        {/* <Route exact path="/job-list" component={JobListHOD} /> */}
         <Route exact path="/application-status" component={ApplicationStatus} />
         <Route exact path="/application-list" component={ApplicationListHOD} />
         <Route exact path="/application" component={Application} />
         <Route exact path="/expense" component={ExpenseHOD} />
         <Route exact path="/expense-report" component={ExpenseReportHOD} />
-        <Route
-          exact
-          path="/job-requisition-form"
-          component={JobRequisitionForm}
-        />
         <Route exact path="/announcement" component={AnnouncementHOD} />
         <Route exact path="/" component={DashboardHOD} />
+        <Route exact path="/job-requisition" component={JobRequisitionForm} />
       </Switch>
     </Layout>
     <Footer />

@@ -36,9 +36,7 @@ export default class SidebarAdmin extends Component {
               />
             </div>
             <div className="info">
-              <span className="d-block">
-                {this.state.user.fullname}
-              </span>
+              <span className="d-block">{this.state.user.fullname}</span>
             </div>
           </div>
           {/* Sidebar Menu */}
@@ -63,6 +61,13 @@ export default class SidebarAdmin extends Component {
                   <p>Employees</p>
                 </NavLink>
               </li>
+              <li className="nav-item">
+                <NavLink to="/requisition-list-admin" className="nav-link">
+                  <i className="fa fa-list nav-icon" />
+                  <p>Requisition List</p>
+                </NavLink>
+              </li>
+
               {/* <li className="nav-item">
                 <NavLink to="/job-list" className="nav-link">
                   <i className="nav-icon fas fa-briefcase" />

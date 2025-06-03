@@ -38,9 +38,7 @@ export default class SidebarSuperAdmin extends Component {
               />
             </div>
             <div className="info">
-              <span className="d-block">
-                {this.state.user.fullname}
-              </span>
+              <span className="d-block">{this.state.user.fullname}</span>
             </div>
           </div>
           {/* Sidebar Menu */}
@@ -97,21 +95,30 @@ export default class SidebarSuperAdmin extends Component {
                 <NavLink exact to="/departments" className="nav-link">
                   <i className="nav-icon fa fa-building" />
 
-                  <p>
-                    Departments
-                  </p>
+                  <p>Departments</p>
+                </NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink to="/superadmin/requisition-list" className="nav-link">
+                  <i className="fa fa-list nav-icon" />
+                  <p>Requisition List</p>
+                </NavLink>
+              </li>
+
+              <li className="nav-item">
+                <NavLink to="/superadmin/job-applications" className="nav-link">
+                  <i className="fa fa-users nav-icon" />
+                  <p>Job Applications</p>
                 </NavLink>
               </li>
 
               <li className="nav-item">
                 <NavLink exact to="/onboarding-dashboard" className="nav-link">
                   <i className="nav-icon fa fa-user-plus" />
-                  <p>
-                    Onboarding Dashboard
-                  </p>
+                  <p>Onboarding Dashboard</p>
                 </NavLink>
               </li>
-              
+
               {/* <li className="nav-item">
                 <NavLink to="/job-list" className="nav-link">
                   <i className="nav-icon fas fa-briefcase" />

@@ -53,7 +53,6 @@ exports.authenticate = (req, res) => {
             process.env.SECRET_KEY,
             { expiresIn: "30m" },
             (err, token) => {
-              
               res.cookie("token", token);
               res.status(200).send({
                 token: token,

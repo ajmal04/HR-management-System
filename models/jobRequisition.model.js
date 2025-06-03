@@ -1,18 +1,39 @@
 const { DataTypes } = require("sequelize");
-module.exports = (sequelize, DataTypes) => {
+
+module.exports = (sequelize) => {
   const JobRequisition = sequelize.define("JobRequisition", {
-    jobTitle: { type: DataTypes.STRING, allowNull: false },
-    department: { type: DataTypes.STRING, allowNull: false },
-    vacancies: { type: DataTypes.INTEGER, allowNull: false },
-    jobType: { type: DataTypes.STRING }, // Full-Time, Part-Time, Contract
-    qualification: { type: DataTypes.STRING },
-    experience: { type: DataTypes.STRING },
-    reason: { type: DataTypes.TEXT },
-    status: {
-      type: DataTypes.ENUM("Pending", "Approved", "Rejected", "Posted"),
-      defaultValue: "Pending",
+    department: {
+      type: DataTypes.STRING,
+      allowNull: false,
     },
-    createdBy: { type: DataTypes.INTEGER }, // User ID
+    positionTitle: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    jobType: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    vacancies: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    qualification: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    experience: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    collegeName: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    status: {
+      type: DataTypes.STRING,
+      defaultValue: "Pending", // Status: Pending, Approved by Admin, Approved by SuperAdmin
+    },
   });
 
   return JobRequisition;
