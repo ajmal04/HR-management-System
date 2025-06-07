@@ -8,7 +8,7 @@ const moment = require("moment");
 // Create and Save a new Application
 exports.create = (req, res) => {
   if (!req.body) {
-<<<<<<< HEAD
+
     return res.status(400).send({ message: "Content can not be empty!" });
   }
 
@@ -33,7 +33,6 @@ exports.create = (req, res) => {
           err.message || "Some error occurred while creating the Application.",
       })
     );
-=======
       return res.status(400).send({
           message: "Content cannot be empty!"
       });
@@ -88,7 +87,7 @@ exports.create = (req, res) => {
               message: err.message || "Error creating application"
           });
       });
->>>>>>> e0349e3f2d10d722e3d8954792197004c6aee799
+
 };
 
 // Retrieve all Applications
