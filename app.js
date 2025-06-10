@@ -19,7 +19,7 @@ const onboarding = require("./routes/onboarding.routes");
 
 const resignationRoutes = require("./routes/resignation.routes");
 const documentRoutes = require("./routes/document.routes");
-const recruitmentRoutes = require("./routes/recruitment.routes");
+// const recruitmentRoutes = require("./routes/recruitment.routes");
 const requisitionRoutes = require("./routes/jobRequisition.routes");
 const collegeAnnouncementRoutes = require("./routes/collegeAnnouncement.routes");
 const collegeEventRoutes = require("./routes/collegeEvent.routes");
@@ -54,7 +54,7 @@ app.use("/register", register);
 app.use("/onboarding", onboarding);
 app.use("/api/resignations", resignationRoutes);
 app.use("/api/documents", documentRoutes);
-app.use("/api/recruitment", recruitmentRoutes);
+// app.use("/api/recruitment", recruitmentRoutes);
 app.use("/api/requisition", requisitionRoutes);
 app.use("/api/collegeAnnouncements", collegeAnnouncementRoutes);
 app.use("/api/collegeEvents", collegeEventRoutes);
