@@ -1,12 +1,8 @@
 import React, { Component } from "react";
-<<<<<<< HEAD
-import { Card, Button, Form, Modal, Alert } from "react-bootstrap";
-=======
-import { Card, Button, Alert } from "react-bootstrap";
+import { Card, Button, Alert,Modal,Form } from "react-bootstrap";
 import { Redirect } from "react-router-dom";
 import "react-bootstrap-table-next/dist/react-bootstrap-table2.min.css";
 import "react-bootstrap-table2-paginator/dist/react-bootstrap-table2-paginator.min.css";
->>>>>>> e0349e3f2d10d722e3d8954792197004c6aee799
 import axios from "axios";
 import moment from "moment";
 import MaterialTable from "material-table";
@@ -27,31 +23,6 @@ export default class HODApplicationList extends Component {
   }
 
   componentDidMount() {
-<<<<<<< HEAD
-    const user = JSON.parse(localStorage.getItem("user"));
-    const token = localStorage.getItem("token");
-
-    axios
-      .get(`/api/applications/department/${user.departmentId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((res) => {
-        res.data.forEach((app) => {
-          app.startDate = moment(app.startDate).format("YYYY-MM-DD");
-          app.endDate = moment(app.endDate).format("YYYY-MM-DD");
-        });
-
-        this.setState({ applications: res.data });
-      })
-      .catch((err) => {
-        console.error("Error fetching applications:", err);
-        this.setState({
-          hasError: true,
-          errorMsg: "Failed to load applications",
-        });
-      });
-  }
-=======
     let deptId = JSON.parse(localStorage.getItem('user')).departmentId;
     axios({
         method: "get",
@@ -68,7 +39,6 @@ export default class HODApplicationList extends Component {
         console.log(err);
     });
 }
->>>>>>> e0349e3f2d10d722e3d8954792197004c6aee799
 
   handleApprove = (id) => {
     const token = localStorage.getItem("token");
@@ -148,52 +118,6 @@ export default class HODApplicationList extends Component {
             <Card.Body>
               <ThemeProvider theme={theme}>
                 <MaterialTable
-<<<<<<< HEAD
-                  columns={[
-                    {
-                      title: "#",
-                      render: (rowData) => rowData.tableData.id + 1,
-                      width: 50,
-                    },
-                    { title: "Full Name", field: "user.fullName" },
-                    { title: "Start Date", field: "startDate" },
-                    { title: "End Date", field: "endDate" },
-                    { title: "Reason", field: "reason" },
-                    { title: "Status", field: "hodStatus" },
-                    {
-                      title: "Actions",
-                      render: (rowData) => {
-                        const user = JSON.parse(localStorage.getItem("user"));
-                        const isProcessed = rowData.hodStatus !== "Pending";
-                        const isOwnApplication =
-                          rowData.user && rowData.user.id === user.id;
-                        if (isOwnApplication) return null;
-                        return (
-                          <>
-                            <Button
-                              variant="success"
-                              size="sm"
-                              onClick={() => this.handleApprove(rowData.id)}
-                              disabled={isProcessed}
-                            >
-                              Approve
-                            </Button>{" "}
-                            <Button
-                              variant="danger"
-                              size="sm"
-                              onClick={() => this.handleRejectClick(rowData)}
-                              disabled={isProcessed}
-                            >
-                              Reject
-                            </Button>
-                          </>
-                        );
-                      },
-                    },
-                  ]}
-                  data={this.state.applications}
-                  options={{
-=======
                     columns={[
                         { 
                             title: '#', 
@@ -229,7 +153,6 @@ export default class HODApplicationList extends Component {
                     data={this.state.applications}
                     
                     options={{
->>>>>>> e0349e3f2d10d722e3d8954792197004c6aee799
                     rowStyle: (rowData, index) => {
                       if (index % 2) {
                         return { backgroundColor: "#f2f2f2" };

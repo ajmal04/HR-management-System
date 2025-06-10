@@ -31,12 +31,8 @@ export default function ResignationForm() {
     "ROLE_ADMIN",
     "ROLE_HOD",
     "ROLE_FACULTY",
-<<<<<<< HEAD
-  ]);
-=======
     "ROLE_EMPLOYEE"
   ];
->>>>>>> e0349e3f2d10d722e3d8954792197004c6aee799
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hasError, setHasError] = useState(false);

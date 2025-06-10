@@ -5,11 +5,7 @@ import interactionPlugin from "@fullcalendar/interaction";
 import axios from "axios";
 import moment from "moment";
 import ReactToolTip from "react-tooltip";
-<<<<<<< HEAD
-import ShowEventPopup from "./ShowEventPopup";
-=======
 import EventModal from "./EventModal";
->>>>>>> e0349e3f2d10d722e3d8954792197004c6aee799
 
 export default class Calendar extends Component {
   _isMounted = false;
@@ -19,58 +15,15 @@ export default class Calendar extends Component {
     this.state = {
       user: {},
       events: [],
-<<<<<<< HEAD
-      showAddModel: false,
-      showModel: false,
-      selectedEvent: {},
-    };
-
-    this.handleEventClick = this.handleEventClick.bind(this);
-=======
       showModal: false,
       modalMode: 'add',
       selectedEvent: null
     };
->>>>>>> e0349e3f2d10d722e3d8954792197004c6aee799
   }
 
   componentDidMount() {
     this._isMounted = true;
-<<<<<<< HEAD
-
-    if (this._isMounted) {
-      this.setState({ user: JSON.parse(localStorage.getItem("user")) }, () => {
-        axios({
-          method: "get",
-          url: `api/personalEvents/user/${this.state.user.id}`,
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        }).then((res) => {
-          let newEvents = res.data.map((x) => ({
-            title: x.eventTitle,
-            description: x.eventDescription,
-            start: x.eventStartDate,
-            end: x.eventEndDate,
-            id: x.id,
-            color: "#007bff",
-            textColor: "white",
-          }));
-
-          for (var i in newEvents) {
-            newEvents[i].start = moment(newEvents[i].start).format(
-              "YYYY-MM-DD HH:mm:ss"
-            );
-            newEvents[i].end = moment(newEvents[i].end).format(
-              "YYYY-MM-DD HH:mm:ss"
-            );
-          }
-
-          this.setState({ events: [...newEvents] });
-        });
-      });
-    }
-=======
     this.loadUserEvents();
->>>>>>> e0349e3f2d10d722e3d8954792197004c6aee799
   }
 
   componentWillUnmount() {
@@ -123,21 +76,6 @@ export default class Calendar extends Component {
         title: info.event.title,
         description: info.event.extendedProps.description,
         start: info.event.start,
-<<<<<<< HEAD
-        end: info.event.end,
-      },
-      showModel: true,
-    });
-  }
-
-  handleEventPositioned(info) {
-    info.el.setAttribute(
-      "title",
-      info.event.extendedProps.description
-        ? info.event.extendedProps.description
-        : "No description"
-    );
-=======
         end: info.event.end
       }
     });
@@ -145,17 +83,10 @@ export default class Calendar extends Component {
 
   handleEventPositioned = (info) => {
     info.el.setAttribute("title", info.event.extendedProps.description || 'No description');
->>>>>>> e0349e3f2d10d722e3d8954792197004c6aee799
     ReactToolTip.rebuild();
   }
 
   render() {
-<<<<<<< HEAD
-    let closeAddModel = () => this.setState({ showAddModel: false });
-    let closeShowModel = () => this.setState({ showModel: false });
-
-=======
->>>>>>> e0349e3f2d10d722e3d8954792197004c6aee799
     return (
       <>
         <FullCalendar
@@ -165,11 +96,6 @@ export default class Calendar extends Component {
           dateClick={this.handleDateClick}
           eventClick={this.handleEventClick}
           eventPositioned={this.handleEventPositioned}
-<<<<<<< HEAD
-          eventTimeFormat={{
-            hour: "2-digit",
-            minute: "2-digit",
-=======
           customButtons={{
             addEventButton: {
               text: "Add Event",
@@ -196,36 +122,9 @@ export default class Calendar extends Component {
           eventTimeFormat={{
             hour: '2-digit',
             minute: '2-digit',
->>>>>>> e0349e3f2d10d722e3d8954792197004c6aee799
             meridiem: false,
             hour12: false,
           }}
-<<<<<<< HEAD
-          customButtons={{
-            button: {
-              text: "Add Event",
-              click: () => {
-                this.setState({ showAddModel: true });
-              },
-            },
-          }}
-          header={{
-            left: "prev,next today button",
-            center: "title",
-            right: "dayGridMonth,timeGridWeek,timeGridDay,listWeek",
-          }}
-        />
-        <AddEventPopup show={this.state.showAddModel} onHide={closeAddModel} />
-        {this.state.showModel ? (
-          <ShowEventPopup
-            show={true}
-            onHide={closeShowModel}
-            data={this.state.selectedEvent}
-          />
-        ) : (
-          <></>
-        )}
-=======
         />
 
         <EventModal
@@ -237,7 +136,6 @@ export default class Calendar extends Component {
         />
 
         <ReactToolTip />
->>>>>>> e0349e3f2d10d722e3d8954792197004c6aee799
       </>
     );
   }
