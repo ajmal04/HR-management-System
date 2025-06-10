@@ -80,23 +80,40 @@ export default class ApplicationList extends Component {
                     { title: "End Date", field: "endDate" },
                     // {title: 'Leave Type', field: 'type'},
                     { title: "Reason", field: "reason" },
+                    { title: "HOD Status", field: "hodStatus" },
+                    { title: "HOD Comment", field: "hodComment" },
+                    { title: "Admin Status", field: "adminStatus" },
+                    { title: "Admin Comment", field: "adminComment" },
                     {
                       title: "Status",
                       field: "status",
-                      render: (rowData) => (
-                        <Button
-                          size="sm"
-                          variant={
-                            rowData.status === "Approved"
-                              ? "success"
-                              : rowData.status === "Pending"
-                              ? "warning"
-                              : "danger"
-                          }
-                        >
-                          {rowData.status}
-                        </Button>
-                      ),
+                      render: (rowData) => {
+                        let finalStatus = "Pending";
+                        let variant = "warning";
+
+                        if (rowData.hodStatus === "Rejected") {
+                          finalStatus = "Rejected";
+                          variant = "danger";
+                        } else if (
+                          rowData.hodStatus === "Approved" &&
+                          rowData.adminStatus === "Rejected"
+                        ) {
+                          finalStatus = "Rejected";
+                          variant = "danger";
+                        } else if (
+                          rowData.hodStatus === "Approved" &&
+                          rowData.adminStatus === "Approved"
+                        ) {
+                          finalStatus = "Approved";
+                          variant = "success";
+                        }
+
+                        return (
+                          <Button size="sm" variant={variant}>
+                            {finalStatus}
+                          </Button>
+                        );
+                      },
                     },
                   ]}
                   data={this.state.applications}

@@ -8,7 +8,9 @@ export default class EmployeeViewEmployee extends Component {
     super(props);
 
     this.state = {
-      user: {},
+      user: {
+        jobPosition: null,
+      },
       department: {
         departmentName: null,
       },
@@ -110,7 +112,8 @@ export default class EmployeeViewEmployee extends Component {
                         {this.state.department.departmentName}
                       </li>
                       <li>
-                        <span>Job Title: </span> {this.state.job.jobTitle}
+                        <span>Job Position: </span>{" "}
+                        {this.state.user.jobPosition}
                       </li>
                       <li>
                         <span>Role: </span>
@@ -137,8 +140,18 @@ export default class EmployeeViewEmployee extends Component {
                           <span>{this.state.userPersonalInfo.dateOfBirth}</span>
                         </Form.Group>
                         <Form.Group as={Row}>
+                          <Form.Label className="label">Age:</Form.Label>
+                          <span>{this.state.userPersonalInfo.age}</span>
+                        </Form.Group>
+                        <Form.Group as={Row}>
                           <Form.Label className="label">Gender:</Form.Label>
                           <span>{this.state.userPersonalInfo.gender}</span>
+                        </Form.Group>
+                        <Form.Group as={Row}>
+                          <Form.Label className="label">
+                            Blood Group:
+                          </Form.Label>
+                          <span>{this.state.userPersonalInfo.bloodGroup}</span>
                         </Form.Group>
                         <Form.Group as={Row}>
                           <Form.Label className="label">
@@ -176,12 +189,13 @@ export default class EmployeeViewEmployee extends Component {
                         </Form.Group>
                         <Form.Group as={Row}>
                           <Form.Label className="label">Mobile:</Form.Label>
-                          <span>
-                            {this.state.userPersonalInfo.mobile}{" "}
-                            {this.state.userPersonalInfo.phone
-                              ? " (" + this.state.userPersonalInfo.phone + ")"
-                              : null}
-                          </span>
+                          <span>{this.state.userPersonalInfo.mobile}</span>
+                        </Form.Group>
+                        <Form.Group as={Row}>
+                          <Form.Label className="label">
+                            Emergency Contact:
+                          </Form.Label>
+                          <span>{this.state.userPersonalInfo.phone}</span>
                         </Form.Group>
                         <Form.Group as={Row}>
                           <Form.Label className="label">

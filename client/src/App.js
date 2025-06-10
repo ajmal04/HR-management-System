@@ -51,12 +51,11 @@ import Register from "./components/Register";
 import withAuth from "./withAuth";
 import Login from "./components/Login";
 
-
-import OnboardingList from './components/systemadmin/OnboardingList.js';
-import OnboardingDetail from './components/systemadmin/OnboardingDetail.js';
-import AssetAllocation from './components/systemadmin/AssetAllocation.js';
+import OnboardingList from "./components/systemadmin/OnboardingList.js";
+import OnboardingDetail from "./components/systemadmin/OnboardingDetail.js";
+import AssetAllocation from "./components/systemadmin/AssetAllocation.js";
 import OnboardingDashboard from "./components/onboarding/OnboardingDashboard";
-import AssetManagement from './components/systemadmin/AssetManagement';
+import AssetManagement from "./components/systemadmin/AssetManagement";
 
 // import JobListSuperAdmin from "./components/superadmin/JobList";
 // import JobListAdmin from "./components/admin/JobList";
@@ -65,8 +64,11 @@ import TerminationList from "./components/pages/TerminationList";
 import ResignationList from "./components/pages/ResignationList";
 import ResignationForm from "./components/pages/ResignationForm.js";
 import ResignationStatus from "./components/pages/ResignationStatus.js";
+import ApplicationStatus from "./components/hod/ApplicationStatus.js";
 
-
+import JobRequisitionForm from "./components/recruitment/JobRequisitionForm.js";
+import JobList from "./components/recruitment/jobList.js";
+import JobApplicationForm from "./components/recruitment/jobApplicationForm.js";
 
 export default class App extends Component {
   render() {
@@ -75,6 +77,8 @@ export default class App extends Component {
         <Switch>
           <Route exact path="/login" component={LoginContainer} />
           <Route exact path="/register" component={RegisterContainer} />
+          <Route exact path="/jobs" component={JobList} />
+          <Route exact path="/apply/:jobId" component={JobApplicationForm} />
           <Route path="/" component={withAuth(DefaultContainer)} />
         </Switch>
       </Router>
@@ -145,8 +149,12 @@ const SuperAdminContainer = () => (
     <Header />
     <SidebarSuperAdmin />
     <Layout>
-      <Switch>  
-        <Route exact path="/onboarding-dashboard" component={OnboardingDashboard} />
+      <Switch>
+        <Route
+          exact
+          path="/onboarding-dashboard"
+          component={OnboardingDashboard}
+        />
 
         <Route exact path="/employee-list" component={EmployeeListSuperAdmin} />
         <Route exact path="/employee-add" component={EmployeeAddSuperAdmin} />
@@ -157,12 +165,20 @@ const SuperAdminContainer = () => (
         <Route exact path="/termination-list" component={TerminationList} />
         <Route exact path="/resignation-list" component={ResignationList} />
         <Route exact path="/resignation-form" component={ResignationForm} />
-        <Route exact path="/application-list" component={ApplicationListSuperAdmin} />
+        <Route
+          exact
+          path="/application-list"
+          component={ApplicationListSuperAdmin}
+        />
         <Route exact path="/salary-list" component={SalaryListSuperAdmin} />
         <Route exact path="/salary-details" component={SalaryDetails} />
         <Route exact path="/salary-view" component={SalaryViewSuperAdmin} />
         <Route exact path="/expense" component={Expense} />
-        <Route exact path="/expense-report" component={ExpenseReportSuperAdmin} />
+        <Route
+          exact
+          path="/expense-report"
+          component={ExpenseReportSuperAdmin}
+        />
         <Route exact path="/announcement" component={AnnouncementSuperAdmin} />
         <Route exact path="/" component={DashboardSuperAdmin} />
       </Switch>
@@ -176,11 +192,18 @@ const SystemAdminContainer = () => (
     <Header />
     <SidebarSystemAdmin />
     <Layout>
-
-      <Switch>  
+      <Switch>
         <Route exact path="/onboarding/list" component={OnboardingList} />
-        <Route exact path="/onboarding-detail/:id" component={OnboardingDetail} />
-        <Route exact path="/asset-allocation/:userId" component={AssetAllocation} />
+        <Route
+          exact
+          path="/onboarding-detail/:id"
+          component={OnboardingDetail}
+        />
+        <Route
+          exact
+          path="/asset-allocation/:userId"
+          component={AssetAllocation}
+        />
         <Route exact path="/assets/manage" component={AssetManagement} />
       </Switch>
     </Layout>
@@ -201,7 +224,20 @@ const AdminContainer = () => (
         <Route exact path="/termination-list" component={TerminationList} />
         <Route exact path="/resignation-list" component={ResignationList} />
         <Route exact path="/resignation-form" component={ResignationForm} />
-        <Route exact path="/application-list" component={ApplicationListAdmin} />
+
+        <Route exact path="/resignation-status" component={ResignationStatus} />
+        <Route
+          exact
+          path="/application-list"
+          component={ApplicationListAdmin}
+        />
+
+        <Route
+          exact
+          path="/application-list"
+          component={ApplicationListAdmin}
+        />
+
         <Route exact path="/application" component={Application} />
         <Route exact path="/expense-report" component={ExpenseReportAdmin} />
         <Route exact path="/expense" component={Expense} />
@@ -226,11 +262,18 @@ const HODContainer = () => (
         <Route exact path="/termination-list" component={TerminationList} />
         <Route exact path="/resignation-list" component={ResignationList} />
         <Route exact path="/resignation-form" component={ResignationForm} />
+        <Route exact path="/resignation-status" component={ResignationStatus} />
         {/* <Route exact path="/job-list" component={JobListHOD} /> */}
+        <Route exact path="/application-status" component={ApplicationStatus} />
         <Route exact path="/application-list" component={ApplicationListHOD} />
         <Route exact path="/application" component={Application} />
         <Route exact path="/expense" component={ExpenseHOD} />
         <Route exact path="/expense-report" component={ExpenseReportHOD} />
+        <Route
+          exact
+          path="/job-requisition-form"
+          component={JobRequisitionForm}
+        />
         <Route exact path="/announcement" component={AnnouncementHOD} />
         <Route exact path="/" component={DashboardHOD} />
       </Switch>
@@ -251,6 +294,7 @@ const FacultyContainer = () => (
           path="/application-list"
           component={ApplicationListEmployee}
         />
+        {/* <Route exact path="/apply-leave" component={Application} /> */}
         <Route exact path="/application" component={Application} />
         <Route exact path="/salary-view" component={SalaryViewEmployee} />
         <Route exact path="/announcement" component={AnnouncementEmployee} />

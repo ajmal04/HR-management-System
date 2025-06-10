@@ -39,9 +39,15 @@ db.payment = require("./payment.model")(sequelize, Sequelize);
 db.expense = require("./expense.model")(sequelize, Sequelize);
 db.qualification = require("./qualification.model")(sequelize, Sequelize);
 
-db.onboardingRequest = require("./onboardingRequest.model")(sequelize, Sequelize);
+db.onboardingRequest = require("./onboardingRequest.model")(
+  sequelize,
+  Sequelize
+);
 db.onboardingStage = require("./onboardingStage.model")(sequelize, Sequelize);
-db.onboardingDocument = require("./onboardingDocument.model")(sequelize, Sequelize);
+db.onboardingDocument = require("./onboardingDocument.model")(
+  sequelize,
+  Sequelize
+);
 db.assetAllocation = require("./assetAllocation.model")(sequelize, Sequelize);
 db.asset = require("./asset.model")(sequelize, Sequelize);
 
@@ -49,6 +55,8 @@ db.employeeDocument = require("./employeeDocument.model")(sequelize, Sequelize);
 db.user.hasMany(db.employeeDocument, { foreignKey: 'userId', as: 'employeeDocs' });
 db.employeeDocument.belongsTo(db.user, { foreignKey: 'userId', as: 'user' });
 
+db.JobRequisition = require("./jobRequisition.model")(sequelize, Sequelize);
+db.JobApplication = require("./jobApplication.model")(sequelize, Sequelize);
 
 // User Associations
 db.user.hasOne(db.userPersonalInfo, { foreignKey: { allowNull: false } });
@@ -127,11 +135,11 @@ db.deptAnnouncement.belongsTo(db.user, {
 // For OnboardingRequest
 db.onboardingRequest.belongsTo(db.user, {
   foreignKey: {
-    name: 'userId',
-    allowNull: false
+    name: "userId",
+    allowNull: false,
   },
-  as: 'employee',
-  onDelete: 'CASCADE' 
+  as: "employee",
+  onDelete: "CASCADE",
 });
 
 db.onboardingRequest.belongsTo(db.user, {
@@ -139,50 +147,50 @@ db.onboardingRequest.belongsTo(db.user, {
     name: "requestedBy",
     allowNull: false,
   },
-  as: 'requester'
+  as: "requester",
 });
 
 db.onboardingRequest.belongsTo(db.department, {
   foreignKey: {
-    name: 'departmentId',
-    allowNull: true
+    name: "departmentId",
+    allowNull: true,
   },
-  as: 'department'
+  as: "department",
 });
 
 db.onboardingRequest.hasMany(db.onboardingStage, {
-  foreignKey: 'requestId',
-  as: 'stages'
+  foreignKey: "requestId",
+  as: "stages",
 });
 
 db.onboardingRequest.hasMany(db.onboardingDocument, {
-  foreignKey: 'requestId',
-  as: 'requestDocuments'
+  foreignKey: "requestId",
+  as: "requestDocuments",
 });
 
 db.onboardingStage.belongsTo(db.onboardingRequest, {
-  foreignKey: 'requestId',
-  as: 'request'
+  foreignKey: "requestId",
+  as: "request",
 });
 
 db.onboardingStage.belongsTo(db.user, {
-  foreignKey: 'assignedTo',
-  as: 'assignee'
+  foreignKey: "assignedTo",
+  as: "assignee",
 });
 
 db.onboardingStage.belongsTo(db.user, {
-  foreignKey: 'completedBy',
-  as: 'completedByUser'
+  foreignKey: "completedBy",
+  as: "completedByUser",
 });
 
 db.onboardingDocument.belongsTo(db.onboardingRequest, {
-  foreignKey: 'requestId',
-  as: 'request'
+  foreignKey: "requestId",
+  as: "request",
 });
 
 db.onboardingDocument.belongsTo(db.user, {
-  foreignKey: 'uploadedBy',
-  as: 'uploader'
+  foreignKey: "uploadedBy",
+  as: "uploader",
 });
 
 // For AssetAllocation
@@ -205,13 +213,13 @@ db.user.hasMany(db.assetAllocation, {
 
 // For Asset and AssetAllocation
 db.asset.hasMany(db.assetAllocation, {
-  foreignKey: 'assetId',
-  as: 'allocations'
+  foreignKey: "assetId",
+  as: "allocations",
 });
 
 db.assetAllocation.belongsTo(db.asset, {
-  foreignKey: 'assetId',
-  as: 'asset'
+  foreignKey: "assetId",
+  as: "asset",
 });
 
 module.exports = db;

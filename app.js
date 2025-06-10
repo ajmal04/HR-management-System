@@ -6,9 +6,10 @@ var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 var withAuth = require("./withAuth");
 
-const { errorHandler } = require('./utils/errorHandler');
+const { errorHandler } = require("./utils/errorHandler");
 const resignationRoutes = require("./routes/resignation.routes");
 const documentRoutes = require('./routes/document.routes');
+const recruitmentRoutes = require("./routes/recruitment.routes");
 
 const db = require("./models");
 require("dotenv").config();
@@ -56,6 +57,7 @@ app.use(errorHandler);
 
 app.use("/api/resignations", resignationRoutes);
 app.use('/api/documents', documentRoutes);
+app.use("/api/recruitment", recruitmentRoutes);
 
 app.use(express.json());
 

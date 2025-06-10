@@ -2,80 +2,104 @@ import React, { Component } from "react";
 import { Card, Row, Col, Form } from "react-bootstrap";
 import { Redirect } from "react-router-dom";
 import axios from "axios";
+import moment from "moment";
 
-export default class SalaryView extends Component {
+export default class EmployeeView extends Component {
   constructor(props) {
     super(props);
+
     this.state = {
-      user: null,
-      currentJobTitle: null,
+      user: {},
+      department: {
+        departmentName: null,
+      },
+      job: {
+        jobTitle: null,
+      },
+      userPersonalInfo: {
+        dateOfBirth: null,
+        age: null,
+        gender: null,
+        bloodGroup: null,
+        maritalStatus: null,
+        fatherName: null,
+        country: null,
+        address: null,
+        mobile: null,
+        emailAddress: null,
+      },
+      userFinancialInfo: {
+        bankName: null,
+        accountName: null,
+        accountNumber: null,
+        iban: null,
+      },
       falseRedirect: false,
-      loading: true,
-      error: null,
+      editRedirect: false,
     };
-    this._isMounted = false;
   }
 
   componentDidMount() {
-    this._isMounted = true;
-    if (this.props.location?.state?.selectedUser?.user?.id) {
+    if (this.props.location.state) {
       axios({
         method: "get",
-        url: "api/users/" + this.props.location.state.selectedUser.user.id,
+        url: "api/users/" + this.props.location.state.selectedUser.id,
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       })
         .then((res) => {
-          if (this._isMounted) {
-            this.setState(
-              {
-                user: res.data,
-                loading: false,
-              },
-              () => {
-                if (this.state.user?.jobs) {
-                  const currentJob = this.state.user.jobs.find(
-                    (job) =>
-                      job &&
-                      new Date(job.startDate).setHours(0) < Date.now() &&
-                      new Date(job.endDate).setHours(24) > Date.now()
-                  );
-                  if (currentJob) {
-                    this.setState({ currentJobTitle: currentJob.jobTitle });
-                  }
+          let user = res.data;
+          this.setState({ user: user }, () => {
+            if (user.jobs) {
+              let jobs = user.jobs;
+              jobs.map((job) => {
+                if (
+                  new Date(job.startDate) <= Date.now() &&
+                  new Date(job.endDate) >= Date.now()
+                ) {
+                  this.setState({ job: job });
                 }
+              });
+            }
+            if (user.department) {
+              this.setState({ department: user.department });
+            }
+            if (user.user_personal_info) {
+              if (user.user_personal_info.dateOfBirth) {
+                user.user_personal_info.dateOfBirth = moment(
+                  user.user_personal_info.dateOfBirth
+                ).format("D MMM YYYY");
               }
-            );
-          }
+              this.setState({ userPersonalInfo: user.user_personal_info });
+            }
+            if (user.user_financial_info) {
+              this.setState({ userFinancialInfo: user.user_financial_info });
+            }
+          });
         })
         .catch((err) => {
-          if (this._isMounted) {
-            console.error(err);
-            this.setState({
-              error: "Failed to load employee data",
-              loading: false,
-            });
-          }
+          console.log(err);
         });
     } else {
-      this.setState({ falseRedirect: true, loading: false });
+      this.setState({ falseRedirect: true });
     }
   }
 
-  componentWillUnmount() {
-    this._isMounted = false;
-  }
+  onEdit = () => {
+    this.setState({ editRedirect: true });
+  };
 
   render() {
-    const { user, currentJobTitle, falseRedirect, loading, error } = this.state;
-    const financialInfo = user?.user_financial_info || {};
-
-    if (falseRedirect) return <Redirect to="/" />;
-    if (loading) return <div className="container-fluid pt-3">Loading...</div>;
-    if (error)
-      return <div className="container-fluid pt-3">Error: {error}</div>;
-
     return (
       <div className="container-fluid pt-3">
+        {this.state.falseRedirect ? <Redirect to="/" /> : <></>}
+        {this.state.editRedirect ? (
+          <Redirect
+            to={{
+              pathname: "/employee-edit",
+              state: { selectedUser: this.state.user },
+            }}
+          />
+        ) : null}
         <Row>
           <Col sm={12}>
             <Card>
@@ -86,11 +110,11 @@ export default class SalaryView extends Component {
                   fontSize: "17px",
                 }}
               >
-                Employee Salary Detail
+                Employee Detail{" "}
               </Card.Header>
               <Card.Body>
                 <Card.Title>
-                  <strong>{user?.fullName || "N/A"}</strong>
+                  <strong>{this.state.user.fullName}</strong>
                 </Card.Title>
                 <Card.Text>
                   <Col lg={12}>
@@ -98,29 +122,28 @@ export default class SalaryView extends Component {
                       <Col lg={3}>
                         <img
                           className="img-circle elevation-1 bp-2"
-                          src={window.location.origin + "/user-128.png"}
-                          alt="User"
-                        />
+                          src={process.env.PUBLIC_URL + "/user-128.png"}
+                        ></img>
                       </Col>
                       <Col className="pt-4" lg={9}>
                         <div className="emp-view-list">
                           <ul>
                             <li>
-                              <span>Employee ID: </span> {user?.id || "N/A"}
+                              <span>Employee ID: </span> {this.state.user.id}
                             </li>
                             <li>
                               <span>Department: </span>{" "}
-                              {user?.department?.departmentName || "N/A"}
+                              {this.state.department.departmentName}
                             </li>
                             <li>
                               <span>Job Position: </span>{" "}
-                              {user?.jobPosition || "N/A"}
+                              {this.state.user.jobPosition}
                             </li>
                             <li>
                               <span>Role: </span>
-                              {user?.role === "ROLE_ADMIN"
+                              {this.state.user.role === "ROLE_ADMIN"
                                 ? "Admin"
-                                : user?.role === "ROLE_MANAGER"
+                                : this.state.user.role === "ROLE_MANAGER"
                                 ? "Manager"
                                 : "Employee"}
                             </li>
@@ -128,94 +151,102 @@ export default class SalaryView extends Component {
                         </div>
                       </Col>
                     </Row>
-
-                    {/* First Row - 2 boxes side by side */}
-                    <Row className="pt-4">
-                      {/* Salary Details Box */}
+                    <Row>
                       <Col sm={6}>
-                        <Card className="secondary-card sal-view h-100">
-                          <Card.Header>Salary Details</Card.Header>
+                        <Card className="secondary-card emp-view">
+                          <Card.Header>Personal Details</Card.Header>
                           <Card.Body>
-                            <Card.Text>
+                            <Card.Text id="emp-view-personal">
                               <Form.Group as={Row}>
                                 <Form.Label className="label">
-                                  Employment Type:
+                                  Date of Birth:
                                 </Form.Label>
                                 <span>
-                                  {financialInfo.employmentType || "N/A"}
+                                  {this.state.userPersonalInfo.dateOfBirth}
+                                </span>
+                              </Form.Group>
+                              <Form.Group as={Row}>
+                                <Form.Label className="label">Age:</Form.Label>
+                                <span>{this.state.userPersonalInfo.age}</span>
+                              </Form.Group>
+                              <Form.Group as={Row}>
+                                <Form.Label className="label">
+                                  Gender:
+                                </Form.Label>
+                                <span>
+                                  {this.state.userPersonalInfo.gender}
                                 </span>
                               </Form.Group>
                               <Form.Group as={Row}>
                                 <Form.Label className="label">
-                                  Basic Salary:
+                                  Blood Group:
                                 </Form.Label>
-                                <span>€ {financialInfo.salaryBasic || 0}</span>
+                                <span>
+                                  {this.state.userPersonalInfo.bloodGroup}
+                                </span>
+                              </Form.Group>
+                              <Form.Group as={Row}>
+                                <Form.Label className="label">
+                                  Marital Status:
+                                </Form.Label>
+                                <span>
+                                  {this.state.userPersonalInfo.maritalStatus}
+                                </span>
+                              </Form.Group>
+                              <Form.Group as={Row}>
+                                <Form.Label className="label">
+                                  Father's Name:
+                                </Form.Label>
+                                <span>
+                                  {this.state.userPersonalInfo.fatherName}
+                                </span>
                               </Form.Group>
                             </Card.Text>
                           </Card.Body>
                         </Card>
                       </Col>
-
-                      {/* Allowances Box */}
                       <Col sm={6}>
-                        <Card className="secondary-card sal-view h-100">
-                          <Card.Header>Allowances</Card.Header>
+                        <Card className="secondary-card emp-view">
+                          <Card.Header>Contact Details</Card.Header>
                           <Card.Body>
-                            <Card.Text>
+                            <Card.Text id="emp-view-contact">
                               <Form.Group as={Row}>
                                 <Form.Label className="label">
-                                  House Rent Allowance:
+                                  Location:
                                 </Form.Label>
                                 <span>
-                                  € {financialInfo.allowanceHouseRent || 0}
+                                  {this.state.userPersonalInfo.country},{" "}
+                                  {this.state.userPersonalInfo.city}
                                 </span>
                               </Form.Group>
                               <Form.Group as={Row}>
                                 <Form.Label className="label">
-                                  Medical Allowance:
+                                  Address:
                                 </Form.Label>
                                 <span>
-                                  € {financialInfo.allowanceMedical || 0}
+                                  {this.state.userPersonalInfo.address}
                                 </span>
                               </Form.Group>
                               <Form.Group as={Row}>
                                 <Form.Label className="label">
-                                  Special Allowance:
+                                  Mobile:
                                 </Form.Label>
                                 <span>
-                                  € {financialInfo.allowanceSpecial || 0}
+                                  {this.state.userPersonalInfo.mobile}
                                 </span>
                               </Form.Group>
                               <Form.Group as={Row}>
                                 <Form.Label className="label">
-                                  Fuel Allowance:
+                                  Emergency Contact:
                                 </Form.Label>
-                                <span>
-                                  € {financialInfo.allowanceFuel || 0}
-                                </span>
+                                <span>{this.state.userPersonalInfo.phone}</span>
                               </Form.Group>
                               <Form.Group as={Row}>
                                 <Form.Label className="label">
-                                  Phone Bill Allowance:
+                                  Email Address:
                                 </Form.Label>
                                 <span>
-                                  € {financialInfo.allowancePhoneBill || 0}
-                                </span>
-                              </Form.Group>
-                              <Form.Group as={Row}>
-                                <Form.Label className="label">
-                                  Other Allowance:
-                                </Form.Label>
-                                <span>
-                                  € {financialInfo.allowanceOther || 0}
-                                </span>
-                              </Form.Group>
-                              <Form.Group as={Row}>
-                                <Form.Label className="label">
-                                  Total Allowance:
-                                </Form.Label>
-                                <span>
-                                  € {financialInfo.allowanceTotal || 0}
+                                  {this.state.userPersonalInfo.emailAddress}
                                 </span>
                               </Form.Group>
                             </Card.Text>
@@ -223,72 +254,45 @@ export default class SalaryView extends Component {
                         </Card>
                       </Col>
                     </Row>
-
-                    {/* Second Row - 2 boxes side by side */}
-                    <Row className="pt-4">
-                      {/* Deductions Box */}
-                      <Col sm={6}>
-                        <Card className="secondary-card h-100">
-                          <Card.Header>Deductions</Card.Header>
+                    <Row>
+                      <Col cm={6}>
+                        <Card className="secondary-card">
+                          <Card.Header>Bank Information</Card.Header>
                           <Card.Body>
-                            <Card.Text>
+                            <Card.Text id="emp-view-bank">
                               <Form.Group as={Row}>
                                 <Form.Label className="label">
-                                  Tax Deduction:
-                                </Form.Label>
-                                <span>€ {financialInfo.deductionTax || 0}</span>
-                              </Form.Group>
-                              <Form.Group as={Row}>
-                                <Form.Label className="label">
-                                  Other Deduction:
+                                  Bank Name:
                                 </Form.Label>
                                 <span>
-                                  € {financialInfo.deductionOther || 0}
+                                  {this.state.userFinancialInfo.bankName}
                                 </span>
                               </Form.Group>
                               <Form.Group as={Row}>
                                 <Form.Label className="label">
-                                  Total Deduction:
+                                  Account Name:
                                 </Form.Label>
                                 <span>
-                                  € {financialInfo.deductionTotal || 0}
+                                  {this.state.userFinancialInfo.accountName}
                                 </span>
+                              </Form.Group>
+                              <Form.Group as={Row}>
+                                <Form.Label className="label">
+                                  Mobile:
+                                </Form.Label>
+                                <span>
+                                  {this.state.userFinancialInfo.accountNumber}
+                                </span>
+                              </Form.Group>
+                              <Form.Group as={Row}>
+                                <Form.Label className="label">IBAN:</Form.Label>
+                                <span>{this.state.userFinancialInfo.iban}</span>
                               </Form.Group>
                             </Card.Text>
                           </Card.Body>
                         </Card>
                       </Col>
-
-                      {/* Total Salary Box */}
-                      <Col sm={6}>
-                        <Card className="secondary-card h-100">
-                          <Card.Header>Total Salary Details</Card.Header>
-                          <Card.Body>
-                            <Card.Text>
-                              <Form.Group as={Row}>
-                                <Form.Label className="label">
-                                  Gross Salary:
-                                </Form.Label>
-                                <span>€ {financialInfo.salaryGross || 0}</span>
-                              </Form.Group>
-                              <Form.Group as={Row}>
-                                <Form.Label className="label">
-                                  Total Deduction:
-                                </Form.Label>
-                                <span>
-                                  € {financialInfo.deductionTotal || 0}
-                                </span>
-                              </Form.Group>
-                              <Form.Group as={Row}>
-                                <Form.Label className="label">
-                                  Net Salary:
-                                </Form.Label>
-                                <span>€ {financialInfo.salaryNet || 0}</span>
-                              </Form.Group>
-                            </Card.Text>
-                          </Card.Body>
-                        </Card>
-                      </Col>
+                      <Col sm={6}></Col>
                     </Row>
                   </Col>
                 </Card.Text>

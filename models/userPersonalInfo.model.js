@@ -1,14 +1,16 @@
 module.exports = (sequelize, Sequelize) => {
-    const UserPersonalInfo = sequelize.define("user_personal_info", {
+  const UserPersonalInfo = sequelize.define(
+    "user_personal_info",
+    {
       id: {
         type: Sequelize.INTEGER,
         autoIncrement: true,
         primaryKey: true,
-        allowNull: false
+        allowNull: false,
       },
       dateOfBirth: {
         type: Sequelize.DATE,
-        allowNull: true
+        allowNull: true,
       },
       age: {
         type: Sequelize.INTEGER,
@@ -30,7 +32,7 @@ module.exports = (sequelize, Sequelize) => {
       },
       fatherName: {
         type: Sequelize.STRING,
-        allowNull: true
+        allowNull: true,
       },
       // Government IDs
       aadharNumber: {
@@ -49,7 +51,7 @@ module.exports = (sequelize, Sequelize) => {
       },
       passportNumber: {
         type: Sequelize.STRING,
-        allowNull: true
+        allowNull: true,
       },
       drivingLicense: {
         type: Sequelize.STRING,
@@ -62,11 +64,11 @@ module.exports = (sequelize, Sequelize) => {
       },
       city: {
         type: Sequelize.STRING,
-        allowNull: true
+        allowNull: true,
       },
       country: {
         type: Sequelize.STRING,
-        allowNull: true
+        allowNull: true,
       },
       mobile: {
         type: Sequelize.STRING,
@@ -77,7 +79,7 @@ module.exports = (sequelize, Sequelize) => {
       },
       phone: {
         type: Sequelize.STRING,
-        allowNull: true
+        allowNull: true,
       },
       emailAddress: {
         type: Sequelize.STRING,

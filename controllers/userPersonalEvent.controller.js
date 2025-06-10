@@ -7,7 +7,7 @@ exports.create = (req, res) => {
   // Validate request
   if (!req.body) {
     res.status(400).send({
-      message: "Content can not be empty!"
+      message: "Content can not be empty!",
     });
     return;
   }
@@ -18,18 +18,19 @@ exports.create = (req, res) => {
     eventDescription: req.body.eventDescription,
     eventStartDate: req.body.eventStartDate,
     eventEndDate: req.body.eventEndDate,
-    userId: req.body.userId
+    userId: req.body.userId,
   };
 
   // Save PersonalEvent in the database
   PersonalEvent.create(personalEvent)
-    .then(data => {
+    .then((data) => {
       res.send(data);
     })
-    .catch(err => {
+    .catch((err) => {
       res.status(500).send({
         message:
-          err.message || "Some error occurred while creating the PersonalEvent."
+          err.message ||
+          "Some error occurred while creating the PersonalEvent.",
       });
     });
 };
@@ -37,44 +38,44 @@ exports.create = (req, res) => {
 // Retrieve all Personal Events from the database.
 exports.findAll = (req, res) => {
   PersonalEvent.findAll()
-    .then(data => {
+    .then((data) => {
       res.send(data);
     })
-    .catch(err => {
+    .catch((err) => {
       res.status(500).send({
         message:
-          err.message || "Some error occurred while retrieving departments."
+          err.message || "Some error occurred while retrieving departments.",
       });
     });
 };
 
 //Retrieve all Personal Events By User Id
 exports.findAllByUserId = (req, res) => {
-    const userId = req.params.id
+  const userId = req.params.id;
 
-    PersonalEvent.findAll({where: {userId: userId}})
-      .then(data => {
-        res.send(data);
-      })
-      .catch(err => {
-        res.status(500).send({
-          message:
-            err.message || "Some error occurred while retrieving departments."
-        });
+  PersonalEvent.findAll({ where: { userId: userId } })
+    .then((data) => {
+      res.send(data);
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message:
+          err.message || "Some error occurred while retrieving departments.",
       });
-  };
+    });
+};
 
 // Find a single PersonalEvent with an id
 exports.findOne = (req, res) => {
   const id = req.params.id;
 
   PersonalEvent.findByPk(id)
-    .then(data => {
+    .then((data) => {
       res.send(data);
     })
-    .catch(err => {
+    .catch((err) => {
       res.status(500).send({
-        message: "Error retrieving PersonalEvent with id=" + id
+        message: "Error retrieving PersonalEvent with id=" + id,
       });
     });
 };
@@ -84,22 +85,22 @@ exports.update = (req, res) => {
   const id = req.params.id;
 
   PersonalEvent.update(req.body, {
-    where: { id: id }
+    where: { id: id },
   })
-    .then(num => {
+    .then((num) => {
       if (num == 1) {
         res.send({
-          message: "PersonalEvent was updated successfully."
+          message: "PersonalEvent was updated successfully.",
         });
       } else {
         res.send({
-          message: `Cannot update PersonalEvent with id=${id}. Maybe PersonalEvent was not found or req.body is empty!`
+          message: `Cannot update PersonalEvent with id=${id}. Maybe PersonalEvent was not found or req.body is empty!`,
         });
       }
     })
-    .catch(err => {
+    .catch((err) => {
       res.status(500).send({
-        message: "Error updating PersonalEvent with id=" + id
+        message: "Error updating PersonalEvent with id=" + id,
       });
     });
 };
@@ -109,22 +110,22 @@ exports.delete = (req, res) => {
   const id = req.params.id;
 
   PersonalEvent.destroy({
-    where: { id: id }
+    where: { id: id },
   })
-    .then(num => {
+    .then((num) => {
       if (num == 1) {
         res.send({
-          message: "PersonalEvent was deleted successfully!"
+          message: "PersonalEvent was deleted successfully!",
         });
       } else {
         res.send({
-          message: `Cannot delete PersonalEvent with id=${id}. Maybe Tutorial was not found!`
+          message: `Cannot delete PersonalEvent with id=${id}. Maybe Tutorial was not found!`,
         });
       }
     })
-    .catch(err => {
+    .catch((err) => {
       res.status(500).send({
-        message: "Could not delete PersonalEvent with id=" + id
+        message: "Could not delete PersonalEvent with id=" + id,
       });
     });
 };
@@ -133,34 +134,40 @@ exports.delete = (req, res) => {
 exports.deleteAll = (req, res) => {
   PersonalEvent.destroy({
     where: {},
-    truncate: false
+    truncate: false,
   })
-    .then(nums => {
-      res.send({ message: `${nums} Personal Events were deleted successfully!` });
+    .then((nums) => {
+      res.send({
+        message: `${nums} Personal Events were deleted successfully!`,
+      });
     })
-    .catch(err => {
+    .catch((err) => {
       res.status(500).send({
         message:
-          err.message || "Some error occurred while removing all Personal Events."
+          err.message ||
+          "Some error occurred while removing all Personal Events.",
       });
     });
 };
 
 // Delete all Personal Events by User Id.
 exports.deleteAllByUserId = (req, res) => {
-    const userId = req.params.id;
+  const userId = req.params.id;
 
-    PersonalEvent.destroy({
-      where: {userId: userId},
-      truncate: false
-    })
-      .then(nums => {
-        res.send({ message: `${nums} Personal Events were deleted successfully!` });
-      })
-      .catch(err => {
-        res.status(500).send({
-          message:
-            err.message || "Some error occurred while removing all Personal Events."
-        });
+  PersonalEvent.destroy({
+    where: { userId: userId },
+    truncate: false,
+  })
+    .then((nums) => {
+      res.send({
+        message: `${nums} Personal Events were deleted successfully!`,
       });
-  };
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message:
+          err.message ||
+          "Some error occurred while removing all Personal Events.",
+      });
+    });
+};

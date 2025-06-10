@@ -1636,6 +1636,7 @@ export default class EmployeeAdd extends Component {
           college: officialStatus.college,
           employeeId: officialStatus.employeeId,
           active: 1,
+          jobPosition: this.state.jobPosition,
         },
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },

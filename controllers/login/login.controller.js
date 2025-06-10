@@ -17,12 +17,15 @@ exports.authenticate = (req, res) => {
   }
 
   let hash = bcrypt.hashSync(req.body.password, 10);
-
+  const UserPersoanlInfo = db.userPersonalInfo;
   User.findOne({
     where: { username: req.body.username },
     include: [
       {
         model: Department,
+      },
+      {
+        model: UserPersoanlInfo,
       },
     ],
   }).then((user) => {
@@ -43,6 +46,7 @@ exports.authenticate = (req, res) => {
             departmentId: deptId,
             department: user.department?.name || "",
             college: user.college,
+            gender: user.user_personal_info?.gender || null,
           };
           jwt.sign(
             { user: userData },

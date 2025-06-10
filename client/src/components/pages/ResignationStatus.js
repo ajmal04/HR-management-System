@@ -8,11 +8,23 @@ const ResignationStatus = () => {
   const token = localStorage.getItem("token");
 
   useEffect(() => {
+    if (!token) return;
+
+    const decoded = JSON.parse(atob(token.split(".")[1]));
+    const role = decoded.user.role;
+
+    let url = "";
+    if (role === "ROLE_HOD") {
+      url = "/api/resignations/hod/status";
+    } else if (role === "ROLE_ADMIN") {
+      url = "/api/resignations/admin/status";
+    } else {
+      url = "/api/resignations/faculty";
+    }
+
     axios
-      .get("/api/resignations/faculty", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      .get(url, {
+        headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
         setResignation(res.data);
@@ -56,15 +68,29 @@ const ResignationStatus = () => {
           <p>
             <strong>HOD Status:</strong> {resignation.hodStatus}
           </p>
+          {resignation.hodStatus === "rejected" && (
+            <p>
+              <strong>HOD Rejection Reason:</strong> {resignation.hodComment}
+            </p>
+          )}
           <p>
             <strong>Principal Status:</strong> {resignation.principalStatus}
           </p>
+          {resignation.principalStatus === "rejected" && (
+            <p>
+              <strong>Principal Rejection Reason:</strong>{" "}
+              {resignation.principalComment}
+            </p>
+          )}
           <p>
             <strong>HR Status:</strong> {resignation.hrStatus}
           </p>
-          <p>
-            <strong>Message:</strong> {resignation.resignationStatus}
-          </p>
+          {resignation.hrStatus === "rejected" && (
+            <p>
+              <strong>SuperAdmin Rejection Reason:</strong>{" "}
+              {resignation.hrComment}
+            </p>
+          )}
 
           {resignation.hrStatus === "approved" && (
             <>
@@ -81,7 +107,9 @@ const ResignationStatus = () => {
                 <strong>Days Left:</strong> {countdown}
               </p>
               <p className="text-danger">
-                Note: No leave will be provided during the notice period.
+                Note: Please note that any leaves availed during the notice
+                period will be added to the notice duration, thereby extending
+                the overall notice period accordingly.
               </p>
             </>
           )}

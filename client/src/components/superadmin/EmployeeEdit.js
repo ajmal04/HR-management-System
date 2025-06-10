@@ -13,6 +13,7 @@ export default class EmployeeEdit extends Component {
       user: {
         id: null,
         fullName: "",
+        jobPosition: null,
         role: null,
         active: null,
         departmentId: null,
@@ -22,11 +23,14 @@ export default class EmployeeEdit extends Component {
       userPersonalInfo: {
         id: null,
         dateOfBirth: null,
+        age: "",
         gender: "",
         maritalStatus: "",
+        bloodGroup: "",
         fatherName: "",
         idNumber: "",
         address: "",
+        tempAddress: "",
         city: "",
         country: "",
         mobile: "",
@@ -59,8 +63,7 @@ export default class EmployeeEdit extends Component {
       isSubmitting: false,
       isLoadingEmployee: true,
       isLoadingDepartments: true,
-      isLoadingColleges: true
-
+      isLoadingColleges: true,
     };
 
     this._isMounted = false;
@@ -87,7 +90,7 @@ export default class EmployeeEdit extends Component {
           errMsg: "Failed to load initial data",
           isLoadingEmployee: false,
           isLoadingDepartments: false,
-          isLoadingColleges: false
+          isLoadingColleges: false,
         });
       }
     });
@@ -163,8 +166,7 @@ export default class EmployeeEdit extends Component {
         this.setState({
           hasError: true,
           errMsg: err.response?.data?.message || "Failed to load employee data",
-          isLoadingEmployee: false
-
+          isLoadingEmployee: false,
         });
       }
     }
@@ -183,8 +185,7 @@ export default class EmployeeEdit extends Component {
       if (this._isMounted) {
         this.setState({
           departments: response.data,
-          isLoadingDepartments: false
-
+          isLoadingDepartments: false,
         });
       }
     } catch (err) {
@@ -192,7 +193,7 @@ export default class EmployeeEdit extends Component {
         this.setState({
           hasError: true,
           errMsg: "Failed to load departments",
-          isLoadingDepartments: false
+          isLoadingDepartments: false,
         });
       }
     }
@@ -211,7 +212,7 @@ export default class EmployeeEdit extends Component {
       if (this._isMounted) {
         this.setState({
           colleges: response.data,
-          isLoadingColleges: false
+          isLoadingColleges: false,
         });
       }
     } catch (err) {
@@ -219,7 +220,7 @@ export default class EmployeeEdit extends Component {
         this.setState({
           hasError: true,
           errMsg: "Failed to load colleges",
-          isLoadingColleges: false
+          isLoadingColleges: false,
         });
       }
     }
@@ -308,6 +309,7 @@ export default class EmployeeEdit extends Component {
           departmentId: user.departmentId,
           college: user.college,
           active: user.active,
+          jobPosition: user.jobPosition,
         },
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         timeout: 10000,
@@ -328,11 +330,14 @@ export default class EmployeeEdit extends Component {
           dateOfBirth: userPersonalInfo.dateOfBirth
             ? moment(userPersonalInfo.dateOfBirth).format("YYYY-MM-DD")
             : null,
+          age: userPersonalInfo.age,
           gender: userPersonalInfo.gender,
+          bloodGroup: userPersonalInfo.bloodGroup,
           maritalStatus: userPersonalInfo.maritalStatus,
           fatherName: userPersonalInfo.fatherName,
           idNumber: userPersonalInfo.idNumber,
           address: userPersonalInfo.address,
+          tempAddress: userPersonalInfo.tempAddress,
           city: userPersonalInfo.city,
           country: userPersonalInfo.country,
           mobile: userPersonalInfo.mobile,
@@ -410,16 +415,15 @@ export default class EmployeeEdit extends Component {
   };
 
   render() {
-    const { 
-      hasError, 
-      errMsg, 
-      completed, 
+    const {
+      hasError,
+      errMsg,
+      completed,
       falseRedirect,
       isLoadingEmployee,
       isLoadingDepartments,
       isLoadingColleges,
-      isSubmitting
-
+      isSubmitting,
     } = this.state;
 
     if (falseRedirect) {
@@ -458,12 +462,16 @@ export default class EmployeeEdit extends Component {
       );
     }
 
-    const { 
-      user, 
-      userPersonalInfo, 
-      userFinancialInfo, 
+    const {
+      user,
+      userPersonalInfo,
+      userFinancialInfo,
       departments,
       colleges,
+<<<<<<< HEAD
+      job,
+=======
+>>>>>>> e0349e3f2d10d722e3d8954792197004c6aee799
     } = this.state;
 
     return (
@@ -478,7 +486,9 @@ export default class EmployeeEdit extends Component {
           <Card className="col-sm-12 main-card">
             <Card.Header>
               <b>Edit Employee</b>
-              {(isLoadingEmployee || isLoadingDepartments || isLoadingColleges) && (
+              {(isLoadingEmployee ||
+                isLoadingDepartments ||
+                isLoadingColleges) && (
                 <span className="float-right">
                   <Spinner animation="border" size="sm" />
                   <span className="ml-2">Loading data...</span>
@@ -492,7 +502,13 @@ export default class EmployeeEdit extends Component {
                   <Card className="secondary-card">
                     <Card.Header>
                       Personal Details
-                      {isLoadingEmployee && <Spinner animation="border" size="sm" className="ml-2" />}
+                      {isLoadingEmployee && (
+                        <Spinner
+                          animation="border"
+                          size="sm"
+                          className="ml-2"
+                        />
+                      )}
                     </Card.Header>
                     <Card.Body>
                       {isLoadingEmployee ? (
@@ -503,46 +519,66 @@ export default class EmployeeEdit extends Component {
                       ) : (
                         <Card.Text>
                           <Form.Group controlId="formFullName">
-                            <Form.Label className="text-muted required">Full Name</Form.Label>
+                            <Form.Label className="text-muted required">
+                              Full Name
+                            </Form.Label>
                             <Form.Control
                               type="text"
                               placeholder="Enter full name"
                               name="fullName"
-                              value={user.fullName || ''}
+                              value={user.fullName || ""}
                               onChange={this.handleChangeUser}
                               required
                             />
                           </Form.Group>
 
                           <Form.Group controlId="formDateofBirth">
-                            <Form.Label className="text-muted required">Date of Birth</Form.Label>
-                            <DatePicker
-                              selected={userPersonalInfo.dateOfBirth}
-                              onChange={(dateOfBirth) =>
-                                this.setState((prevState) => ({
-                                  userPersonalInfo: {
-                                    ...prevState.userPersonalInfo,
-                                    dateOfBirth: dateOfBirth,
-                                  },
-                                }))
-                              }
-                              showMonthDropdown
-                              showYearDropdown
-                              dropdownMode="select"
-                              name="dateOfBirth"
-                              dateFormat="yyyy-MM-dd"
-                              className="form-control"
-                              placeholderText="Select Date Of Birth"
-                              autoComplete="off"
+                            <Form.Label className="text-muted required">
+                              Date of Birth
+                            </Form.Label>
+                            <div>
+                              <DatePicker
+                                selected={userPersonalInfo.dateOfBirth}
+                                onChange={(dateOfBirth) =>
+                                  this.setState((prevState) => ({
+                                    userPersonalInfo: {
+                                      ...prevState.userPersonalInfo,
+                                      dateOfBirth: dateOfBirth,
+                                    },
+                                  }))
+                                }
+                                showMonthDropdown
+                                showYearDropdown
+                                dropdownMode="select"
+                                name="dateOfBirth"
+                                dateFormat="yyyy-MM-dd"
+                                className="form-control"
+                                placeholderText="Select Date Of Birth"
+                                autoComplete="off"
+                                required
+                              />
+                            </div>
+                          </Form.Group>
+                          <Form.Group controlId="formAge">
+                            <Form.Label className="text-muted required">
+                              Age
+                            </Form.Label>
+                            <Form.Control
+                              type="text"
+                              placeholder="Enter Age"
+                              name="age"
+                              value={this.state.userPersonalInfo.age}
+                              onChange={this.handleChangeUserPersonal}
                               required
                             />
                           </Form.Group>
-
                           <Form.Group controlId="formGender">
-                            <Form.Label className="text-muted required">Gender</Form.Label>
+                            <Form.Label className="text-muted required">
+                              Gender
+                            </Form.Label>
                             <Form.Control
                               as="select"
-                              value={userPersonalInfo.gender || ''}
+                              value={userPersonalInfo.gender || ""}
                               onChange={this.handleChangeUserPersonal}
                               name="gender"
                               required
@@ -552,12 +588,37 @@ export default class EmployeeEdit extends Component {
                               <option value="Female">Female</option>
                             </Form.Control>
                           </Form.Group>
-
-                          <Form.Group controlId="formMaritalStatus">
-                            <Form.Label className="text-muted required">Marital Status</Form.Label>
+                          <Form.Group controlId="formBloodGroup">
+                            <Form.Label className="text-muted required">
+                              Blood Group
+                            </Form.Label>
                             <Form.Control
                               as="select"
-                              value={userPersonalInfo.maritalStatus || ''}
+                              value={
+                                this.state.userPersonalInfo.bloodGroup || ""
+                              }
+                              onChange={this.handleChangeUserPersonal}
+                              name="bloodGroup"
+                              required
+                            >
+                              <option value="">Choose...</option>
+                              <option value="A+">A+</option>
+                              <option value="A-">A-</option>
+                              <option value="B+">B+</option>
+                              <option value="B-">B-</option>
+                              <option value="O+">O+</option>
+                              <option value="O-">O-</option>
+                              <option value="AB+">AB+</option>
+                              <option value="AB-">AB-</option>
+                            </Form.Control>
+                          </Form.Group>
+                          <Form.Group controlId="formMaritalStatus">
+                            <Form.Label className="text-muted required">
+                              Marital Status
+                            </Form.Label>
+                            <Form.Control
+                              as="select"
+                              value={userPersonalInfo.maritalStatus || ""}
                               onChange={this.handleChangeUserPersonal}
                               name="maritalStatus"
                               required
@@ -569,24 +630,28 @@ export default class EmployeeEdit extends Component {
                           </Form.Group>
 
                           <Form.Group controlId="formFatherName">
-                            <Form.Label className="text-muted required">Father's name</Form.Label>
+                            <Form.Label className="text-muted required">
+                              Father's name
+                            </Form.Label>
                             <Form.Control
                               type="text"
                               placeholder="Enter Father's Name"
                               name="fatherName"
-                              value={userPersonalInfo.fatherName || ''}
+                              value={userPersonalInfo.fatherName || ""}
                               onChange={this.handleChangeUserPersonal}
                               required
                             />
                           </Form.Group>
 
                           <Form.Group controlId="formId">
-                            <Form.Label className="text-muted required">ID Number</Form.Label>
+                            <Form.Label className="text-muted required">
+                              ID Number
+                            </Form.Label>
                             <Form.Control
                               type="text"
                               placeholder="Enter ID Number"
                               name="idNumber"
-                              value={userPersonalInfo.idNumber || ''}
+                              value={userPersonalInfo.idNumber || ""}
                               onChange={this.handleChangeUserPersonal}
                               required
                             />
@@ -601,7 +666,13 @@ export default class EmployeeEdit extends Component {
                   <Card className="secondary-card">
                     <Card.Header>
                       Contact Details
-                      {isLoadingEmployee && <Spinner animation="border" size="sm" className="ml-2" />}
+                      {isLoadingEmployee && (
+                        <Spinner
+                          animation="border"
+                          size="sm"
+                          className="ml-2"
+                        />
+                      )}
                     </Card.Header>
                     <Card.Body>
                       {isLoadingEmployee ? (
@@ -612,21 +683,42 @@ export default class EmployeeEdit extends Component {
                       ) : (
                         <Card.Text>
                           <Form.Group controlId="formPhysicalAddress">
-                            <Form.Label className="text-muted required">Physical Address</Form.Label>
+                            <Form.Label className="text-muted required">
+                              Physical Address
+                            </Form.Label>
                             <Form.Control
-                              type="text"
-                              value={userPersonalInfo.address || ''}
-                              onChange={this.handleChangeUserPersonal} 
+                              as="textarea"
+                              rows={3}
+                              value={userPersonalInfo.address || ""}
+                              onChange={this.handleChangeUserPersonal}
                               name="address"
                               placeholder="Enter Address"
                               required
                             />
                           </Form.Group>
+                          <Form.Group controlId="formTempAddress">
+                            <Form.Label className="text-muted required">
+                              Temporary Address
+                            </Form.Label>
+                            <Form.Control
+                              as="textarea"
+                              rows={3}
+                              value={
+                                this.state.userPersonalInfo.tempAddress || ""
+                              }
+                              onChange={this.handleChangeUserPersonal}
+                              name="tempAddress"
+                              placeholder="Enter Temporary Address"
+                              required
+                            />
+                          </Form.Group>
                           <Form.Group controlId="formCountry">
-                            <Form.Label className="text-muted required">Country</Form.Label>
+                            <Form.Label className="text-muted required">
+                              Country
+                            </Form.Label>
                             <Form.Control
                               type="text"
-                              value={userPersonalInfo.country || ''}
+                              value={userPersonalInfo.country || ""}
                               onChange={this.handleChangeUserPersonal}
                               name="country"
                               placeholder="Enter Country"
@@ -634,21 +726,25 @@ export default class EmployeeEdit extends Component {
                             />
                           </Form.Group>
                           <Form.Group controlId="formCity">
-                            <Form.Label className="text-muted required">City</Form.Label>
-                            <Form.Control 
-                              type="text" 
-                              value={userPersonalInfo.city || ''}
+                            <Form.Label className="text-muted required">
+                              City
+                            </Form.Label>
+                            <Form.Control
+                              type="text"
+                              value={userPersonalInfo.city || ""}
                               onChange={this.handleChangeUserPersonal}
                               name="city"
-                              placeholder="Enter City" 
+                              placeholder="Enter City"
                               required
                             />
                           </Form.Group>
                           <Form.Group controlId="formMobile">
-                            <Form.Label className="text-muted required">Mobile</Form.Label>
+                            <Form.Label className="text-muted required">
+                              Mobile
+                            </Form.Label>
                             <Form.Control
                               type="text"
-                              value={userPersonalInfo.mobile || ''}
+                              value={userPersonalInfo.mobile || ""}
                               onChange={this.handleChangeUserPersonal}
                               name="mobile"
                               placeholder="Enter Mobile"
@@ -656,23 +752,27 @@ export default class EmployeeEdit extends Component {
                             />
                           </Form.Group>
                           <Form.Group controlId="formPhone">
-                            <Form.Label className="text-muted">Phone</Form.Label>
-                            <Form.Control 
-                              type="text" 
-                              value={userPersonalInfo.phone || ''}
+                            <Form.Label className="text-muted required">
+                              Emergency Contact Number
+                            </Form.Label>
+                            <Form.Control
+                              type="text"
+                              value={userPersonalInfo.phone || ""}
                               onChange={this.handleChangeUserPersonal}
                               name="phone"
-                              placeholder="Enter Phone" 
+                              placeholder="Enter Phone"
                             />
                           </Form.Group>
                           <Form.Group controlId="formEmail">
-                            <Form.Label className="text-muted required">Email</Form.Label>
-                            <Form.Control 
-                              type="email" 
-                              value={userPersonalInfo.emailAddress || ''}
+                            <Form.Label className="text-muted required">
+                              Email
+                            </Form.Label>
+                            <Form.Control
+                              type="email"
+                              value={userPersonalInfo.emailAddress || ""}
                               onChange={this.handleChangeUserPersonal}
                               name="emailAddress"
-                              placeholder="Enter Email" 
+                              placeholder="Enter Email"
                               required
                             />
                           </Form.Group>
@@ -688,7 +788,13 @@ export default class EmployeeEdit extends Component {
                   <Card className="secondary-card">
                     <Card.Header>
                       Bank Information
-                      {isLoadingEmployee && <Spinner animation="border" size="sm" className="ml-2" />}
+                      {isLoadingEmployee && (
+                        <Spinner
+                          animation="border"
+                          size="sm"
+                          className="ml-2"
+                        />
+                      )}
                     </Card.Header>
                     <Card.Body>
                       {isLoadingEmployee ? (
@@ -699,30 +805,36 @@ export default class EmployeeEdit extends Component {
                       ) : (
                         <Card.Text>
                           <Form.Group controlId="formBankName">
-                            <Form.Label className="text-muted">Bank Name</Form.Label>
+                            <Form.Label className="text-muted">
+                              Bank Name
+                            </Form.Label>
                             <Form.Control
                               type="text"
-                              value={userFinancialInfo.bankName || ''}
+                              value={userFinancialInfo.bankName || ""}
                               onChange={this.handleChangeUserFinancial}
                               name="bankName"
                               placeholder="Enter Bank name"
                             />
                           </Form.Group>
                           <Form.Group controlId="formAccountName">
-                            <Form.Label className="text-muted">Account Name</Form.Label>
+                            <Form.Label className="text-muted">
+                              Account Name
+                            </Form.Label>
                             <Form.Control
                               type="text"
-                              value={userFinancialInfo.accountName || ''}
+                              value={userFinancialInfo.accountName || ""}
                               onChange={this.handleChangeUserFinancial}
                               name="accountName"
                               placeholder="Enter Account name"
                             />
                           </Form.Group>
                           <Form.Group controlId="formAccountNumber">
-                            <Form.Label className="text-muted">Account Number</Form.Label>
+                            <Form.Label className="text-muted">
+                              Account Number
+                            </Form.Label>
                             <Form.Control
                               type="text"
-                              value={userFinancialInfo.accountNumber || ''}
+                              value={userFinancialInfo.accountNumber || ""}
                               onChange={this.handleChangeUserFinancial}
                               name="accountNumber"
                               placeholder="Enter Account number"
@@ -730,12 +842,12 @@ export default class EmployeeEdit extends Component {
                           </Form.Group>
                           <Form.Group controlId="formIban">
                             <Form.Label className="text-muted">IBAN</Form.Label>
-                            <Form.Control 
-                              type="text" 
-                              value={userFinancialInfo.iban || ''}
+                            <Form.Control
+                              type="text"
+                              value={userFinancialInfo.iban || ""}
                               onChange={this.handleChangeUserFinancial}
                               name="iban"
-                              placeholder="Enter IBAN" 
+                              placeholder="Enter IBAN"
                             />
                           </Form.Group>
                         </Card.Text>
@@ -748,12 +860,20 @@ export default class EmployeeEdit extends Component {
                   <Card className="secondary-card">
                     <Card.Header>
                       Official Status
-                      {(isLoadingEmployee || isLoadingDepartments || isLoadingColleges) && (
-                        <Spinner animation="border" size="sm" className="ml-2" />
+                      {(isLoadingEmployee ||
+                        isLoadingDepartments ||
+                        isLoadingColleges) && (
+                        <Spinner
+                          animation="border"
+                          size="sm"
+                          className="ml-2"
+                        />
                       )}
                     </Card.Header>
                     <Card.Body>
-                      {(isLoadingEmployee || isLoadingDepartments || isLoadingColleges) ? (
+                      {isLoadingEmployee ||
+                      isLoadingDepartments ||
+                      isLoadingColleges ? (
                         <div className="text-center py-3">
                           <Spinner animation="border" />
                           <p>Loading official information...</p>
@@ -761,67 +881,114 @@ export default class EmployeeEdit extends Component {
                       ) : (
                         <Card.Text>
                           <Form.Group controlId="formEmployeeId">
-                            <Form.Label className="text-muted">Employee ID</Form.Label>
-                            <div>{user.username || ''}</div>
+                            <Form.Label className="text-muted">
+                              Employee ID
+                            </Form.Label>
+                            <div>{user.username || ""}</div>
                           </Form.Group>
                           <Form.Group controlId="formDepartment">
-                            <Form.Label className="text-muted required">Department</Form.Label>
+                            <Form.Label className="text-muted required">
+                              Department
+                            </Form.Label>
                             <Form.Control
                               as="select"
-                              value={user.departmentId || ''}
+                              value={user.departmentId || ""}
                               onChange={this.handleChangeUser}
                               name="departmentId"
                               required
                             >
                               <option value="">Choose...</option>
                               {departments.map((dept, index) => (
-                                <option key={index} value={dept.id}>{dept.departmentName}</option>
+                                <option key={index} value={dept.id}>
+                                  {dept.departmentName}
+                                </option>
                               ))}
                             </Form.Control>
                           </Form.Group>
                           <Form.Group controlId="formCollege">
-                            <Form.Label className="text-muted required">College</Form.Label>
+                            <Form.Label className="text-muted required">
+                              College
+                            </Form.Label>
                             <Form.Control
                               as="select"
-                              value={user.college || ''}
+                              value={user.college || ""}
                               onChange={this.handleChangeUser}
                               name="college"
                               required
                             >
                               <option value="">Choose...</option>
                               {colleges.map((college, index) => (
-                                <option key={index} value={college}>{college}</option>
+                                <option key={index} value={college}>
+                                  {college}
+                                </option>
                               ))}
                             </Form.Control>
                           </Form.Group>
-                          <Form.Group controlId="formRole">
-                            <Form.Label className="text-muted required">Role</Form.Label>
+                          <Form.Group controlId="formJobPosition">
+                            <Form.Label className="text-muted required">
+                              Job Position
+                            </Form.Label>
                             <Form.Control
                               as="select"
-                              value={user.role || ''}
+                              value={this.state.user.jobPosition}
+                              onChange={this.handleChangeUser}
+                              name="jobPosition"
+                              required
+                            >
+                              <option value="">Choose...</option>
+                              <option value="HR">HR</option>
+                              <option value="PRINCIPAL">principal</option>
+                              <option value="HOD">Hod</option>
+                              <option value="ASSOCIATE_PROFESSOR">
+                                Associate Professor
+                              </option>
+                              <option value="ASSISTANT_PROFESSOR">
+                                Assistant Professor
+                              </option>
+                            </Form.Control>
+                          </Form.Group>
+                          <Form.Group controlId="formRole">
+                            <Form.Label className="text-muted required">
+                              Role
+                            </Form.Label>
+                            <Form.Control
+                              as="select"
+                              value={user.role || ""}
                               onChange={this.handleChangeUser}
                               name="role"
                               required
                             >
                               <option value="">Choose...</option>
-                              <option value="ROLE_SUPER_ADMIN">Super Admin</option>
-                              <option value="ROLE_SYSTEM_ADMIN">System Admin</option>
+                              <option value="ROLE_SUPER_ADMIN">
+                                Super Admin
+                              </option>
+                              <option value="ROLE_SYSTEM_ADMIN">
+                                System Admin
+                              </option>
                               <option value="ROLE_ADMIN">Principal</option>
                               <option value="ROLE_HOD">HOD</option>
                               <option value="ROLE_FACULTY">Faculty</option>
                             </Form.Control>
                           </Form.Group>
                           <Form.Group controlId="formActive">
-                            <Form.Label className="text-muted required">Status</Form.Label>
+                            <Form.Label className="text-muted required">
+                              Status
+                            </Form.Label>
                             <Form.Control
                               as="select"
-                              value={user.active === null ? '' : user.active.toString()}
-                              onChange={(e) => this.handleChangeUser({
-                                target: {
-                                  name: 'active',
-                                  value: e.target.value === 'true'
-                                }
-                              })}
+                              value={
+                                user.active === null
+                                  ? ""
+                                  : user.active.toString()
+                              }
+                              onChange={(e) =>
+                                this.handleChangeUser({
+                                  target: {
+                                    name: "active",
+                                    value: e.target.value === "true",
+                                  },
+                                })
+                              }
                               name="active"
                               required
                             >
@@ -838,7 +1005,12 @@ export default class EmployeeEdit extends Component {
                     variant="primary"
                     type="submit"
                     block
-                    disabled={isLoadingEmployee || isLoadingDepartments || isLoadingColleges || isSubmitting}
+                    disabled={
+                      isLoadingEmployee ||
+                      isLoadingDepartments ||
+                      isLoadingColleges ||
+                      isSubmitting
+                    }
                   >
                     {isSubmitting ? (
                       <>

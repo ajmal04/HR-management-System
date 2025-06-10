@@ -31,8 +31,12 @@ export default function ResignationForm() {
     "ROLE_ADMIN",
     "ROLE_HOD",
     "ROLE_FACULTY",
+<<<<<<< HEAD
+  ]);
+=======
     "ROLE_EMPLOYEE"
   ];
+>>>>>>> e0349e3f2d10d722e3d8954792197004c6aee799
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hasError, setHasError] = useState(false);
@@ -55,28 +59,6 @@ export default function ResignationForm() {
       .catch((err) => {
         console.error("Error fetching departments:", err);
       });
-
-    // axios({
-    //   method: "get",
-    //   url: "/api/departments",
-    //   headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-    // })
-    //   .then((res) => {
-    //     console.log("Departments API response:", res.data);
-    //     // Ensure we have an array of departments with id and departmentName
-    //     const depts = Array.isArray(res.data)
-    //       ? res.data.map((item) => ({
-    //           id: item.departmentId, // Adjust these property names if needed
-    //           departmentName: item.name,
-    //         }))
-    //       : [];
-    //     console.log("Processed departments:", depts);
-    //     setDepartments(depts);
-    //   })
-    //   .catch((err) => {
-    //     console.error("Error fetching departments:", err);
-    //     setDepartments([]);
-    //   });
 
     // Fetch colleges
     axios({

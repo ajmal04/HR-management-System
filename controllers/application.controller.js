@@ -1,15 +1,38 @@
 const db = require("../models");
 const Application = db.application;
 const User = db.user;
-const Department = db.department
+const Department = db.department;
 const Op = db.Sequelize.Op;
-const moment = require('moment');
-const { department } = require("../models");
+const moment = require("moment");
 
 // Create and Save a new Application
 exports.create = (req, res) => {
-  // Validate request
   if (!req.body) {
+
+    return res.status(400).send({ message: "Content can not be empty!" });
+  }
+
+  const application = {
+    reason: req.body.reason,
+    startDate: req.body.startDate,
+    endDate: req.body.endDate,
+    status: "pending",
+    type: req.body.type,
+    userId: req.body.userId,
+    hodStatus: "Pending",
+    hodComment: null,
+    adminStatus: "Pending",
+    adminComment: null,
+  };
+
+  Application.create(application)
+    .then((data) => res.send(data))
+    .catch((err) =>
+      res.status(500).send({
+        message:
+          err.message || "Some error occurred while creating the Application.",
+      })
+    );
       return res.status(400).send({
           message: "Content cannot be empty!"
       });
@@ -64,331 +87,347 @@ exports.create = (req, res) => {
               message: err.message || "Error creating application"
           });
       });
+
 };
 
-// Retrieve all Applications from the database.
+// Retrieve all Applications
 exports.findAll = (req, res) => {
-  Application.findAll({
-    include: User
-  })
-    .then((data) => {
-      res.send(data);
-    })
-    .catch((err) => {
+  Application.findAll({ include: User })
+    .then((data) => res.send(data))
+    .catch((err) =>
       res.status(500).send({
         message:
           err.message || "Some error occurred while retrieving Applications.",
-      });
-    });
+      })
+    );
 };
 
-// Retrieve all Applications from the database.
+// Retrieve applications from past 14 days to next 7 days
 exports.findAllRecent = (req, res) => {
   Application.findAll({
     where: {
-      [Op.and]: [
-        {startDate: {
-          [Op.gte]: moment().subtract(14, 'days').toDate()
-        }},
-        {startDate : {
-          [Op.lte]: moment().add(7, 'days').toDate()
-        }}
-      ]
+      startDate: {
+        [Op.gte]: moment().subtract(14, "days").toDate(),
+        [Op.lte]: moment().add(7, "days").toDate(),
+      },
     },
-    include: [{
-      model: User
-    }]
+    include: [User],
   })
-    .then(data => {
-      res.send(data);
-    })
-    .catch(err => {
-      console.log(err)
+    .then((data) => res.send(data))
+    .catch((err) =>
       res.status(500).send({
         message:
-          err.message || "Some error occurred while retrieving Applications.",
-      });
-    });
+          err.message ||
+          "Some error occurred while retrieving recent Applications.",
+      })
+    );
 };
 
-// Retrieve all Applications from the database.
-exports.findAllRecent = (req, res) => {
-  Application.findAll({
-    where: {
-      [Op.and]: [
-        {startDate: {
-          [Op.gte]: moment().subtract(14, 'days').toDate()
-        }},
-        {startDate : {
-          [Op.lte]: moment().add(7, 'days').toDate()
-        }}
-      ]
-    },
-    include: [{
-      model: User
-    }]
-  })
-    .then(data => {
-      res.send(data);
-    })
-    .catch(err => {
-      console.log(err)
-      res.status(500).send({
-        message:
-          err.message || "Some error occurred while retrieving Applications.",
-      });
-    });
-};
-
+// Retrieve recent Applications by Department
 exports.findAllRecentAndDept = (req, res) => {
-  const id = req.params.id
+  const id = req.params.id;
 
   Application.findAll({
     where: {
-      [Op.and]: [
-        {startDate: {
-          [Op.gte]: moment().subtract(14, 'days').toDate()
-        }},
-        {startDate : {
-          [Op.lte]: moment().add(7, 'days').toDate()
-        }}
-      ]
+      startDate: {
+        [Op.gte]: moment().subtract(14, "days").toDate(),
+        [Op.lte]: moment().add(7, "days").toDate(),
+      },
     },
-    include: [{
-      model: User,
-      where: {departmentId: id}
-    }]
+    include: [
+      {
+        model: User,
+        where: { departmentId: id },
+        jobPosition: { [Op.ne]: "HOD" },
+      },
+    ],
   })
-    .then(data => {
-      res.send(data);
-    })
-    .catch(err => {
-      console.log(err)
+    .then((data) => res.send(data))
+    .catch((err) =>
       res.status(500).send({
         message:
-          err.message || "Some error occurred while retrieving Applications.",
-      });
-    });
+          err.message ||
+          "Some error occurred while retrieving department applications.",
+      })
+    );
 };
 
+// Retrieve recent Applications by User
 exports.findAllRecentAndUser = (req, res) => {
-  const id = req.params.id
+  const id = req.params.id;
 
   Application.findAll({
     where: {
-      [Op.and]: [
-        {startDate: {
-          [Op.gte]: moment().subtract(14, 'days').toDate()
-        }},
-        {startDate : {
-          [Op.lte]: moment().add(7, 'days').toDate()
-        }}
-      ]
+      startDate: {
+        [Op.gte]: moment().subtract(14, "days").toDate(),
+        [Op.lte]: moment().add(7, "days").toDate(),
+      },
     },
-    include: [{
-      model: User,
-      where: {id: id}
-    }]
+    include: [
+      {
+        model: User,
+        where: { id: id },
+      },
+    ],
   })
-    .then(data => {
-      res.send(data);
-    })
-    .catch(err => {
-      console.log(err)
+    .then((data) => res.send(data))
+    .catch((err) =>
       res.status(500).send({
         message:
-          err.message || "Some error occurred while retrieving Applications.",
-      });
-    });
+          err.message ||
+          "Some error occurred while retrieving user applications.",
+      })
+    );
 };
 
-//Retrieve all Applications By User Id
+// Retrieve all Applications by Department ID
 exports.findAllByDeptId = (req, res) => {
   const deptId = req.params.id;
 
   Application.findAll({
-    include: [{
-      model: User,
-      where: {departmentId: deptId}
-    }]
+    include: [
+      {
+        model: User,
+        where: { departmentId: deptId },
+      },
+    ],
   })
-  .then(data => {
-    res.send(data)
-  })
-  .catch(err => {
-    res.status(500).send({
-      message:
-        err.message || "Some error occurred while retrieving Applications.",
-    });
-  })
+    .then((data) => res.send(data))
+    .catch((err) =>
+      res.status(500).send({
+        message:
+          err.message ||
+          "Some error occurred while retrieving applications by department.",
+      })
+    );
 };
 
-//Retrieve all Applications By User Id
+// Retrieve all Applications by User ID
 exports.findAllByUserId = (req, res) => {
   const userId = req.params.id;
 
-  User.findByPk(userId).then((user) => {
-    Application.findAll({ 
-      include: [{
-        model: User
-      }],
-      where: { userId: userId } 
+  User.findByPk(userId).then(() => {
+    Application.findAll({
+      where: { userId: userId },
+      include: [User],
     })
-      .then((data) => {
-        res.send(data);
+      .then((applications) => {
+        const updatedApplications = applications.map((app) => {
+          const appData = app.toJSON();
+
+          if (appData.hodStatus === "Approved" && !appData.hodComment) {
+            appData.hodComment = "-";
+          }
+
+          if (appData.adminStatus === "Approved" && !appData.adminComment) {
+            appData.adminComment = "-";
+          }
+
+          if (appData.hodStatus === "Rejected") {
+            appData.adminStatus = "NA";
+            appData.adminComment = "NA";
+          }
+
+          return appData;
+        });
+
+        res.send(updatedApplications);
       })
-      .catch((err) => {
+      .catch((err) =>
         res.status(500).send({
           message:
-            err.message || "Some error occurred while retrieving Applications.",
-        });
-      });
+            err.message ||
+            "Some error occurred while retrieving user applications.",
+        })
+      );
   });
 };
 
-// Find a single Application with an id
+// Retrieve a single Application by ID
 exports.findOne = (req, res) => {
   const id = req.params.id;
 
   Application.findByPk(id)
-    .then((data) => {
-      res.send(data);
-    })
-    .catch((err) => {
+    .then((data) => res.send(data))
+    .catch(() =>
       res.status(500).send({
-        message: "Error retrieving Application with id=" + id,
-      });
-    });
+        message: `Error retrieving Application with id=${id}`,
+      })
+    );
 };
 
-// Update a Application by the id in the request
+// Update an Application by ID
 exports.update = (req, res) => {
   const id = req.params.id;
 
-  Application.update(req.body, {
-    where: { id: id },
-  })
+  Application.update(req.body, { where: { id } })
     .then((num) => {
       if (num == 1) {
-        res.send({
-          message: "Application was updated successfully.",
-        });
+        res.send({ message: "Application was updated successfully." });
       } else {
         res.send({
           message: `Cannot update Application with id=${id}. Maybe Application was not found or req.body is empty!`,
         });
       }
     })
-    .catch((err) => {
-      console.log(err);
+    .catch((err) =>
       res.status(500).send({
-        message: "Error updating Application with id=" + id,
-      });
-    });
+        message: `Error updating Application with id=${id}`,
+      })
+    );
 };
 
-// Delete a Application with the specified id in the request
+// Update HOD status and comment
+exports.hodUpdate = async (req, res) => {
+  const id = req.params.id;
+  const { status, comment } = req.body;
+
+  try {
+    const updateData = {
+      hodStatus: status,
+      hodComment: status == "Approved" ? "NA" : comment,
+    };
+
+    if (status === "Rejected") {
+      updateData.status = "Rejected";
+      updateData.adminStatus = "Not Applicable";
+    }
+
+    await Application.update(updateData, { where: { id } });
+    res.send({ message: "HOD decision recorded." });
+  } catch (err) {
+    res.status(500).send({ message: "Error updating HOD status." });
+  }
+};
+
+// Update Admin status and comment
+exports.adminUpdate = async (req, res) => {
+  const id = req.params.id;
+  const { status, comment } = req.body;
+
+  try {
+    const updateData = {
+      adminStatus: status,
+      adminComment: comment,
+    };
+
+    if (status === "Approved") {
+      updateData.status = "Approved";
+    } else if (status === "Rejected") {
+      updateData.status = "Rejected";
+    }
+
+    await Application.update(updateData, { where: { id } });
+    res.send({ message: "Admin decision recorded." });
+  } catch (err) {
+    res.status(500).send({ message: "Error updating Admin status." });
+  }
+};
+
+// Delete an Application by ID
 exports.delete = (req, res) => {
   const id = req.params.id;
 
-  Application.destroy({
-    where: { id: id },
-  })
+  Application.destroy({ where: { id } })
     .then((num) => {
       if (num == 1) {
-        res.send({
-          message: "Application was deleted successfully!",
-        });
+        res.send({ message: "Application was deleted successfully!" });
       } else {
         res.send({
-          message: `Cannot delete Application with id=${id}. Maybe Tutorial was not found!`,
+          message: `Cannot delete Application with id=${id}. Maybe Application was not found!`,
         });
       }
     })
-    .catch((err) => {
+    .catch((err) =>
       res.status(500).send({
-        message: "Could not delete Application with id=" + id,
-      });
-    });
+        message: `Could not delete Application with id=${id}`,
+      })
+    );
 };
 
-// Delete all Applications from the database.
+// Delete all Applications
 exports.deleteAll = (req, res) => {
-  Application.destroy({
-    where: {},
-    truncate: false,
-  })
-    .then((nums) => {
-      res.send({ message: `${nums} Applications were deleted successfully!` });
-    })
-    .catch((err) => {
+  Application.destroy({ where: {}, truncate: false })
+    .then((nums) =>
+      res.send({ message: `${nums} Applications were deleted successfully!` })
+    )
+    .catch((err) =>
       res.status(500).send({
         message:
           err.message || "Some error occurred while removing all Applications.",
-      });
-    });
+      })
+    );
 };
 
-// Delete all Applications by User Id.
+// Delete all Applications by User ID
 exports.deleteAllByUserId = (req, res) => {
   const userId = req.params.id;
 
-  Application.destroy({
-    where: { userId: userId },
-    truncate: false,
-  })
-    .then((nums) => {
-      res.send({ message: `${nums} Applications were deleted successfully!` });
-    })
-    .catch((err) => {
+  Application.destroy({ where: { userId }, truncate: false })
+    .then((nums) =>
+      res.send({ message: `${nums} Applications were deleted successfully!` })
+    )
+    .catch((err) =>
       res.status(500).send({
         message:
           err.message || "Some error occurred while removing all Applications.",
-      });
-    });
+      })
+    );
 };
 
-
+// Retrieve all applications by college (for admins)
 exports.getApplicationsByCollege = async (req, res) => {
   try {
-    // 1. Get admin's college from the authenticated user
     const adminCollege = req.user.college;
-    
+
     if (!adminCollege) {
-      return res.status(400).json({ message: 'Admin college not specified' });
+      return res.status(400).json({ message: "Admin college not specified" });
     }
 
-    // 2. Find all applications from users in the same college
     const applications = await Application.findAll({
       include: [
         {
           model: User,
           where: { college: adminCollege },
-          attributes: ['id', 'fullName'],
-          include: [{
-            model: Department,
-            attributes: ['id', ['department_name', 'departmentName']]
-        }],
-          required: true
-        }
+          attributes: ["id", "fullName", "college", "jobPosition"],
+          include: [
+            {
+              model: Department,
+              attributes: ["id", ["department_name", "departmentName"]],
+            },
+          ],
+        },
       ],
-      order: [['start_date', 'DESC']]
     });
 
-    // 3. Format the response
-    const formattedApplications = applications.map(app => ({
-      ...app.get({ plain: true }),
-      startDate: app.startDate ? moment(app.startDate).format('YYYY-MM-DD') : null,
-      endDate: app.endDate ? moment(app.endDate).format('YYYY-MM-DD') : null
-    }));
+    // ✅ Convert "Pending" to "NA" if user is a HOD
+    const updatedApplications = applications.map((app) => {
+      const appData = app.toJSON();
+      const isHod = appData.user?.jobPosition === "HOD";
 
-    res.status(200).json(formattedApplications);
-    
+      if (isHod && appData.hodStatus === "Pending") {
+        appData.hodStatus = "NA";
+        appData.hodComment = "NA";
+      }
+      if (!isHod && appData.hodStatus === "Approved" && !appData.hodComment) {
+        appData.hodComment = "-";
+      }
+      if (appData.adminStatus === "Approved" && !appData.adminComment) {
+        appData.adminComment = "-";
+      }
+      //HOD Reject the application, then the admin's status and comment should be filled with NA
+      if (appData.hodStatus === "Rejected") {
+        appData.adminStatus = "NA";
+        appData.adminComment = "NA";
+      }
+      return appData;
+    });
+
+    res.send(updatedApplications);
   } catch (err) {
-    console.error('Error fetching college applications:', err);
-    res.status(500).json({ 
-      message: 'Failed to fetch applications',
-      error: process.env.NODE_ENV === 'development' ? err.message : undefined
+    console.error(err);
+    res.status(500).send({
+      message: "Error retrieving applications by college.",
     });
   }
 };
