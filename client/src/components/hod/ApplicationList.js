@@ -53,11 +53,9 @@ export default class HODApplicationList extends Component {
         { headers: { Authorization: `Bearer ${token}` } }
       )
       .then(() => {
-        console.log("Approved successfully");
-        this.componentDidMount(); // Refresh
+        this.componentDidMount(); // Refresh the list
       })
       .catch((err) => {
-        console.error("Approval error:", err);
         this.setState({
           hasError: true,
           errorMsg: "Approval failed. Check console for details.",
@@ -74,7 +72,6 @@ export default class HODApplicationList extends Component {
     const token = localStorage.getItem("token");
 
     if (!selectedApp || !selectedApp.id) {
-      console.error("No selected application for rejection.");
       this.setState({ showModal: false });
       return;
     }
@@ -86,12 +83,10 @@ export default class HODApplicationList extends Component {
         { headers: { Authorization: `Bearer ${token}` } }
       )
       .then(() => {
-        console.log("Rejected successfully");
         this.setState({ showModal: false, comment: "", selectedApp: null });
-        this.componentDidMount(); // Refresh
+        this.componentDidMount(); // Refresh the list
       })
       .catch((err) => {
-        console.error("Rejection error:", err);
         this.setState({
           hasError: true,
           errorMsg: "Rejection failed. Check console for details.",
@@ -104,7 +99,7 @@ export default class HODApplicationList extends Component {
       overrides: {
         MuiTableCell: {
           root: {
-            padding: "6px 6px 6px 6px",
+            padding: "6px",
           },
         },
       },
@@ -181,7 +176,7 @@ export default class HODApplicationList extends Component {
           </Card>
         </div>
 
-        {/* Rejection Reason Modal */}
+        {/* Modal for Rejection Reason */}
         <Modal
           show={this.state.showModal}
           onHide={() => this.setState({ showModal: false })}
@@ -213,11 +208,11 @@ export default class HODApplicationList extends Component {
           </Modal.Footer>
         </Modal>
 
-        {this.state.hasError ? (
+        {this.state.hasError && (
           <Alert variant="danger" className="m-3">
             {this.state.errorMsg}
           </Alert>
-        ) : null}
+        )}
       </div>
     );
   }

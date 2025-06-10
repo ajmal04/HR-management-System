@@ -1,35 +1,14 @@
-import React, { useState, useEffect, useCallback  } from 'react';
-import { Card, Button, Form, Table, Alert, Spinner } from 'react-bootstrap';
+import React, { useState } from 'react';
+import { Card, Button, Form, Alert, Spinner } from 'react-bootstrap';
 import axios from 'axios';
 
-const DocumentUpload = ({ requestId, onUpdate, userRole }) => {
-  const [documents, setDocuments] = useState([]);
-  const [loading, setLoading] = useState(true);
+const DocumentUpload = ({ requestId, onUpdate }) => {
   const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [documentType, setDocumentType] = useState('');
   const [description, setDescription] = useState('');
-
-
-  const fetchDocuments = useCallback(async () => {
-    try {
-      setLoading(true);
-      const response = await axios.get(`/api/onboarding/requests/${requestId}/documents`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-      });
-      setDocuments(response.data || []);
-      setLoading(false);
-    } catch (err) {
-      console.error('Error fetching documents:', err);
-      setError('Failed to load documents. Please try again later.');
-      setLoading(false);
-    }
-  }, [requestId]);
-
-  useEffect(() => {
-    fetchDocuments();
-  }, [requestId, fetchDocuments]);
 
   const handleFileChange = (e) => {
     setSelectedFile(e.target.files[0]);
@@ -37,75 +16,59 @@ const DocumentUpload = ({ requestId, onUpdate, userRole }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!selectedFile || !documentType) {
-      setError('Please select a file and document type');
-      return;
-    }
-
     try {
       setUploading(true);
       setError(null);
+      setSuccess(null);
+
+      if (!selectedFile) {
+        setError('Please select a file');
+        return;
+      }
 
       const formData = new FormData();
       formData.append('file', selectedFile);
       formData.append('documentType', documentType);
       formData.append('description', description);
 
-      await axios.post(`/api/onboarding/requests/${requestId}/documents`, formData, {
-        headers: { 
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-          'Content-Type': 'multipart/form-data'
+      await axios.post(
+        `/api/onboarding/requests/${requestId}/documents`,
+        formData,
+        {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'multipart/form-data'
+          },
+          timeout: 30000
         }
-      });
+      );
 
-      // Reset form
+      setSuccess('Document uploaded successfully!');
       setSelectedFile(null);
       setDocumentType('');
       setDescription('');
       
-      // Refresh documents
-      fetchDocuments();
-      
-      // Notify parent component
       if (onUpdate) {
-        onUpdate();
+        onUpdate(); // Notify parent component of the update
       }
-    } catch (err) {
-      console.error('Error uploading document:', err);
-      setError(err.response?.data?.message || 'Failed to upload document. Please try again.');
+    } catch (error) {
+      let errorMsg = 'Upload failed';
+      if (error.response) {
+        errorMsg = error.response.data.message || 
+          `Server error: ${error.response.status}`;
+      } else if (error.request) {
+        errorMsg = 'No response from server';
+      } else {
+        errorMsg = error.message;
+      }
+      setError(errorMsg);
     } finally {
       setUploading(false);
     }
   };
 
-  const handleDelete = async (documentId) => {
-    if (!window.confirm('Are you sure you want to delete this document?')) {
-      return;
-    }
-
-    try {
-      setLoading(true);
-      await axios.delete(`/api/onboarding/requests/${requestId}/documents/${documentId}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-      });
-      
-      // Refresh documents
-      fetchDocuments();
-      
-      // Notify parent component
-      if (onUpdate) {
-        onUpdate();
-      }
-    } catch (err) {
-      console.error('Error deleting document:', err);
-      setError('Failed to delete document. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const getDocumentTypeOptions = () => {
-    const options = [
+    return [
       { value: 'ID_PROOF', label: 'ID Proof' },
       { value: 'EDUCATION_CERTIFICATE', label: 'Education Certificate' },
       { value: 'EXPERIENCE_LETTER', label: 'Experience Letter' },
@@ -113,12 +76,6 @@ const DocumentUpload = ({ requestId, onUpdate, userRole }) => {
       { value: 'MEDICAL_CERTIFICATE', label: 'Medical Certificate' },
       { value: 'OTHER', label: 'Other' }
     ];
-    return options;
-  };
-
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
   };
 
   return (
@@ -128,9 +85,10 @@ const DocumentUpload = ({ requestId, onUpdate, userRole }) => {
           <h5 className="mb-0">Document Upload</h5>
         </Card.Header>
         <Card.Body>
-          {error && <Alert variant="danger">{error}</Alert>}
+          {error && <Alert variant="danger" onClose={() => setError(null)} dismissible>{error}</Alert>}
+          {success && <Alert variant="success" onClose={() => setSuccess(null)} dismissible>{success}</Alert>}
           
-          <Form onSubmit={handleSubmit} className="mb-4">
+          <Form onSubmit={handleSubmit}>
             <Form.Group className="mb-3">
               <Form.Label>Document Type</Form.Label>
               <Form.Control
@@ -191,63 +149,10 @@ const DocumentUpload = ({ requestId, onUpdate, userRole }) => {
               ) : 'Upload Document'}
             </Button>
           </Form>
-          
-          <h6>Uploaded Documents</h6>
-          {loading ? (
-            <div className="text-center p-3">
-              <Spinner animation="border" role="status">
-                <span className="visually-hidden">Loading...</span>
-              </Spinner>
-            </div>
-          ) : documents.length > 0 ? (
-            <Table responsive hover>
-              <thead>
-                <tr>
-                  <th>Document Type</th>
-                  <th>Description</th>
-                  <th>Uploaded By</th>
-                  <th>Upload Date</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {documents.map(doc => (
-                  <tr key={doc.id}>
-                    <td>
-                      {getDocumentTypeOptions().find(opt => opt.value === doc.documentType)?.label || doc.documentType}
-                    </td>
-                    <td>{doc.description || '-'}</td>
-                    <td>{doc.uploadedBy?.fullName || '-'}</td>
-                    <td>{formatDate(doc.uploadedAt)}</td>
-                    <td>
-                      <Button 
-                        variant="outline-primary" 
-                        size="sm" 
-                        className="me-2"
-                        href={`/onboarding/documents/${doc.id}/download`}
-                        target="_blank"
-                      >
-                        Download
-                      </Button>
-                      <Button 
-                        variant="outline-danger" 
-                        size="sm"
-                        onClick={() => handleDelete(doc.id)}
-                      >
-                        Delete
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
-          ) : (
-            <Alert variant="info">No documents have been uploaded yet.</Alert>
-          )}
         </Card.Body>
       </Card>
     </div>
   );
 };
 
-export default DocumentUpload; 
+export default DocumentUpload;

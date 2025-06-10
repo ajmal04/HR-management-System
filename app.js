@@ -5,59 +5,65 @@ var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 var cors = require("cors");
 var withAuth = require("./withAuth");
+
 require("dotenv").config();
 
 const { errorHandler } = require("./utils/errorHandler");
 const db = require("./models");
 
-const resignationRoutes = require("./routes/resignation.routes");
-const requisitionRoutes = require("./routes/jobRequisition.routes");
-const collegeAnnouncementRoutes = require("./routes/collegeAnnouncement.routes");
-const collegeEventRoutes = require("./routes/collegeEvent.routes");
-const departmentEventRoutes = require("./routes/departmentEvent.routes");
-
+// Route imports
 const api = require("./routes/api");
 const login = require("./routes/login/login.routes");
 const register = require("./routes/register/register.routes");
 const onboarding = require("./routes/onboarding.routes");
 
+const resignationRoutes = require("./routes/resignation.routes");
+const documentRoutes = require("./routes/document.routes");
+const recruitmentRoutes = require("./routes/recruitment.routes");
+const requisitionRoutes = require("./routes/jobRequisition.routes");
+const collegeAnnouncementRoutes = require("./routes/collegeAnnouncement.routes");
+const collegeEventRoutes = require("./routes/collegeEvent.routes");
+const departmentEventRoutes = require("./routes/departmentEvent.routes");
+
 var app = express();
 
-// Middleware Setup
+// Middleware setup
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-// CORS Setup (only once)
+// CORS Setup
 app.use(
   cors({
-    origin: "http://localhost:3000", // adjust if deploying
+    origin: "http://localhost:3000", // adjust for deployment
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
 );
 
-// Database Sync
+// Sync database
 db.sequelize.sync({ alter: true }).then(() => {
   console.log("✅ Database synced successfully.");
 });
 
-// Route Registrations
+// Route registration
 app.use("/api", api);
 app.use("/login", login);
 app.use("/register", register);
 app.use("/onboarding", onboarding);
 app.use("/api/resignations", resignationRoutes);
+app.use("/api/documents", documentRoutes);
+app.use("/api/recruitment", recruitmentRoutes);
 app.use("/api/requisition", requisitionRoutes);
 app.use("/api/collegeAnnouncements", collegeAnnouncementRoutes);
 app.use("/api/collegeEvents", collegeEventRoutes);
 app.use("/api/departmentEvents", departmentEventRoutes);
 
-// Token Check Endpoint
+// Token check route
 app.get("/checkToken", withAuth.checkToken);
 
-// Root Check
+// Root route
 app.get("/", (req, res) => {
   res.json({ success: true, message: "Server is running 🚀" });
 });
@@ -70,7 +76,7 @@ if (process.env.NODE_ENV === "production") {
   });
 }
 
-// Error: 404 - Not Found
+// 404 Not Found handler
 app.use((req, res, next) => {
   res.status(404).json({
     success: false,
@@ -82,7 +88,7 @@ app.use((req, res, next) => {
   });
 });
 
-// Global Error Handler
+// Global error handler
 app.use((err, req, res, next) => {
   const status = err.status || 500;
   res.status(status).json({

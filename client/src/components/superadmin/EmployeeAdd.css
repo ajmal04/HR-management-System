@@ -1,0 +1,520 @@
+.employee-add-container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  background: #f8f9fa;
+  min-height: 100vh;
+}
+
+.main-card {
+  border: none;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  background: white;
+  overflow: hidden;
+}
+
+.main-card-header {
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  padding: 2rem;
+  color: white;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.main-card-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+  z-index: 1;
+}
+
+.main-card-header h3 {
+  color: white;
+  font-weight: 600;
+  font-size: 1.75rem;
+  margin: 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative;
+  z-index: 2;
+}
+
+.form-card {
+  border: none;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  background: white;
+  transition: all 0.3s ease;
+}
+
+.form-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+.form-card-header {
+  background: white;
+  border-bottom: 2px solid #f1f5f9;
+  padding: 1.5rem;
+  border-radius: 12px 12px 0 0;
+  position: relative;
+}
+
+.form-card-header::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, #4f46e5 0%, #7c3aed 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.form-card:hover .form-card-header::after {
+  opacity: 1;
+}
+
+.form-card-header h4 {
+  color: #1e293b;
+  font-weight: 600;
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.form-group-custom {
+  margin-bottom: 1.5rem;
+  padding: 0 1.5rem;
+}
+
+.form-group-custom label {
+  color: #475569;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+}
+
+.form-group-custom label.required::after {
+  content: " *";
+  color: #ef4444;
+  margin-left: 4px;
+}
+
+.form-control {
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  transition: all 0.2s ease;
+  font-size: 0.95rem;
+  background: #f8fafc;
+}
+
+.form-control:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+  background: white;
+}
+
+/* Step Indicator Styles */
+.step-indicator {
+  margin: 2rem 0 4rem;
+  padding: 0 2rem;
+}
+
+.steps-container {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  padding: 0 1rem;
+}
+
+.steps-container::before {
+  content: "";
+  position: absolute;
+  top: 24px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #e2e8f0;
+  z-index: 1;
+}
+
+.step {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  flex: 1;
+  padding: 0 1rem;
+}
+
+.step-icon {
+  font-size: 1.75rem;
+  margin-bottom: 0.75rem;
+  color: #94a3b8;
+  transition: all 0.3s ease;
+}
+
+.step.active .step-icon {
+  color: #4f46e5;
+  transform: scale(1.1);
+}
+
+.step-number {
+  width: 48px;
+  height: 48px;
+  background: white;
+  border: 3px solid #e2e8f0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 0.75rem;
+  font-weight: 600;
+  color: #94a3b8;
+  transition: all 0.3s ease;
+  font-size: 1.1rem;
+}
+
+.step.active .step-number {
+  background: #4f46e5;
+  border-color: #4f46e5;
+  color: white;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+}
+
+.step-title {
+  font-size: 0.9rem;
+  color: #64748b;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.step.active .step-title {
+  color: #4f46e5;
+  font-weight: 600;
+}
+
+/* Navigation Buttons */
+.form-navigation {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 3rem;
+  padding: 2rem;
+  background: #f8fafc;
+  border-top: 2px solid #f1f5f9;
+}
+
+.nav-button {
+  padding: 0.875rem 2rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: all 0.2s ease;
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+.nav-button.btn-outline-primary {
+  border: 2px solid #4f46e5;
+  color: #4f46e5;
+}
+
+.nav-button.btn-outline-primary:hover {
+  background: #4f46e5;
+  color: white;
+  transform: translateY(-1px);
+}
+
+.nav-button.btn-primary {
+  background: #4f46e5;
+  border: 2px solid #4f46e5;
+}
+
+.nav-button.btn-primary:hover {
+  background: #4338ca;
+  border-color: #4338ca;
+  transform: translateY(-1px);
+}
+
+.nav-button.btn-success {
+  background: #10b981;
+  border: 2px solid #10b981;
+}
+
+.nav-button.btn-success:hover {
+  background: #059669;
+  border-color: #059669;
+  transform: translateY(-1px);
+}
+
+.nav-button i {
+  font-size: 1rem;
+}
+
+/* Alert Styles */
+.alert-custom {
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  margin: 1.5rem 2rem;
+  border: none;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  font-weight: 500;
+}
+
+.alert-danger {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.alert-success {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+/* Form Content Animation */
+.form-content {
+  position: relative;
+  min-height: 400px;
+  padding: 0 2rem;
+}
+
+.form-step {
+  animation: slideIn 0.4s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Select Styles */
+select.form-control {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%234f46e5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1rem;
+  padding-right: 2.5rem;
+  height: auto;
+  min-height: 42px;
+  white-space: normal;
+  word-wrap: break-word;
+}
+
+select.form-control option {
+  padding: 8px;
+  font-size: 0.95rem;
+  color: #1e293b;
+  background: white;
+}
+
+select.form-control:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+  background-color: white;
+}
+
+/* Dropdown Container */
+.form-group-custom {
+  position: relative;
+}
+
+/* Custom Dropdown Styles */
+select.form-control {
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+select.form-control option {
+  padding: 12px;
+  margin: 4px;
+  border-radius: 4px;
+}
+
+select.form-control option:hover {
+  background-color: #f1f5f9;
+}
+
+select.form-control option:checked {
+  background-color: #4f46e5;
+  color: white;
+}
+
+/* Ensure dropdown is above other elements */
+select.form-control:focus {
+  z-index: 1;
+}
+
+/* Fix for Firefox */
+@-moz-document url-prefix() {
+  select.form-control {
+    text-indent: -2px;
+  }
+}
+
+/* Fix for IE */
+@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+  select.form-control {
+    padding-right: 2.5rem;
+  }
+}
+
+/* Ensure proper spacing in form groups */
+.form-group-custom {
+  margin-bottom: 1.5rem;
+  padding: 0 1.5rem;
+}
+
+.form-group-custom label {
+  margin-bottom: 0.75rem;
+}
+
+/* Add some space between options */
+select.form-control option {
+  margin: 2px 0;
+}
+
+/* Ensure proper height for all form controls */
+.form-control {
+  min-height: 42px;
+  line-height: 1.5;
+  padding: 0.75rem 1rem;
+}
+
+/* Add hover effect for better UX */
+select.form-control:hover {
+  border-color: #4f46e5;
+}
+
+/* Ensure proper text color for placeholder */
+select.form-control option:first-child {
+  color: #64748b;
+}
+
+/* Add transition for smooth interactions */
+select.form-control,
+select.form-control option {
+  transition: all 0.2s ease;
+}
+
+/* Ensure proper spacing in mobile view */
+@media (max-width: 768px) {
+  select.form-control {
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+  
+  .form-group-custom {
+    padding: 0 1rem;
+  }
+}
+
+/* DatePicker Styles */
+.react-datepicker-wrapper {
+  width: 100%;
+}
+
+.react-datepicker__input-container input {
+  width: 100%;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  transition: all 0.2s ease;
+  font-size: 0.95rem;
+  background: #f8fafc;
+}
+
+.react-datepicker__input-container input:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+  background: white;
+  outline: none;
+}
+
+/* Textarea Styles */
+textarea.form-control {
+  min-height: 100px;
+  resize: vertical;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .employee-add-container {
+    padding: 0;
+    margin: 0;
+  }
+
+  .main-card {
+    border-radius: 0;
+  }
+
+  .main-card-header {
+    padding: 1.5rem;
+  }
+
+  .steps-container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+    padding: 0;
+  }
+
+  .steps-container::before {
+    display: none;
+  }
+
+  .step {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0;
+    width: 100%;
+  }
+
+  .step-number {
+    margin: 0;
+  }
+
+  .step-icon {
+    margin: 0;
+  }
+
+  .form-navigation {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.5rem;
+  }
+
+  .nav-button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .form-content {
+    padding: 0 1rem;
+  }
+
+  .form-group-custom {
+    padding: 0 1rem;
+  }
+
+  .alert-custom {
+    margin: 1rem;
+  }
+} 

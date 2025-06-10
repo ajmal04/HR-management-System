@@ -41,6 +41,23 @@ exports.create = (req, res) => {
   const salaryNet = salaryGross - deduction;
 
   const userFinancialInformation = {
+    employmentType: req.body.employmentType,
+    salaryBasic: req.body.salaryBasic,
+    salaryGross: req.body.salaryGross,
+    salaryNet: req.body.salaryNet,
+    allowanceHouseRent: req.body.allowanceHouseRent,
+    allowanceMedical: req.body.allowanceMedical,
+    allowanceSpecial: req.body.allowanceSpecial,
+    allowanceFuel: req.body.allowanceFuel,
+    allowancePhoneBill: req.body.allowancePhoneBill,
+    allowanceOther: req.body.allowanceOther,
+    allowanceTotal: req.body.allowanceTotal,
+    bankName: req.body.bankName,
+    accountName: req.body.accountName,
+    accountNumber: req.body.accountNumber,
+    ifscCode: req.body.ifscCode,
+    iban: req.body.iban,
+    userId: req.body.userId,
     employmentType,
     salaryBasic,
     salaryGross,
@@ -71,11 +88,9 @@ exports.create = (req, res) => {
           })
         );
     } else {
-      res
-        .status(403)
-        .send({
-          message: "Financial Information Already Exists for this User",
-        });
+      res.status(403).send({
+        message: "Financial Information Already Exists for this User",
+      });
     }
   });
 };

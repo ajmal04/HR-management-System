@@ -1,38 +1,45 @@
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
 const { createError } = require('../utils/errorHandler');
 
-// Configure storage
+// Ensure uploads directory exists
+const uploadDir = 'uploads';
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads/');
+  destination: (req, file, cb) => {
+    cb(null, uploadDir);
   },
-  filename: function (req, file, cb) {
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+    cb(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
   }
 });
 
-// File filter
 const fileFilter = (req, file, cb) => {
-  // Accept images and documents
-  if (file.mimetype.startsWith('image/') || 
-      file.mimetype === 'application/pdf' ||
-      file.mimetype === 'application/msword' ||
-      file.mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+  const allowedTypes = [
+    'image/jpeg',
+    'image/png',
+    'application/pdf',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+  ];
+  
+  if (allowedTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(createError(400, 'Please upload an image or document file'), false);
+    cb(createError(400, `Invalid file type: ${file.mimetype}. Only images, PDFs and Word docs are allowed`), false);
   }
 };
 
-// Create multer upload instance
-const upload = multer({
-  storage: storage,
-  fileFilter: fileFilter,
+module.exports = multer({
+  storage,
+  fileFilter,
   limits: {
-    fileSize: 5 * 1024 * 1024 // 5MB max file size
+    fileSize: 10 * 1024 * 1024 // 10MB
   }
 });
-
-module.exports = upload; 

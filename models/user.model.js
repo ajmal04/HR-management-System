@@ -8,6 +8,11 @@ module.exports = (sequelize, Sequelize) => {
         primaryKey: true,
         allowNull: false,
       },
+      employeeId: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        unique: true
+      },
       username: {
         type: Sequelize.STRING,
         allowNull: false,

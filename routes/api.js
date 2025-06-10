@@ -18,6 +18,7 @@ var userFinancialInformationRouter = require('./userFinacnialInformation.routes'
 var collegeRouter = require('./college.routes');
 var onboardingRouter = require('./onboarding.routes');
 var assetRouter = require('./asset.routes');
+var qualificationRouter = require('./qualification.routes');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -41,5 +42,5 @@ router.use('/financialInformations', userFinancialInformationRouter)
 router.use('/colleges', collegeRouter);
 router.use('/onboarding', onboardingRouter);
 router.use('/assets', assetRouter);
-
+router.use('/qualifications', qualificationRouter);
 module.exports = router;

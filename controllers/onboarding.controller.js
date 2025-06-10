@@ -1,6 +1,6 @@
 const db = require('../models');
 const { createError } = require('../utils/errorHandler');
-const { uploadFile } = require('../utils/fileUpload');
+const { uploadFile } = require('../middleware/upload');  
 const { Op } = require('sequelize');
 
 // Test function to create a sample request
@@ -341,52 +341,80 @@ exports.deleteStage = async (req, res, next) => {
 
 // Document Management
 exports.uploadDocument = async (req, res, next) => {
-    try {
-        const request = await db.onboardingRequest.findByPk(req.params.id);
-        if (!request) {
-            throw createError(404, "Request not found");
-        }
+  try {
+    console.log('Upload request received:', {
+      params: req.params,
+      body: req.body,
+      file: req.file ? {
+        originalname: req.file.originalname,
+        mimetype: req.file.mimetype,
+        size: req.file.size
+      } : null
+    });
 
-        if (!req.file) {
-            throw createError(400, "No file uploaded");
-        }
-
-        console.log('Uploading file:', req.file);
-        const filePath = await uploadFile(req.file, 'onboarding-documents');
-        console.log('File path:', filePath);
-
-        const document = await db.onboardingDocument.create({
-            requestId: request.id,
-            documentType: req.body.documentType,
-            fileName: req.file.originalname,
-            filePath,
-            uploadedBy: req.user.id,
-            comments: req.body.description,
-            status: 'pending'
-        });
-
-        res.status(201).json(document);
-    } catch (error) {
-        console.error('Error in uploadDocument:', error);
-        next(error);
+    if (!req.file) {
+      throw createError(400, "No file was uploaded");
     }
+
+    const request = await db.onboardingRequest.findByPk(req.params.id);
+    if (!request) {
+      throw createError(404, "Onboarding request not found");
+    }
+
+    const document = await db.onboardingDocument.create({
+      requestId: request.id,
+      documentType: req.body.documentType,
+      fileName: req.file.originalname,
+      filePath: req.file.path, // Multer already saved the file
+      uploadedBy: req.user.id,
+      comments: req.body.description || '',
+      status: 'pending'
+    });
+
+    res.status(201).json({
+      success: true,
+      message: 'Document uploaded successfully',
+      document: {
+        id: document.id,
+        documentType: document.documentType,
+        fileName: document.fileName,
+        status: document.status,
+        uploadDate: document.createdAt
+      }
+    });
+  } catch (error) {
+    console.error('Upload error:', {
+      error: error.message,
+      stack: error.stack
+    });
+    
+    // Clean up file if upload failed
+    if (req.file && req.file.path) {
+      fs.unlink(req.file.path, (err) => {
+        if (err) console.error('Failed to cleanup file:', err);
+      });
+    }
+    
+    next(error);
+  }
 };
 
 exports.getDocuments = async (req, res, next) => {
-    try {
-        const documents = await OnboardingDocument.findAll({
-            where: { requestId: req.params.id },
-            include: [
-                { model: User, as: 'uploader', attributes: ['id', 'fullName'] }
-            ]
-        });
-        
-        res.json(documents);
-    } catch (error) {
-        next(error);
-    }
+  try {
+    const documents = await db.onboardingDocument.findAll({
+      where: { requestId: req.params.id },
+      include: [{
+        model: db.user,
+        as: 'uploader',
+        attributes: ['id', 'fullName']
+      }]
+    });
+    res.json(documents);
+  } catch (error) {
+    console.error('Error fetching documents:', error);
+    next(error);
+  }
 };
-
 exports.deleteDocument = async (req, res, next) => {
     try {
         const document = await OnboardingDocument.findByPk(req.params.documentId);

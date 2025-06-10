@@ -1,50 +1,69 @@
-const fs = require('fs');
+const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
 const createError = require('http-errors');
 
-/**
- * Upload a file to the specified directory
- * @param {Object} file - The file object from multer
- * @param {String} subDir - The subdirectory to store the file in
- * @returns {String} - The path to the uploaded file
- */
-exports.uploadFile = async (file, subDir = '') => {
-  try {
-    if (!file) {
-      throw createError(400, 'No file provided');
-    }
+// Configure multer to use memory storage
+const storage = multer.memoryStorage();
 
-    // The file has already been moved by multer, just return the relative path
-    return path.join(subDir, path.basename(file.path));
-  } catch (error) {
-    console.error('Error in uploadFile:', error);
-    throw createError(500, `Error uploading file: ${error.message}`);
+// File filter for images and PDFs only
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith('image/') || file.mimetype === 'application/pdf') {
+    cb(null, true);
+  } else {
+    cb(new Error('Only images and PDFs are allowed!'), false);
   }
 };
 
-/**
- * Delete a file from the filesystem
- * @param {String} filePath - The path to the file to delete
- * @returns {Boolean} - True if the file was deleted successfully
- */
-exports.deleteFile = async (filePath) => {
+// Upload middleware
+const upload = multer({
+  storage: storage,
+  fileFilter: fileFilter,
+  limits: { fileSize: 5 * 1024 * 1024 } // 5MB limit
+});
+
+// File upload utility
+const uploadFile = async (file, subDir = '') => {
   try {
-    if (!filePath) {
-      return false;
+    if (!file || !file.buffer) {
+      throw createError(400, 'Invalid file or empty buffer');
     }
 
-    const fullPath = path.join('uploads', filePath);
-
-    // Check if file exists
-    if (!fs.existsSync(fullPath)) {
-      return false;
+    const uploadDir = path.join(__dirname, '../uploads', subDir);
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
     }
 
-    // Delete the file
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const filename = file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname);
+    const filepath = path.join(uploadDir, filename);
+
+    await fs.promises.writeFile(filepath, file.buffer);
+    return path.join(subDir, filename);
+  } catch (error) {
+    console.error('Error uploading file:', error);
+    throw error;
+  }
+};
+
+// File delete utility
+const deleteFile = async (filePath) => {
+  try {
+    if (!filePath) return false;
+
+    const fullPath = path.join(__dirname, '../uploads', filePath);
+    if (!fs.existsSync(fullPath)) return false;
+
     await fs.promises.unlink(fullPath);
     return true;
   } catch (error) {
     console.error(`Error deleting file: ${error.message}`);
     return false;
   }
-}; 
+};
+
+module.exports = {
+  upload,
+  uploadFile,
+  deleteFile
+};
