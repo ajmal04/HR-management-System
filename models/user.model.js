@@ -40,7 +40,7 @@ module.exports = (sequelize, Sequelize) => {
           "ASSOCIATE_PROFESSOR",
           "ASSISTANT_PROFESSOR",
         ],
-        allowNull: false,
+        allowNull: true,
       },
       role: {
         type: Sequelize.ENUM,
@@ -61,6 +61,7 @@ module.exports = (sequelize, Sequelize) => {
           "Nursing",
           "Allied_Health_Science",
           "Medical_Science_Research",
+          "Educational Institution",
         ],
         allowNull: true, // Changed from false to true
       },

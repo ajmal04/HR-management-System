@@ -1,6 +1,7 @@
+// Replace deptAnnouncement.model.js content with this:
 module.exports = (sequelize, Sequelize) => {
-  const Department = sequelize.define(
-    "department",
+  const CollegeAnnouncement = sequelize.define(
+    "college_announcement",
     {
       id: {
         type: Sequelize.INTEGER,
@@ -8,12 +9,17 @@ module.exports = (sequelize, Sequelize) => {
         primaryKey: true,
         allowNull: false,
       },
-      departmentName: {
+      announcementTitle: {
         type: Sequelize.STRING,
         allowNull: false,
-        validate: {
-          notEmpty: true,
-        },
+      },
+      announcementDescription: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      createdByUserId: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
       },
       college: {
         type: Sequelize.ENUM,
@@ -25,7 +31,11 @@ module.exports = (sequelize, Sequelize) => {
           "Medical_Science_Research",
           "Educational Institution",
         ],
-        allowNull: true,
+        allowNull: false,
+      },
+      created_at: {
+        type: Sequelize.DATE,
+        allowNull: false,
       },
     },
     {
@@ -35,5 +45,5 @@ module.exports = (sequelize, Sequelize) => {
     }
   );
 
-  return Department;
+  return CollegeAnnouncement;
 };

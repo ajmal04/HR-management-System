@@ -4,6 +4,7 @@ import "../../App.css";
 import Calendar from "../Calendar";
 import RecentApplciations from "../employee/RecentApplications";
 import RecentAnnouncements from "../RecentAnnouncementsManagerEmp";
+import RecentEventWidgetManagerEmp from "../RecentEventWidgetManagerEmp";
 import EmployeeViewDashboard from "./EmployeeViewDashboard";
 import LeaveDetails from "../LeaveDetails";
 
@@ -59,6 +60,15 @@ export default class Dashboard extends Component {
               </div>
               <RecentApplciations />
             </div>
+          </div>
+          <div className="panel panel-default">
+            <div
+              className="panel-heading with-border"
+              style={{ backgroundColor: "#515e73", color: "white" }}
+            >
+              <h3 className="panel-title">Recent Events</h3>
+            </div>
+            <RecentEventWidgetManagerEmp />
           </div>
         </div>
       </div>

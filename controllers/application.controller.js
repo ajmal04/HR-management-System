@@ -375,3 +375,46 @@ exports.getApplicationsByCollege = async (req, res) => {
     });
   }
 };
+
+exports.findAllRecentByCollege = (req, res) => {
+  const userCollege = req.user.college; // Get admin's college from JWT token
+
+  Application.findAll({
+    where: {
+      [Op.and]: [
+        {
+          startDate: {
+            [Op.gte]: moment().subtract(14, "days").toDate(),
+          },
+        },
+        {
+          startDate: {
+            [Op.lte]: moment().add(7, "days").toDate(),
+          },
+        },
+      ],
+    },
+    include: [
+      {
+        model: User,
+        where: { college: userCollege },
+        attributes: ["id", "fullName"],
+      },
+    ],
+  })
+    .then((applications) => {
+      const formattedData = applications.map((app) => ({
+        ...app.get({ plain: true }),
+        applicantName: app.User ? app.User.fullName : null,
+      }));
+
+      res.send(formattedData);
+    })
+    .catch((err) => {
+      console.error("Error fetching college applications:", err);
+      res.status(500).send({
+        message: "Error retrieving college applications",
+        error: err.message,
+      });
+    });
+};

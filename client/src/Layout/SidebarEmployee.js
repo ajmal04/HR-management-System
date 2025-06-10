@@ -38,9 +38,7 @@ export default class SidebarEmployee extends Component {
               />
             </div>
             <div className="info">
-            <span className="d-block">
-              {this.state.user.fullname}
-            </span>
+              <span className="d-block">{this.state.user.fullname}</span>
             </div>
           </div>
           {/* Sidebar Menu */}
@@ -64,6 +62,48 @@ export default class SidebarEmployee extends Component {
                   <i className="nav-icon fas fa-euro-sign" />
                   <p>My Salary Details</p>
                 </NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink exact to="/announcement" className="nav-link">
+                  <i className="nav-icon fa fa-bell" />
+                  <p>Announcements</p>
+                </NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink exact to="/emp-events" className="nav-link">
+                  <i className="nav-icon fas fa-calendar-alt" />
+                  <p>Events</p>
+                </NavLink>
+              </li>
+              <li className="nav-item has-treeview">
+                <NavLink
+                  to="/fake-url"
+                  className="nav-link"
+                  activeClassName="nav-link"
+                >
+                  <i className="nav-icon fa fa-rocket" />
+                  <p>
+                    Leave
+                    <i className="right fas fa-angle-left" />
+                  </p>
+                </NavLink>
+                <ul
+                  className="nav nav-treeview"
+                  style={{ paddingLeft: "20px" }}
+                >
+                  <li className="nav-item">
+                    <NavLink to="/application-list" className="nav-link">
+                      <i className="fas fa-list-ul nav-icon" />
+                      <p>My Application Status</p>
+                    </NavLink>
+                  </li>
+                  <li className="nav-item">
+                    <NavLink to="/application" className="nav-link">
+                      <i className="fa fa-plus nav-icon" />
+                      <p>Application</p>
+                    </NavLink>
+                  </li>
+                </ul>
               </li>
               <li className="nav-item has-treeview">
                 <NavLink
@@ -103,42 +143,6 @@ export default class SidebarEmployee extends Component {
                     </NavLink>
                   </li>
                 </ul>
-              </li>
-              <li className="nav-item has-treeview">
-                <NavLink
-                  to="/fake-url"
-                  className="nav-link"
-                  activeClassName="nav-link"
-                >
-                  <i className="nav-icon fa fa-rocket" />
-                  <p>
-                    Leave
-                    <i className="right fas fa-angle-left" />
-                  </p>
-                </NavLink>
-                <ul
-                  className="nav nav-treeview"
-                  style={{ paddingLeft: "20px" }}
-                >
-                  <li className="nav-item">
-                    <NavLink to="/application-list" className="nav-link">
-                      <i className="fas fa-list-ul nav-icon" />
-                      <p>My Application Status</p>
-                    </NavLink>
-                  </li>
-                  <li className="nav-item">
-                    <NavLink to="/application" className="nav-link">
-                      <i className="fa fa-plus nav-icon" />
-                      <p>Application</p>
-                    </NavLink>
-                  </li>
-                </ul>
-              </li>
-              <li className="nav-item">
-                <NavLink exact to="/announcement" className="nav-link">
-                  <i className="nav-icon fa fa-bell" />
-                  <p>Announcements</p>
-                </NavLink>
               </li>
             </ul>
           </nav>

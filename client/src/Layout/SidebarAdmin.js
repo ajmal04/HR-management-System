@@ -67,22 +67,48 @@ export default class SidebarAdmin extends Component {
                   <p>Requisition List</p>
                 </NavLink>
               </li>
-
-              {/* <li className="nav-item">
-                <NavLink to="/job-list" className="nav-link">
-                  <i className="nav-icon fas fa-briefcase" />
+              <li className="nav-item">
+                <NavLink exact to="/announcement" className="nav-link">
+                  <i className="nav-icon fa fa-bell" />
+                  <p>Announcements</p>
+                </NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink exact to="/admin-events" className="nav-link">
+                  <i className="nav-icon fas fa-calendar-alt" />
+                  <p>Events</p>
+                </NavLink>
+              </li>
+              <li className="nav-item has-treeview">
+                <NavLink
+                  to="/fake-url"
+                  className="nav-link"
+                  activeClassName="nav-link"
+                >
+                  <i className="nav-icon fa fa-rocket" />
                   <p>
-                    Job List
+                    Leave
+                    <i className="right fas fa-angle-left" />
                   </p>
                 </NavLink>
-              </li> */}
-
-              {/* <li className="nav-item">
-                <NavLink to="/termination-list" className="nav-link">
-                  <i className="nav-icon fas fa-user-slash" />
-                  <p>Termination List</p>
-                </NavLink>
-              </li> */}
+                <ul
+                  className="nav nav-treeview"
+                  style={{ paddingLeft: "20px" }}
+                >
+                  <li className="nav-item">
+                    <NavLink to="/application-list" className="nav-link">
+                      <i className="fas fa-list-ul nav-icon" />
+                      <p>Application List</p>
+                    </NavLink>
+                  </li>
+                  <li className="nav-item">
+                    <NavLink to="/application" className="nav-link">
+                      <i className="fa fa-plus nav-icon" />
+                      <p>Add Application</p>
+                    </NavLink>
+                  </li>
+                </ul>
+              </li>
               <li className="nav-item has-treeview">
                 <NavLink
                   to="/resignation"
@@ -132,38 +158,6 @@ export default class SidebarAdmin extends Component {
                   </li>
                 </ul>
               </li>
-
-              <li className="nav-item has-treeview">
-                <NavLink
-                  to="/fake-url"
-                  className="nav-link"
-                  activeClassName="nav-link"
-                >
-                  <i className="nav-icon fa fa-rocket" />
-                  <p>
-                    Leave
-                    <i className="right fas fa-angle-left" />
-                  </p>
-                </NavLink>
-                <ul
-                  className="nav nav-treeview"
-                  style={{ paddingLeft: "20px" }}
-                >
-                  <li className="nav-item">
-                    <NavLink to="/application-list" className="nav-link">
-                      <i className="fas fa-list-ul nav-icon" />
-                      <p>Application List</p>
-                    </NavLink>
-                  </li>
-                  <li className="nav-item">
-                    <NavLink to="/application" className="nav-link">
-                      <i className="fa fa-plus nav-icon" />
-                      <p>Add Application</p>
-                    </NavLink>
-                  </li>
-                </ul>
-              </li>
-
               <li className="nav-item has-treeview">
                 <NavLink
                   to="/fake-url"
@@ -193,12 +187,6 @@ export default class SidebarAdmin extends Component {
                     </NavLink>
                   </li>
                 </ul>
-              </li>
-              <li className="nav-item">
-                <NavLink exact to="/announcement" className="nav-link">
-                  <i className="nav-icon fa fa-bell" />
-                  <p>Announcements</p>
-                </NavLink>
               </li>
             </ul>
           </nav>

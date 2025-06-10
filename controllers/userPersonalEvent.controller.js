@@ -19,6 +19,7 @@ exports.create = (req, res) => {
     eventStartDate: req.body.eventStartDate,
     eventEndDate: req.body.eventEndDate,
     userId: req.body.userId,
+    isGlobal: req.body.isGlobal || false,
   };
 
   // Save PersonalEvent in the database
@@ -47,6 +48,12 @@ exports.findAll = (req, res) => {
           err.message || "Some error occurred while retrieving departments.",
       });
     });
+};
+
+exports.findAllGlobal = (req, res) => {
+  PersonalEvent.findAll({ where: { isGlobal: true } })
+    .then((data) => res.send(data))
+    .catch((err) => res.status(500).send({ message: err.message }));
 };
 
 //Retrieve all Personal Events By User Id

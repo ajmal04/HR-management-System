@@ -1,6 +1,6 @@
 module.exports = (sequelize, Sequelize) => {
-  const Job = sequelize.define(
-    "job",
+  const DeptEvent = sequelize.define(
+    "department_event",
     {
       id: {
         type: Sequelize.INTEGER,
@@ -8,7 +8,11 @@ module.exports = (sequelize, Sequelize) => {
         primaryKey: true,
         allowNull: false,
       },
-      jobTitle: {
+      eventName: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      eventDescription: {
         type: Sequelize.STRING,
         allowNull: true,
       },
@@ -20,6 +24,18 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.DATE,
         allowNull: false,
       },
+      createdByUserId: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+      },
+      departmentId: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+      },
+      created_at: {
+        type: Sequelize.DATE,
+        allowNull: false,
+      },
     },
     {
       timestamps: false,
@@ -28,5 +44,5 @@ module.exports = (sequelize, Sequelize) => {
     }
   );
 
-  return Job;
+  return DeptEvent;
 };

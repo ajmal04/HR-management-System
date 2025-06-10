@@ -57,6 +57,13 @@ router.get(
   application.findAllRecentAndUser
 );
 
+router.get(
+  "/recent/college",
+  withAuth.verifyToken,
+  withAuth.withAdmin,
+  application.findAllRecentByCollege
+);
+
 // 📌 Retrieve a single Application (Admin & User itself)
 router.get("/:id", withAuth.verifyToken, application.findOne);
 

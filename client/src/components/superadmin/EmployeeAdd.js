@@ -181,18 +181,18 @@ export default class EmployeeAdd extends Component {
     );
 
     // Job Info
-    await axios.post(
-      "/api/jobs",
-      {
-        jobTitle: this.state.jobTitle,
-        startDate: this.state.startDate,
-        endDate: this.state.endDate,
-        userId,
-      },
-      {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      }
-    );
+    // await axios.post(
+    //   "/api/jobs",
+    //   {
+    //     jobTitle: this.state.jobTitle,
+    //     startDate: this.state.startDate,
+    //     endDate: this.state.endDate,
+    //     userId,
+    //   },
+    //   {
+    //     headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+    //   }
+    // );
   };
 
   pushDepartments = () => {

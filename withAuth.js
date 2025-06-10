@@ -127,4 +127,12 @@ exports.withAdminOrSelf = (req, res, next) => {
   return res.status(403).json({ message: "Access denied" });
 };
 
+// ✅ Allow access for any authenticated user (Faculty, HOD, Admin, etc.)
+exports.withAnyRole = (req, res, next) => {
+  if (!req.user || !req.user.role) {
+    return res.status(403).send({ message: "Access denied: Role missing" });
+  }
+  next();
+};
+
 exports.withAuth = checkRole;

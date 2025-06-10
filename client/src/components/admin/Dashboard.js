@@ -4,8 +4,9 @@ import "../../App.css";
 import Infobox from "../infobox";
 import Calendar from "../Calendar";
 import ExpenseChartsPage from "./ExpenseChartsPage";
-import RecentApplciations from "./RecentApplications";
+import RecentApplciations from "../admin/RecentApplications";
 import RecentAnnouncements from "../superadmin/RecentAnnouncements";
+import RecentCollegeEvents from "../superadmin/RecentCollegeEvents";
 import axios from "axios";
 
 export default class Dashboard extends Component {
@@ -47,7 +48,6 @@ export default class Dashboard extends Component {
       } else {
       }
     });
-
   }
   render() {
     return (
@@ -107,6 +107,15 @@ export default class Dashboard extends Component {
                 <h3 className="panel-title">Recent Announcements</h3>
               </div>
               <RecentAnnouncements />
+            </div>
+            <div className="panel panel-default">
+              <div
+                className="panel-heading with-border"
+                style={{ backgroundColor: "#515e73", color: "white" }}
+              >
+                <h3 className="panel-title">Recent Events</h3>
+              </div>
+              <RecentCollegeEvents />
             </div>
           </div>
         </div>

@@ -1,13 +1,10 @@
 import React, { Component } from "react";
-
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import axios from "axios";
-//import AddEventPopup from "./AddEventPopup";
 import moment from "moment";
 import ReactToolTip from "react-tooltip";
-//import ShowEventPopup from "./ShowEventPopup";
 
 export default class Calendar extends Component {
   _isMounted = false;
@@ -30,33 +27,45 @@ export default class Calendar extends Component {
     this._isMounted = true;
 
     if (this._isMounted) {
-      this.setState({ user: JSON.parse(localStorage.getItem("user")) }, () => {
+      const user = JSON.parse(localStorage.getItem("user"));
+      this.setState({ user: user }, () => {
         axios({
           method: "get",
-          url: `api/personalEvents/user/${this.state.user.id}`,
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        }).then((res) => {
-          let newEvents = res.data.map((x) => ({
-            title: x.eventTitle,
-            description: x.eventDescription,
-            start: x.eventStartDate,
-            end: x.eventEndDate,
-            id: x.id,
-            color: "#007bff",
-            textColor: "white",
-          }));
+          url: "http://localhost:5000/api/personalEvents/global",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        })
+          .then((res) => {
+            console.log("Raw API Response:", res);
+            console.log("res.data:", res.data);
+            // if (!Array.isArray(res.data)) {
+            //   console.error("Expected array but got:", res.data);
+            //   alert(
+            //     "Error loading calendar events. Check user access or token."
+            //   );
+            //   return;
+            // }
 
-          for (var i in newEvents) {
-            newEvents[i].start = moment(newEvents[i].start).format(
-              "YYYY-MM-DD HH:mm:ss"
-            );
-            newEvents[i].end = moment(newEvents[i].end).format(
-              "YYYY-MM-DD HH:mm:ss"
-            );
-          }
+            const newEvents = res.data.map((x) => ({
+              title: x.eventTitle,
+              description: x.eventDescription,
+              start: moment(x.eventStartDate).format("YYYY-MM-DD HH:mm:ss"),
+              end: moment(x.eventEndDate).format("YYYY-MM-DD HH:mm:ss"),
+              id: x.id,
+              color: "#28a745", // global event green
+              textColor: "white",
+            }));
 
-          this.setState({ events: [...newEvents] });
-        });
+            this.setState({ events: newEvents });
+          })
+          .catch((err) => {
+            console.error(
+              "Error loading events:",
+              err
+              // err.response?.data || err.message
+            );
+          });
       });
     }
   }
@@ -81,22 +90,20 @@ export default class Calendar extends Component {
   handleEventPositioned(info) {
     info.el.setAttribute(
       "title",
-      info.event.extendedProps.description
-        ? info.event.extendedProps.description
-        : "No description"
+      info.event.extendedProps.description || "No description"
     );
     ReactToolTip.rebuild();
   }
 
   render() {
-    let closeAddModel = () => this.setState({ showAddModel: false });
-    let closeShowModel = () => this.setState({ showModel: false });
+    const closeAddModel = () => this.setState({ showAddModel: false });
+    const closeShowModel = () => this.setState({ showModel: false });
 
     return (
       <>
         <FullCalendar
-          defaultView="dayGridMonth"
           plugins={[dayGridPlugin, interactionPlugin]}
+          initialView="dayGridMonth"
           eventClick={this.handleEventClick}
           dateClick={() => this.setState({ showAddModel: true })}
           events={this.state.events}
@@ -110,9 +117,7 @@ export default class Calendar extends Component {
           customButtons={{
             button: {
               text: "Add Event",
-              click: () => {
-                this.setState({ showAddModel: true });
-              },
+              click: () => this.setState({ showAddModel: true }),
             },
           }}
           header={{
@@ -121,16 +126,6 @@ export default class Calendar extends Component {
             right: "dayGridMonth,timeGridWeek,timeGridDay,listWeek",
           }}
         />
-        {/* <AddEventPopup show={this.state.showAddModel} onHide={closeAddModel} /> */}
-        {/* {this.state.showModel ? (
-          <ShowEventPopup
-            show={true}
-            onHide={closeShowModel}
-            data={this.state.selectedEvent}
-          />
-        ) : (
-          <></>
-        )} */}
       </>
     );
   }

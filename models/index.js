@@ -33,6 +33,10 @@ db.userPersonalEvent = require("./userPersonalEvent.model")(
 db.department = require("./department.model")(sequelize, Sequelize);
 db.Resignation = require("./resignation.model")(sequelize, Sequelize);
 db.deptAnnouncement = require("./deptAnnouncement.model")(sequelize, Sequelize);
+db.collegeAnnouncement = require("./collegeAnnouncement.model")(
+  sequelize,
+  Sequelize
+);
 db.job = require("./job.model")(sequelize, Sequelize);
 db.application = require("./application.model")(sequelize, Sequelize);
 db.payment = require("./payment.model")(sequelize, Sequelize);
@@ -49,6 +53,9 @@ db.onboardingDocument = require("./onboardingDocument.model")(
 );
 db.assetAllocation = require("./assetAllocation.model")(sequelize, Sequelize);
 db.asset = require("./asset.model")(sequelize, Sequelize);
+
+db.collegeEvent = require("./collegeEvent.model")(sequelize, Sequelize);
+db.deptEvent = require("./deptEvent.model")(sequelize, Sequelize);
 
 db.JobRequisition = require("./jobRequisition.model")(sequelize, Sequelize);
 
@@ -122,6 +129,43 @@ db.deptAnnouncement.belongsTo(db.department, {
 });
 db.deptAnnouncement.belongsTo(db.user, {
   foreignKey: { name: "createdByUserId", allowNull: false },
+});
+
+// College Announcement Associations
+db.collegeAnnouncement.belongsTo(db.user, {
+  foreignKey: { name: "createdByUserId", allowNull: false },
+});
+db.user.hasMany(db.collegeAnnouncement, {
+  foreignKey: { name: "createdByUserId", allowNull: false },
+  onDelete: "CASCADE",
+  hooks: true,
+});
+
+// College Event Associations
+db.collegeEvent.belongsTo(db.user, {
+  foreignKey: { name: "createdByUserId", allowNull: false },
+});
+db.user.hasMany(db.collegeEvent, {
+  foreignKey: { name: "createdByUserId", allowNull: false },
+  onDelete: "CASCADE",
+  hooks: true,
+});
+
+// Department Event Associations
+db.deptEvent.belongsTo(db.user, {
+  foreignKey: { name: "createdByUserId", allowNull: false },
+});
+db.user.hasMany(db.deptEvent, {
+  foreignKey: { name: "createdByUserId", allowNull: false },
+  onDelete: "CASCADE",
+  hooks: true,
+});
+
+db.deptEvent.belongsTo(db.department, {
+  foreignKey: { name: "departmentId", allowNull: false },
+});
+db.department.hasMany(db.deptEvent, {
+  foreignKey: { name: "departmentId", allowNull: false },
 });
 
 // For OnboardingRequest

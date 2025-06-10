@@ -1,32 +1,40 @@
 module.exports = (sequelize, Sequelize) => {
-    const UserPersonalEvent = sequelize.define("user_personal_event", {
+  const UserPersonalEvent = sequelize.define(
+    "user_personal_event",
+    {
       id: {
         type: Sequelize.INTEGER,
         autoIncrement: true,
         primaryKey: true,
-        allowNull: false
+        allowNull: false,
       },
       eventTitle: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: false,
       },
       eventDescription: {
         type: Sequelize.STRING,
-        allowNull: true
+        allowNull: true,
       },
       eventStartDate: {
         type: Sequelize.DATE,
-        allowNull: false
+        allowNull: false,
       },
       eventEndDate: {
-          type: Sequelize.DATE,
-          allowNull: true
-      }
-    }, {
-        timestamps: false,
-        freezeTableName: true,
-        underscored: true
-    });
-  
-    return UserPersonalEvent;
-  };
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
+      isGlobal: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+      },
+    },
+    {
+      timestamps: false,
+      freezeTableName: true,
+      underscored: true,
+    }
+  );
+
+  return UserPersonalEvent;
+};

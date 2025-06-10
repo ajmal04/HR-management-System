@@ -6,6 +6,7 @@ import ExpenseChartsPage from "./ExpenseChartsPage";
 import PaymentChartsPage from "./PaymentChartsPage";
 import RecentApplciations from "./RecentApplications";
 import RecentAnnouncements from "./RecentAnnouncements";
+import RecentCollegeEvents from "./RecentCollegeEvents";
 import axios from "axios";
 
 export default class Dashboard extends Component {
@@ -140,6 +141,15 @@ export default class Dashboard extends Component {
                 <h3 className="panel-title">Recent Announcements</h3>
               </div>
               <RecentAnnouncements />
+            </div>
+            <div className="panel panel-default">
+              <div
+                className="panel-heading with-border"
+                style={{ backgroundColor: "#515e73", color: "white" }}
+              >
+                <h3 className="panel-title">Recent Events</h3>
+              </div>
+              <RecentCollegeEvents />
             </div>
           </div>
         </div>

@@ -18,7 +18,10 @@ export default class RecentApplications extends React.Component {
         this.setState({ recentApplications: res.data, isLoading: false });
       })
       .catch((err) => {
-        this.setState({ error: "Failed to load applications", isLoading: false });
+        this.setState({
+          error: "Failed to load applications",
+          isLoading: false,
+        });
         console.error("API Error:", err);
       });
   }
@@ -40,28 +43,33 @@ export default class RecentApplications extends React.Component {
               <li key={app.id} className="py-2 border-bottom">
                 <div className="d-flex align-items-center">
                   <img
-                    src={app.user.avatarUrl || process.env.PUBLIC_URL + "/user-40.png"}
+                    src={
+                      app.user.avatarUrl ||
+                      process.env.PUBLIC_URL + "/user-40.png"
+                    }
                     alt={app.user.fullName}
                     className="rounded-circle mr-3"
                     width="40"
                     height="40"
                   />
                   <div className="flex-grow-1">
-                    <h6 className="mb-0">
-                      {app.user.fullName} <small className="text-muted">({app.type})</small>
+                    <h6 className="mb-0" style={{ fontSize: "1.3rem" }}>
+                      {app.user.fullName}{" "}
+                      <small className="text-muted">({app.type})</small>
                     </h6>
                     <div className="d-flex justify-content-between">
                       <small className="text-muted">
                         {new Date(app.createdAt).toLocaleDateString()}
                       </small>
                       <small
-                        className={`font-weight-bold ${
+                        className={`${
                           app.status === "Approved"
                             ? "text-success"
                             : app.status === "Rejected"
                             ? "text-danger"
                             : "text-warning"
                         }`}
+                        style={{ fontSize: "1.1rem" }}
                       >
                         {app.status}
                       </small>

@@ -57,9 +57,6 @@ import AssetAllocation from "./components/systemadmin/AssetAllocation.js";
 import OnboardingDashboard from "./components/onboarding/OnboardingDashboard";
 import AssetManagement from "./components/systemadmin/AssetManagement";
 
-// import JobListSuperAdmin from "./components/superadmin/JobList";
-// import JobListAdmin from "./components/admin/JobList";
-// import JobListHOD from "./components/hod/JobList";
 import TerminationList from "./components/pages/TerminationList";
 import ResignationList from "./components/pages/ResignationList";
 import ResignationForm from "./components/pages/ResignationForm.js";
@@ -68,6 +65,12 @@ import ApplicationStatus from "./components/hod/ApplicationStatus.js";
 
 import JobRequisitionForm from "./components/recruitment/JobRequisitionForm.js";
 import RequisitionListAdmin from "./components/recruitment/RequisitionListAdmin.js";
+
+import CollegeEventFormSuperAdmin from "./components/superadmin/CollegeEventFormSuperAdmin.js";
+import RecentCollegeEvents from "./components/superadmin/RecentCollegeEvents.js";
+import DepartmentEventFormAdmin from "./components/admin/DepartmentEventFormAdmin.js";
+import DepartmentEventFormHOD from "./components/hod/DepartmentEventFormHOD.js";
+import EventViewerFaculty from "./components/employee/EventViewerFaculty.js";
 
 export default class App extends Component {
   render() {
@@ -160,7 +163,6 @@ const SuperAdminContainer = () => (
         <Route exact path="/departments" component={DepartmentListSuperAdmin} />
         <Route exact path="/termination-list" component={TerminationList} />
         <Route exact path="/resignation-list" component={ResignationList} />
-        <Route exact path="/resignation-form" component={ResignationForm} />
         <Route
           exact
           path="/application-list"
@@ -176,6 +178,12 @@ const SuperAdminContainer = () => (
           component={ExpenseReportSuperAdmin}
         />
         <Route exact path="/announcement" component={AnnouncementSuperAdmin} />
+        <Route exact path="/events" component={CollegeEventFormSuperAdmin} />
+        <Route
+          exact
+          path="/recent-college-event"
+          Component={RecentCollegeEvents}
+        />
         <Route exact path="/" component={DashboardSuperAdmin} />
       </Switch>
     </Layout>
@@ -226,18 +234,20 @@ const AdminContainer = () => (
           path="/application-list"
           component={ApplicationListAdmin}
         />
-
         <Route
           exact
           path="/application-list"
           component={ApplicationListAdmin}
         />
-
         <Route exact path="/application" component={Application} />
         <Route exact path="/expense-report" component={ExpenseReportAdmin} />
         <Route exact path="/expense" component={Expense} />
-
         <Route exact path="/announcement" component={AnnouncementAdmin} />
+        <Route
+          exact
+          path="/admin-events"
+          component={DepartmentEventFormAdmin}
+        />
         <Route exact path="/" component={DashboardAdmin} />
         <Route
           exact
@@ -269,6 +279,7 @@ const HODContainer = () => (
         <Route exact path="/expense" component={ExpenseHOD} />
         <Route exact path="/expense-report" component={ExpenseReportHOD} />
         <Route exact path="/announcement" component={AnnouncementHOD} />
+        <Route exact path="/hod-events" Component={DepartmentEventFormHOD} />
         <Route exact path="/" component={DashboardHOD} />
         <Route exact path="/job-requisition" component={JobRequisitionForm} />
       </Switch>
@@ -293,6 +304,7 @@ const FacultyContainer = () => (
         <Route exact path="/application" component={Application} />
         <Route exact path="/salary-view" component={SalaryViewEmployee} />
         <Route exact path="/announcement" component={AnnouncementEmployee} />
+        <Route exact path="/emp-events" Component={EventViewerFaculty} />
         <Route exact path="/resignation-form" component={ResignationForm} />
         <Route exact path="/resignation-status" component={ResignationStatus} />
         <Route exact path="/" component={DashboardEmployee} />
