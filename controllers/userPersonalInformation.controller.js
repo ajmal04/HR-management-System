@@ -16,10 +16,16 @@ exports.create = (req, res) => {
   // Create an UserPersonalInformation
   const userPersonalInformation = {
     dateOfBirth: moment(req.body.dateOfBirth).format('YYYY-MM-DD'),
+    age: req.body.age,
     gender: req.body.gender,
     maritalStatus: req.body.maritalStatus,
     fatherName: req.body.fatherName,
-    idNumber: req.body.idNumber,
+    // Government IDs
+    aadharNumber: req.body.aadharNumber,
+    panNumber: req.body.panNumber,
+    passportNumber: req.body.passportNumber,
+    drivingLicense: req.body.drivingLicense,
+    // Contact Details
     address: req.body.address,
     city: req.body.city,
     country: req.body.country,

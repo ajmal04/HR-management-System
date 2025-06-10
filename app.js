@@ -8,6 +8,7 @@ var withAuth = require("./withAuth");
 
 const { errorHandler } = require('./utils/errorHandler');
 const resignationRoutes = require("./routes/resignation.routes");
+const documentRoutes = require('./routes/document.routes');
 
 const db = require("./models");
 require("dotenv").config();
@@ -54,6 +55,7 @@ app.use("/onboarding", onboarding);
 app.use(errorHandler);
 
 app.use("/api/resignations", resignationRoutes);
+app.use('/api/documents', documentRoutes);
 
 app.use(express.json());
 

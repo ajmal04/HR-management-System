@@ -3,7 +3,7 @@ const router = express.Router();
 const onboardingController = require('../controllers/onboarding.controller');
 const { verifyToken, withHigherRoles, withAdmin } = require('../withAuth');
 const { checkStagePermission, canManageDocuments } = require('../middleware/onboardingAuth');
-const upload = require('../middleware/upload');
+const upload = require('../middleware/upload'); 
 
 // Apply authentication middleware to all routes
 router.use(verifyToken);
@@ -56,8 +56,8 @@ router.delete('/requests/:id',
 
 // Document management routes (legacy)
 router.post('/requests/:id/documents', 
-  withHigherRoles, 
-  canManageDocuments,
+  verifyToken, 
+  withHigherRoles,
   upload.single('file'), 
   onboardingController.uploadDocument
 );
